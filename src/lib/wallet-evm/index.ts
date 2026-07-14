@@ -31,16 +31,17 @@ export const EVM_CHAIN_IDS: Record<string, number> = {
 }
 
 // Public RPC endpoints (with failover) — all CORS-enabled for browser use
-const RPC_ENDPOINTS: Record<string, string[]> = {
+// publicnode.com is the most reliable for browser-side CORS, listed first
+export const RPC_ENDPOINTS: Record<string, string[]> = {
   ethereum: [
-    'https://eth.llamarpc.com',
     'https://ethereum-rpc.publicnode.com',
     'https://1rpc.io/eth',
+    'https://eth.llamarpc.com',
   ],
   bsc: [
-    'https://bsc-dataseed.binance.org',
     'https://bsc-rpc.publicnode.com',
     'https://1rpc.io/bnb',
+    'https://bsc-dataseed.binance.org',
   ],
   polygon: [
     'https://polygon-bor-rpc.publicnode.com',

@@ -3,78 +3,88 @@
 import { useState } from 'react'
 import { useWallet } from './wallet-context'
 import { DAPPS } from '@/lib/wallet/data'
-import { verifySite, RISK_BG, RISK_DOT, type SiteCheckResult } from '@/lib/wallet/security'
+import { runDappShield, type DappShieldResult } from '@/lib/wallet-scanner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
-import { Globe, Search, ShieldCheck, ShieldAlert, AlertTriangle, Ban, ExternalLink, Loader2, CheckCircle2, Lock } from 'lucide-react'
+import { Globe, Search, ShieldCheck, ShieldAlert, AlertTriangle, Ban, ExternalLink, Loader2, CheckCircle2, Lock, Globe2, Clock, Award, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const SAMPLE_URLS = [
-  { url: 'app.uniswap.org', label: 'Uniswap (legítimo)' },
-  { url: 'metarnask-login.com', label: 'Phishing de MetaMask' },
-  { url: 'opensea-mint-free.io', label: 'Drainer NFT falso' },
-  { url: 'aave-v3-bonus.com', label: 'Phishing de Aave' },
-  { url: 'jup.ag', label: 'Jupiter (legítimo)' },
+  { url: 'https://app.uniswap.org', label: 'Uniswap (legítimo)' },
+  { url: 'https://metarnask-login.com', label: 'Phishing de MetaMask' },
+  { url: 'https://opensea-mint-free.io', label: 'Drainer NFT falso' },
+  { url: 'https://aave-v3-bonus.com', label: 'Phishing de Aave' },
+  { url: 'https://jup.ag', label: 'Jupiter (legítimo)' },
 ]
 
-const RATING_LABEL: Record<SiteCheckResult['rating'], string> = {
+const RATING_LABEL: Record<DappShieldResult['rating'], string> = {
   verified: 'Verificado',
   unknown: 'Desconhecido',
   suspicious: 'Suspeito',
   malicious: 'Malicioso',
 }
 
+const RATING_COLOR: Record<DappShieldResult['rating'], string> = {
+  verified: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400',
+  unknown: 'border-zinc-500/40 bg-zinc-500/10 text-zinc-400',
+  suspicious: 'border-amber-500/40 bg-amber-500/10 text-amber-400',
+  malicious: 'border-red-500/40 bg-red-500/10 text-red-400',
+}
+
 export function DappsView() {
   const { blockedSites, addSecurityEvent } = useWallet()
   const { toast } = useToast()
   const [url, setUrl] = useState('')
-  const [verifying, setVerifying] = useState(false)
-  const [result, setResult] = useState<SiteCheckResult | null>(null)
+  const [scanning, setScanning] = useState(false)
+  const [result, setResult] = useState<DappShieldResult | null>(null)
   const [checkedUrl, setCheckedUrl] = useState('')
 
-  const runCheck = (target?: string) => {
+  const runCheck = async (target?: string) => {
     const finalUrl = target ?? url
     if (!finalUrl) return
-    setVerifying(true)
+    setScanning(true)
     setResult(null)
     setCheckedUrl(finalUrl)
-    setTimeout(() => {
-      const r = verifySite({ url: finalUrl }, blockedSites)
+    if (target) setUrl(target)
+    try {
+      const r = await runDappShield(finalUrl, blockedSites)
       setResult(r)
-      setVerifying(false)
-      if (r.blocked) {
+      if (r.rating === 'malicious') {
         addSecurityEvent({
           type: 'blocked-site',
           title: 'Site malicioso bloqueado',
-          description: `${finalUrl} foi bloqueado antes da conexão DApp.`,
+          description: `${r.domain} foi bloqueado pelo DApp Shield.`,
           severity: 'critical',
-          related: finalUrl,
+          related: r.domain,
         })
       }
-    }, 1100)
+    } catch (e) {
+      toast({ title: 'Erro', description: (e as Error).message, variant: 'destructive' })
+    } finally {
+      setScanning(false)
+    }
   }
 
   const handleConnect = () => {
-    if (!result || result.blocked) return
+    if (!result || result.recommendation === 'block') return
     toast({
-      title: 'Conexão autorizada',
-      description: `FortiX conectada a ${checkedUrl} com permissões limitadas.`,
+      title: result.recommendation === 'allow' ? 'Conexão autorizada' : 'Conexão limitada',
+      description: `Tank Wallet conectada a ${result.domain} com permissões ${result.recommendation === 'allow' ? 'padrão' : 'restritas'}.`,
     })
-    setResult(null)
-    setUrl('')
-    setCheckedUrl('')
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Browser DApp</h1>
+        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+          <Globe className="h-6 w-6 text-emerald-400" />
+          DApp Shield
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Antes de conectar a carteira a qualquer site, a FortiX verifica a URL contra blocklist, typosquatting, TLDs suspeitos e certificado.
+          Antes da conexão: verifica domínio, SSL, DNS, WHOIS, idade, phishing, typosquatting, clones e reputação.
         </p>
       </div>
 
@@ -94,12 +104,12 @@ export function DappsView() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && runCheck()}
-                placeholder="ex: app.uniswap.org"
+                placeholder="https://app.uniswap.org"
                 className="pl-10"
               />
             </div>
-            <Button onClick={() => runCheck()} disabled={!url || verifying} className="gap-2 bg-emerald-600 hover:bg-emerald-700">
-              {verifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+            <Button onClick={() => runCheck()} disabled={!url || scanning} className="gap-2 bg-emerald-600 hover:bg-emerald-700">
+              {scanning ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
               Verificar
             </Button>
           </div>
@@ -109,10 +119,7 @@ export function DappsView() {
             {SAMPLE_URLS.map((s) => (
               <button
                 key={s.url}
-                onClick={() => {
-                  setUrl(s.url)
-                  runCheck(s.url)
-                }}
+                onClick={() => runCheck(s.url)}
                 className="rounded-full border border-border/60 bg-muted/30 px-2 py-0.5 text-[10px] text-muted-foreground hover:bg-muted/50"
               >
                 {s.label}
@@ -122,100 +129,126 @@ export function DappsView() {
         </CardContent>
       </Card>
 
-      {/* Result */}
-      {verifying && (
+      {/* Scanning */}
+      {scanning && (
         <Card className="border-emerald-500/30">
           <CardContent className="flex items-center gap-3 p-6">
             <Loader2 className="h-5 w-5 animate-spin text-emerald-400" />
             <div>
-              <p className="text-sm font-medium">Verificando {checkedUrl}…</p>
-              <p className="text-xs text-muted-foreground">Checando blocklist, typosquatting, TLD, certificado e domínios similares.</p>
+              <p className="text-sm font-medium">Executando DApp Shield…</p>
+              <p className="text-xs text-muted-foreground">Verificando blocklist, typosquatting, SSL, WHOIS (idade real do domínio), TLDs suspeitos e reputação.</p>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {result && !verifying && (
-        <Card className={cn('border-2', result.blocked ? 'border-red-500/40' : result.rating === 'verified' ? 'border-emerald-500/40' : 'border-amber-500/40')}>
+      {/* Result */}
+      {result && !scanning && (
+        <Card className={cn('border-2', RATING_COLOR[result.rating])}>
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
                 {result.rating === 'verified' ? (
                   <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" />
-                ) : result.blocked ? (
+                ) : result.rating === 'malicious' ? (
                   <Ban className="h-5 w-5 shrink-0 text-red-400" />
                 ) : (
                   <AlertTriangle className="h-5 w-5 shrink-0 text-amber-400" />
                 )}
                 <div className="min-w-0">
-                  <CardTitle className="text-base truncate">{checkedUrl}</CardTitle>
-                  <p className="text-xs text-muted-foreground">Análise de segurança</p>
+                  <CardTitle className="text-base truncate">{result.domain}</CardTitle>
+                  <p className="text-xs text-muted-foreground">Análise completa DApp Shield</p>
                 </div>
               </div>
-              <Badge
-                className={cn(
-                  'border',
-                  result.rating === 'verified' && 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
-                  result.rating === 'unknown' && 'bg-zinc-500/10 border-zinc-500/30 text-zinc-400',
-                  result.rating === 'suspicious' && 'bg-amber-500/10 border-amber-500/30 text-amber-400',
-                  result.rating === 'malicious' && 'bg-red-500/10 border-red-500/30 text-red-400'
-                )}
-              >
+              <Badge className={cn('border', RATING_COLOR[result.rating])}>
                 {RATING_LABEL[result.rating]}
               </Badge>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
+            {/* Score + recommendation */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg border border-border/50 bg-muted/20 p-3">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Score de segurança</p>
-                <p className={cn('text-2xl font-bold', result.score >= 90 ? 'text-emerald-400' : result.score >= 60 ? 'text-zinc-400' : result.score >= 30 ? 'text-amber-400' : 'text-red-400')}>
-                  {result.score}<span className="text-sm text-muted-foreground">/100</span>
+                <p className={cn(
+                  'text-2xl font-bold',
+                  result.riskScore >= 90 ? 'text-emerald-400' : result.riskScore >= 60 ? 'text-zinc-400' : result.riskScore >= 30 ? 'text-amber-400' : 'text-red-400'
+                )}>
+                  {result.riskScore}<span className="text-sm text-muted-foreground">/100</span>
                 </p>
               </div>
               <div className="rounded-lg border border-border/50 bg-muted/20 p-3">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Categoria</p>
-                <p className="text-sm font-bold capitalize">{result.category ?? '—'}</p>
-                <p className="text-[10px] text-muted-foreground">{result.blocked ? 'Bloqueado' : 'Permitido'}</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Recomendação</p>
+                <p className={cn(
+                  'text-sm font-bold capitalize',
+                  result.recommendation === 'allow' && 'text-emerald-400',
+                  result.recommendation === 'limit' && 'text-amber-400',
+                  result.recommendation === 'block' && 'text-red-400'
+                )}>
+                  {result.recommendation === 'allow' ? 'Conexão permitida' : result.recommendation === 'limit' ? 'Conexão limitada' : 'Conexão bloqueada'}
+                </p>
               </div>
             </div>
 
-            <div className="rounded-lg border border-border/50 bg-muted/10 p-3">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Detalhes da verificação</p>
-              <ul className="space-y-1.5">
-                {result.reasons.map((r, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs">
-                    <span className={cn('mt-1 h-1.5 w-1.5 shrink-0 rounded-full', result.blocked ? 'bg-red-500' : result.rating === 'verified' ? 'bg-emerald-500' : 'bg-amber-500')} />
-                    <span>{r}</span>
-                  </li>
+            {/* Checks list */}
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Verificações executadas</p>
+              <div className="space-y-1.5">
+                {result.checks.map((check, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      'flex items-start gap-2 rounded-lg border p-2.5',
+                      check.status === 'pass' && 'border-emerald-500/20 bg-emerald-500/5',
+                      check.status === 'warn' && 'border-amber-500/20 bg-amber-500/5',
+                      check.status === 'fail' && 'border-red-500/20 bg-red-500/5'
+                    )}
+                  >
+                    {check.status === 'pass' ? (
+                      <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-400 mt-0.5" />
+                    ) : check.status === 'warn' ? (
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-400 mt-0.5" />
+                    ) : (
+                      <X className="h-3.5 w-3.5 shrink-0 text-red-400 mt-0.5" />
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-semibold">{check.name}</p>
+                        <Badge variant="outline" className={cn(
+                          'text-[8px] h-3.5',
+                          check.status === 'pass' && 'border-emerald-500/40 text-emerald-400',
+                          check.status === 'warn' && 'border-amber-500/40 text-amber-400',
+                          check.status === 'fail' && 'border-red-500/40 text-red-400'
+                        )}>
+                          {check.category}
+                        </Badge>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{check.description}</p>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
 
-            {result.blocked ? (
+            {/* Action */}
+            {result.recommendation === 'block' ? (
               <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3">
                 <Ban className="h-4 w-4 shrink-0 text-red-400" />
                 <p className="text-xs text-red-300">
-                  Conexão bloqueada. Este site está na nossa blocklist de DApps maliciosos. Não tente acessá-lo por outro meio.
+                  Conexão bloqueada. Não tente acessar por outro meio — este site está comprometido.
                 </p>
               </div>
-            ) : result.rating === 'suspicious' ? (
+            ) : result.recommendation === 'limit' ? (
               <div className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
                 <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
                 <p className="text-xs text-amber-300">
-                  Site suspeito. Recomendamos não conectar a carteira. Se precisar acessar, use quantias pequenas.
+                  Conexão limitada: apenas leitura. Não assine transações sem revisão adicional.
                 </p>
               </div>
             ) : (
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 flex-1">
-                  <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-400" />
-                  <p className="text-xs text-emerald-300">Site seguro para conexão. Permissões serão limitadas por padrão.</p>
-                </div>
-                <Button onClick={handleConnect} className="gap-2 bg-emerald-600 hover:bg-emerald-700 shrink-0">
-                  <Lock className="h-4 w-4" /> Conectar
-                </Button>
-              </div>
+              <Button onClick={handleConnect} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700">
+                <Lock className="h-4 w-4" /> Conectar com permissões limitadas
+              </Button>
             )}
           </CardContent>
         </Card>
@@ -226,7 +259,7 @@ export function DappsView() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-base">
-              <ShieldCheck className="h-4 w-4 text-emerald-400" />
+              <Award className="h-4 w-4 text-emerald-400" />
               DApps verificados
             </CardTitle>
             <Badge variant="secondary" className="text-[10px]">{DAPPS.length} oficiais</Badge>
@@ -237,15 +270,12 @@ export function DappsView() {
             {DAPPS.map((dapp) => (
               <button
                 key={dapp.id}
-                onClick={() => {
-                  setUrl(dapp.url)
-                  runCheck(dapp.url)
-                }}
+                onClick={() => runCheck(`https://${dapp.url}`)}
                 className="group flex flex-col gap-2 rounded-xl border border-border/50 bg-muted/20 p-3 text-left transition-all hover:border-emerald-500/40 hover:bg-emerald-500/5"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
-                    <Globe className="h-4 w-4" />
+                    <Globe2 className="h-4 w-4" />
                   </div>
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
                 </div>
@@ -254,16 +284,14 @@ export function DappsView() {
                   <p className="text-[10px] text-muted-foreground">{dapp.url}</p>
                 </div>
                 <p className="text-[11px] text-muted-foreground line-clamp-2">{dapp.description}</p>
-                <div className="flex items-center gap-1">
-                  <Badge variant="outline" className="text-[9px] h-4">{dapp.category}</Badge>
-                </div>
+                <Badge variant="outline" className="text-[9px] w-fit">{dapp.category}</Badge>
               </button>
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Blocklist preview */}
+      {/* Blocklist */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">

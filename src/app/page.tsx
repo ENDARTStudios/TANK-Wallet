@@ -12,6 +12,11 @@ import { DappsView } from '@/components/wallet/dapps-view'
 import { RiskCenterView } from '@/components/wallet/risk-center-view'
 import { SettingsView } from '@/components/wallet/settings-view'
 import { Onboarding } from '@/components/wallet/onboarding/onboarding'
+import { SovereigntyView } from '@/components/wallet/sovereignty/sovereignty-view'
+import { PermissionsView } from '@/components/wallet/sovereignty/permissions-view'
+import { LockdownView } from '@/components/wallet/sovereignty/lockdown-view'
+import { HistoryView } from '@/components/wallet/sovereignty/history-view'
+import { ScannerView } from '@/components/wallet/scanner/scanner-view'
 
 export default function Home() {
   return (
@@ -49,7 +54,12 @@ function WalletApp() {
             {view === 'send' && <SendView />}
             {view === 'vault' && <VaultView />}
             {view === 'dapps' && <DappsView />}
+            {view === 'scanner' && <ScannerView />}
+            {view === 'permissions' && <PermissionsView />}
+            {view === 'sovereignty' && <SovereigntyView />}
+            {view === 'lockdown' && <LockdownView />}
             {view === 'risk' && <RiskCenterView />}
+            {view === 'history' && <HistoryView />}
             {view === 'settings' && <SettingsView />}
           </div>
         </main>

@@ -15,6 +15,8 @@ import type { FullWallet } from '@/lib/wallet-core'
 import { hasStoredVault } from '@/lib/wallet-core/storage'
 import { EvmProvider, formatEtherSafe } from '@/lib/wallet-evm'
 import { chainById } from '@/lib/wallet/data'
+import type { Erc20Approval, NftApproval, DappSession, PermissionEvent, LockdownResult } from '@/lib/wallet-sovereignty'
+import { getInitialSessions, getInitialPermissionHistory, executeLockdown } from '@/lib/wallet-sovereignty'
 
 interface RealChainBalance {
   chain: string
@@ -57,6 +59,27 @@ interface WalletContextValue extends WalletState {
   // Security events
   addSecurityEvent: (ev: Omit<SecurityEvent, 'id' | 'timestamp'>) => void
   clearSecurityEvents: () => void
+  // ============ Sovereignty ============
+  erc20Approvals: Erc20Approval[]
+  nftApprovals: NftApproval[]
+  sessions: DappSession[]
+  permissionHistory: PermissionEvent[]
+  refreshApprovals: () => Promise<void>
+  loadingApprovals: boolean
+  revokeApproval: (id: string) => Promise<void>
+  endSession: (id: string) => void
+  lockdownActive: boolean
+  lockdownResult: LockdownResult | null
+  runLockdown: () => Promise<void>
+  clearLockdown: () => void
+  // ============ PRO tier ============
+  isProTier: boolean
+  setProTier: (pro: boolean) => void
+  // ============ Paranoico mode ============
+  paranoidMode: boolean
+  setParanoidMode: (on: boolean) => void
+  // ============ Device security ============
+  deviceWarnings: string[]
 }
 
 const WalletContext = createContext<WalletContextValue | null>(null)
@@ -69,6 +92,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [isLocked, setIsLocked] = useState<boolean>(true)
   const [realBalances, setRealBalances] = useState<Record<string, RealChainBalance>>({})
   const [loadingBalances, setLoadingBalances] = useState(false)
+  // ============ Sovereignty state ============
+  const [erc20Approvals, setErc20Approvals] = useState<Erc20Approval[]>([])
+  const [nftApprovals, setNftApprovals] = useState<NftApproval[]>([])
+  const [sessions, setSessions] = useState<DappSession[]>(getInitialSessions())
+  const [permissionHistory, setPermissionHistory] = useState<PermissionEvent[]>(getInitialPermissionHistory())
+  const [loadingApprovals, setLoadingApprovals] = useState(false)
+  const [lockdownActive, setLockdownActive] = useState(false)
+  const [lockdownResult, setLockdownResult] = useState<LockdownResult | null>(null)
+  const [isProTier, setIsProTier] = useState(false)
+  const [paranoidMode, setParanoidMode] = useState(false)
+  const [deviceWarnings, setDeviceWarnings] = useState<string[]>([])
 
   // Check on mount if there's a stored vault
   useEffect(() => {
@@ -336,7 +370,136 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const clearSecurityEvents = useCallback(() => setState((s) => ({ ...s, securityEvents: [] })), [])
 
-  const globalRiskScore = computeGlobalRiskScore(state.tokens, state.vaultUnlocked, state.safeSessionActive)
+  // ============ Sovereignty implementations ============
+
+  const refreshApprovals = useCallback(async () => {
+    if (!realWallet) return
+    setLoadingApprovals(true)
+    try {
+      const { readErc20Approvals, readNftApprovals } = await import('@/lib/wallet-sovereignty')
+      // Use real wallet's ERC-20 tokens (we use the mock tokens for demo since most have 0 balance)
+      const evmTokens = state.tokens
+        .filter((t) => t.contract && t.chain !== 'solana' && t.chain !== 'bitcoin' && t.chain !== 'lightning')
+        .map((t) => ({ address: t.contract, symbol: t.symbol, logoColor: t.logoColor }))
+      const chainIds = ['ethereum', 'bsc', 'polygon', 'arbitrum', 'optimism', 'avalanche', 'base']
+      const allErc20: Erc20Approval[] = []
+      const allNft: NftApproval[] = []
+      for (const chain of chainIds) {
+        try {
+          const erc20 = await readErc20Approvals(chain, realWallet.evm.address, evmTokens)
+          allErc20.push(...erc20)
+        } catch { /* skip */ }
+        try {
+          const nfts = await readNftApprovals(chain, realWallet.evm.address)
+          allNft.push(...nfts)
+        } catch { /* skip */ }
+      }
+      setErc20Approvals(allErc20)
+      setNftApprovals(allNft)
+    } catch (e) {
+      // graceful degradation
+      console.warn('Failed to refresh approvals:', e)
+    } finally {
+      setLoadingApprovals(false)
+    }
+  }, [realWallet, state.tokens])
+
+  const revokeApproval = useCallback(async (id: string) => {
+    // Find the approval and record the revocation
+    const approval = erc20Approvals.find((a) => a.id === id) || nftApprovals.find((a) => a.id === id)
+    if (approval) {
+      // In production: build revoke calldata and broadcast via EvmSigner
+      // For demo: just remove from state and add to history
+      setErc20Approvals((prev) => prev.filter((a) => a.id !== id))
+      setNftApprovals((prev) => prev.filter((a) => a.id !== id))
+      const event: PermissionEvent = {
+        id: `pe-${Date.now()}`,
+        timestamp: Date.now(),
+        type: 'revoked',
+        permissionType: 'erc20-approval',
+        description: 'Aprovação revogada',
+        chain: approval.chain,
+        tokenSymbol: 'tokenSymbol' in approval ? approval.tokenSymbol : undefined,
+        spenderName: approval.spenderName,
+      }
+      setPermissionHistory((prev) => [event, ...prev])
+    }
+  }, [erc20Approvals, nftApprovals])
+
+  const endSession = useCallback((id: string) => {
+    setSessions((prev) => prev.filter((s) => s.id !== id))
+    const event: PermissionEvent = {
+      id: `pe-${Date.now()}`,
+      timestamp: Date.now(),
+      type: 'revoked',
+      permissionType: 'session',
+      description: 'Sessão DApp encerrada',
+    }
+    setPermissionHistory((prev) => [event, ...prev])
+  }, [])
+
+  const runLockdown = useCallback(async () => {
+    setLockdownActive(true)
+    const result = await executeLockdown(erc20Approvals, nftApprovals, sessions)
+    setLockdownResult(result)
+    // Clear all permissions after lockdown
+    setErc20Approvals([])
+    setNftApprovals([])
+    setSessions([])
+    // Add to history
+    const event: SecurityEvent = {
+      id: `se-${Date.now()}`,
+      type: 'high-risk-warning',
+      title: 'LOCKDOWN executado',
+      description: `${result.totalRevoked} permissões revogadas em ${result.durationMs}ms. Modo somente leitura ativo.`,
+      timestamp: Date.now(),
+      severity: 'critical',
+    }
+    setState((s) => ({ ...s, securityEvents: [event, ...s.securityEvents] }))
+  }, [erc20Approvals, nftApprovals, sessions])
+
+  const clearLockdown = useCallback(() => {
+    setLockdownActive(false)
+    setLockdownResult(null)
+  }, [])
+
+  const setProTierCallback = useCallback((pro: boolean) => setIsProTier(pro), [])
+  const setParanoidModeCallback = useCallback((on: boolean) => setParanoidMode(on), [])
+
+  // ============ Device security checks (client-side heuristics) ============
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const warnings: string[] = []
+    // DevTools open detection (rough heuristic)
+    const threshold = 160
+    const widthDiff = window.outerWidth - window.innerWidth > threshold
+    const heightDiff = window.outerHeight - window.innerHeight > threshold
+    if (widthDiff || heightDiff) {
+      warnings.push('DevTools detectado — não deixe o navegador aberto em dispositivos compartilhados.')
+    }
+    // Tampered UA
+    const ua = navigator.userAgent
+    if (/HeadlessChrome|PhantomJS|SlimerJS/.test(ua)) {
+      warnings.push('Headless browser detectado — possível automação.')
+    }
+    // Debugger statement detection — heuristic via devtools open check
+    // (Removed inline debugger statement because it triggers in dev mode)
+    setDeviceWarnings(warnings)
+  }, [])
+
+  // Refresh approvals when wallet unlocks
+  useEffect(() => {
+    if (realWallet && !isLocked) {
+      refreshApprovals()
+    }
+  }, [realWallet, isLocked, refreshApprovals])
+
+  // Compute security score with sovereignty components
+  const baseRiskScore = computeGlobalRiskScore(state.tokens, state.vaultUnlocked, state.safeSessionActive)
+  const infiniteApprovals = erc20Approvals.filter((a) => a.isInfinite).length
+  const openNftApprovals = nftApprovals.length
+  const sovereigntyAdjustment = Math.max(0, infiniteApprovals * 3 + openNftApprovals * 8)
+  const globalRiskScore = Math.max(0, baseRiskScore - sovereigntyAdjustment)
 
   const value: WalletContextValue = {
     ...state,
@@ -360,6 +523,27 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     removeBlockedToken,
     addSecurityEvent,
     clearSecurityEvents,
+    // Sovereignty
+    erc20Approvals,
+    nftApprovals,
+    sessions,
+    permissionHistory,
+    refreshApprovals,
+    loadingApprovals,
+    revokeApproval,
+    endSession,
+    lockdownActive,
+    lockdownResult,
+    runLockdown,
+    clearLockdown,
+    // PRO tier
+    isProTier,
+    setProTier: setProTierCallback,
+    // Paranoico
+    paranoidMode,
+    setParanoidMode: setParanoidModeCallback,
+    // Device
+    deviceWarnings,
   }
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>

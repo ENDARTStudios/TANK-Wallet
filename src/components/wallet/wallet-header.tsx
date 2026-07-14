@@ -5,7 +5,7 @@ import { useWallet } from './wallet-context'
 import { ChainBadge, ScoreRing } from './common'
 import { CHAINS } from '@/lib/wallet/data'
 import { shortenAddress } from '@/lib/wallet/security'
-import { Menu, Copy, Check, Shield, ShieldCheck, Zap, Globe2, Lock, RefreshCw } from 'lucide-react'
+import { Menu, Copy, Check, Shield, ShieldCheck, Zap, Globe2, Lock, RefreshCw, Power, Crown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { WalletSidebar, type WalletView } from './wallet-sidebar'
@@ -29,6 +29,9 @@ export function WalletHeader({
     endSafeSession,
     refreshBalances,
     loadingBalances,
+    lockdownActive,
+    isProTier,
+    paranoidMode,
   } = useWallet()
   const { toast } = useToast()
   const [copied, setCopied] = useState(false)
@@ -128,13 +131,36 @@ export function WalletHeader({
         </Button>
 
         {/* Mini score */}
-        <div className="hidden sm:flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-2 py-1">
+        <div className={cn(
+          'hidden sm:flex items-center gap-2 rounded-full border bg-muted/30 px-2 py-1',
+          lockdownActive ? 'border-red-500/40 bg-red-500/10' : 'border-border/60'
+        )}>
           <ScoreRing score={globalRiskScore} size={28} />
           <div className="pr-1">
-            <p className="text-[9px] uppercase tracking-wider text-muted-foreground">Score</p>
-            <p className="text-xs font-bold text-emerald-400">{globalRiskScore}/100</p>
+            <p className="text-[9px] uppercase tracking-wider text-muted-foreground">
+              {lockdownActive ? 'Lockdown' : 'Score'}
+            </p>
+            <p className={cn('text-xs font-bold', lockdownActive ? 'text-red-400' : 'text-emerald-400')}>
+              {lockdownActive ? 'ATIVO' : `${globalRiskScore}/100`}
+            </p>
           </div>
         </div>
+
+        {/* PRO badge */}
+        {isProTier && (
+          <div className="hidden md:flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-1">
+            <Crown className="h-3 w-3 text-amber-400" />
+            <span className="text-[10px] font-bold text-amber-400">PRO</span>
+          </div>
+        )}
+
+        {/* Paranoico badge */}
+        {paranoidMode && (
+          <div className="hidden md:flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-1">
+            <Shield className="h-3 w-3 text-amber-400" />
+            <span className="text-[10px] font-bold text-amber-400">Paranoid</span>
+          </div>
+        )}
 
         {/* Lock */}
         <Button variant="ghost" size="icon" onClick={onLock} title="Bloquear carteira">
