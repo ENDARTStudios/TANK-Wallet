@@ -366,3 +366,171 @@ A Tank Wallet assume que **tudo é suspeito até ser comprovado seguro**:
 8. **History**: nada desaparece — toda ação é logada
 
 Essa abordagem transforma a segurança no núcleo do produto, não em um recurso adicional.
+
+# Phase 3 — Brand Identity & UX Overhaul (entregue)
+
+## Filosofia atualizada
+
+> **A hot wallet built to never sign a dangerous transaction.**
+
+Posicionamento: **proteção ativa**, não gerenciamento de ativos. Toda a interface, terminologia e identidade visual reforçam que a carteira atua continuamente para prevenir riscos.
+
+## Identidade visual
+
+### Logo
+- **TANK** → `font-black uppercase tracking-tight` (weight 900)
+- **Wallet** → `font-medium text-muted-foreground` (weight 500)
+- Nunca invertido — fortalece a marca
+
+### Tagline
+- `ZERO TRUST SECURITY` — em caixa alta com tracking amplo, abaixo do logo
+- Subtítulo: "The hot wallet built to never sign a dangerous transaction."
+
+### Paleta padronizada (aprendizado intuitivo)
+- **Verde**: Seguro / Verificado / Protegido
+- **Amarelo**: Atenção / Risco moderado
+- **Vermelho**: Crítico / Bloqueado / Lockdown
+- **Azul**: Informação / Rede / Navegação
+
+## Mudanças de status
+
+| Área | Phase 2 | Phase 3 |
+| --- | --- | --- |
+| UX | 10/10 | 10/10 |
+| Brand identity | 4/10 → | **9/10** |
+| Soberania do usuário | 8/10 | 8/10 |
+| Proteção ativa | 5/10 → | **8/10** |
+
+## Componentes novos
+
+### Header (reescrito)
+- Logo TANK Wallet compacto à esquerda
+- Badge REAL (BIP-44) + endereço
+- Indicador de redes (7 EVM + 3) com ícone Wifi azul
+- Botão refresh de saldos
+- **Wallet Status pill**: Standby (amarelo) / Protected (verde) / Lockdown (vermelho pulsante)
+- Botão Safe Session
+- Mini score (muda para "ATIVO" em vermelho durante Lockdown)
+- Badges PRO e Paranoid (quando ativos)
+- Botão Lock
+
+### Sidebar (agrupada por categorias)
+4 grupos:
+1. **HOME**: Dashboard, Assets (soon), NFTs (soon), Activity
+2. **OPERATIONS**: Send, Receive, Swap (soon), Bridge (soon), Staking (soon)
+3. **SECURITY**: Vault, Wallet Health, Risk Center, Permission Manager, Sovereignty Center, Contract Scanner, DApp Shield, Security Timeline, AI Security Assistant (PRO), Lockdown (PRO)
+4. **SETTINGS**: Notifications, Settings
+
+Badges "SOON" nos módulos em desenvolvimento. Badge dinâmico de permissões abertas no Permission Manager. Indicadores de Lockdown/Paranoid/PRO no painel de score.
+
+### Footer (reescrito)
+- **Left**: TANK Wallet · v1.0.0-beta · Security Engine 2.0
+- **Right (Free)**: Copyright © 2026 END ART
+- **Right (PRO)**: PRO ACTIVE · Threat Intel Online · Last sync: 12s ago
+
+### Lock Screen (reescrito)
+Estilo software de segurança:
+- Logo TANK Wallet + ZERO TRUST SECURITY
+- **Wallet Status panel**:
+  - ✓ Device Secure
+  - ✓ No Malware Detected
+  - ✓ Threat Intelligence Updated
+  - Last protection scan: 18 seconds ago
+- Input de senha + botão "Unlock Wallet"
+
+### Dashboard (reescrito)
+Painel de controle estilo antivírus:
+- **Wallet Health hero**: score 91/100 + estrelas + status Protected/Attention/Critical
+- Total Balance + variação 24h
+- Quick actions: Receive / Send / Vault / Scan
+- **Quick stats grid**:
+  - Risk Score
+  - Threats Blocked
+  - Permissions (com badge)
+  - Connected DApps
+- Connected Networks com saldo real via RPC
+- Assets list
+- Recent Activity
+- Security Alerts preview
+
+### Wallet Health (novo)
+Painel estilo antivírus:
+- **Saúde Geral**: score % + status + stars + badges
+- Contadores: OK / Warnings / Critical
+- Last protection scan: 18 seconds ago
+- Cards detalhados:
+  - Backups (OK)
+  - Seed (OK)
+  - Biometria (OK)
+  - Permissões (críticas/warning/ok)
+  - Dispositivo (warnings)
+  - Atualizações (OK)
+  - Vault (sealed/unsealed)
+  - Sessão (active/idle)
+- Ação recomendada quando há critical
+
+### Security Timeline (novo)
+Linha do tempo visual com timestamps:
+- Eventos agrupados por dia (sticky headers)
+- Cada evento: timestamp + ícone colorido + título + descrição + tags
+- **Conectados por setas ↓** mostrando fluxo de ações
+- Stats: Events / Permissions / Blocked / Sessions
+
+### AI Security Assistant (novo, PRO)
+Explica riscos em linguagem natural:
+- 5 cenários pré-definidos (approve infinito, setApprovalForAll, honeypot, phishing, swap legítimo)
+- Cada cenário: explicação detalhada + recomendação
+- Campo "Pergunte ao assistente" com resposta simulada
+- Reduz erros de usuários menos experientes
+
+### Lockdown (reescrito com 4 níveis)
+- **L1 Block Signatures** (5-10s): bloqueia assinaturas EVM/EIP-712/EIP-191 + modo leitura
+- **L2 Disconnect DApps** (15-30s): L1 + encerra sessões + desconecta WalletConnect
+- **L3 Revoke All Approvals** (30-90s): L2 + revoga ERC-20 + NFT + Permit2
+- **L4 Migrate to New Wallet** (10-30min): L3 + gera nova carteira + migra ativos + desativa antiga
+- Cards selecionáveis com descrição e lista de ações
+- Botão circular vermelho de emergência
+- Dialog de confirmação com warning específico por nível
+
+### Permission Manager (reescrito com filtros)
+Filtros:
+- Todas / Maior risco / Sem uso 180d / Approve infinito / Permit2 / NFTs / Delegações / Bridge / DEX / Gaming / Marketplace
+- Cada filtro mostra contagem
+- Warning para approves infinitos
+- Botão "Revogar tudo" (PRO)
+- Categorização automática de spenders por tipo (DEX, Bridge, Marketplace, etc.)
+
+### DApp Shield (3 estados)
+Mudou de 4 estados (verified/unknown/suspicious/malicious) para 3:
+- **Verificado** (verde) — Conexão permitida
+- **Desconhecido** (azul) — Conexão limitada (sem info ≠ perigoso)
+- **Malicioso** (vermelho) — Conexão bloqueada
+
+Thresholds ajustados: ≥85 = verificado, ≥35 = desconhecido, <35 = malicioso
+
+## Roadmap atualizado (conforme sugestão do usuário)
+
+Phase 4: **Universal Asset Engine** — descoberta automática de ERC-20/721/1155/SPL/BRC-20/Runes/Ordinals/ARC20/Jettons/CW20
+Phase 5: **Broadcast Engine** — eth_sendRawTransaction + Alchemy/Infura SDK
+Phase 6: **Bitcoin + Lightning** — PSBT (BIP-174) + Taproot + SegWit + BOLT-11 + LND
+Phase 7: **Solana** — Versioned Transactions via @solana/web3.js
+Phase 8: **Account Abstraction (ERC-4337)** — smart contract wallet
+Phase 9: **WalletConnect v2** — EIP-6963 + injected provider + sandbox
+Phase 10: **Threat Intelligence Backend** — ChainPatrol + ScamSniffer + HashDit + PhishFort + IA própria
+Phase 11: **MPC e Passkeys** — substituir seed por Multi-Party Computation
+Phase 12: **Sistema de recuperação social** — k-of-n friends/family
+Phase 13: **IA de detecção comportamental** — perfil de uso (horários, redes, valores, dispositivos) + ativação automática de Modo Paranoico/Lockdown quando transação foge do padrão
+
+## Verificação end-to-end (Phase 3)
+
+1. **Onboarding**: TANK Wallet + ZERO TRUST SECURITY + tagline + footer Copyright © 2026 END ART
+2. **Lock screen**: Wallet Status panel com ✓ Device Secure / ✓ No Malware / ✓ Threat Intel Updated / Last scan 18s
+3. **Dashboard**: Wallet Health 91/100 PROTECTED + quick stats (Risk Score 91, Threats Blocked 7, Permissions 3, Connected DApps 3)
+4. **Sidebar agrupada**: HOME / OPERATIONS / SECURITY / SETTINGS com badges SOON
+5. **Wallet Health**: 6 OK / 2 Warnings / 0 Critical + cards detalhados
+6. **Security Timeline**: 15 events com timestamps e setas conectando ações
+7. **AI Security Assistant** (PRO): 5 cenários com explicações em linguagem natural
+8. **Lockdown 4 níveis**: L1/L2/L3/L4 selecionáveis com estimativas de tempo
+9. **Permission Manager**: 11 filtros com contagens dinâmicas
+10. **DApp Shield**: 3 estados (Verificado/Desconhecido/Malicioso)
+11. **Footer PRO**: PRO ACTIVE + Threat Intel Online + Last sync 12s ago

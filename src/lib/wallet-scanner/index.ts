@@ -255,7 +255,8 @@ export function analyzeCalldata(calldata: string): ContractFinding[] {
 export interface DappShieldResult {
   url: string
   domain: string
-  rating: 'verified' | 'unknown' | 'suspicious' | 'malicious'
+  /** 3 states only: Verified (safe) / Unknown (no info, caution) / Malicious (blocked) */
+  rating: 'verified' | 'unknown' | 'malicious'
   riskScore: number // 0-100, higher = safer
   checks: DappShieldCheck[]
   recommendation: 'allow' | 'limit' | 'block'
@@ -426,8 +427,10 @@ export async function runDappShield(
   }
 
   riskScore = Math.max(0, Math.min(100, riskScore))
+  // 3-state model: Verified / Unknown / Malicious
+  // "Desconhecido" ≠ "Perigoso" — millions of new DApps, lack of data doesn't mean malicious
   const rating: DappShieldResult['rating'] =
-    riskScore >= 90 ? 'verified' : riskScore >= 60 ? 'unknown' : riskScore >= 30 ? 'suspicious' : 'malicious'
+    riskScore >= 85 ? 'verified' : riskScore >= 35 ? 'unknown' : 'malicious'
 
   const recommendation: DappShieldResult['recommendation'] =
     rating === 'verified' ? 'allow' : rating === 'unknown' ? 'limit' : 'block'

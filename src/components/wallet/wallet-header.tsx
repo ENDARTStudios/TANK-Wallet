@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { useWallet } from './wallet-context'
-import { ChainBadge, ScoreRing } from './common'
+import { ScoreRing } from './common'
 import { CHAINS } from '@/lib/wallet/data'
 import { shortenAddress } from '@/lib/wallet/security'
-import { Menu, Copy, Check, Shield, ShieldCheck, Zap, Globe2, Lock, RefreshCw, Power, Crown } from 'lucide-react'
+import { Menu, Copy, Check, ShieldCheck, Zap, Globe2, Lock, RefreshCw, Power, Crown, Shield, Activity, Wifi } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { WalletSidebar, type WalletView } from './wallet-sidebar'
@@ -38,8 +38,14 @@ export function WalletHeader({
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const address = realWallet?.evm.address ?? ''
-  // Show "REAL" badge since keys are derived from BIP-39
   const isRealWallet = !!realWallet
+
+  // Wallet status: Locked / Protected / Lockdown
+  const status = lockdownActive
+    ? { label: 'Lockdown', color: 'text-red-400 bg-red-500/10 border-red-500/30', dot: 'bg-red-500 animate-pulse' }
+    : safeSessionActive
+    ? { label: 'Protected', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-500' }
+    : { label: 'Standby', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30', dot: 'bg-amber-400' }
 
   const copyAddress = async () => {
     try {
@@ -67,7 +73,13 @@ export function WalletHeader({
           </SheetContent>
         </Sheet>
 
-        {/* REAL badge + address pill */}
+        {/* Brand compact (mobile shows just the lock icon) */}
+        <div className="hidden md:flex items-baseline gap-1.5 mr-2">
+          <span className="font-black uppercase tracking-tight text-sm">TANK</span>
+          <span className="font-medium text-muted-foreground text-sm">Wallet</span>
+        </div>
+
+        {/* Address pill */}
         <button
           onClick={copyAddress}
           className="group flex items-center gap-2 rounded-full border border-border/60 bg-muted/40 py-1.5 pl-2 pr-3 text-xs font-medium transition-colors hover:bg-muted/70"
@@ -82,8 +94,8 @@ export function WalletHeader({
 
         {/* Networks indicator */}
         <div className="hidden lg:flex items-center gap-1.5">
-          <Globe2 className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">7 EVM + 3</span>
+          <Wifi className="h-3.5 w-3.5 text-blue-400" />
+          <span className="text-xs text-muted-foreground">Auto</span>
           <div className="ml-1 flex -space-x-1.5">
             {CHAINS.slice(0, 7).map((c) => (
               <span
@@ -112,6 +124,15 @@ export function WalletHeader({
         </Button>
 
         <div className="flex-1" />
+
+        {/* Wallet status (right side) */}
+        <div className={cn(
+          'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold',
+          status.color
+        )}>
+          <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
+          <span className="hidden sm:inline">{status.label}</span>
+        </div>
 
         {/* Safe session toggle */}
         <Button

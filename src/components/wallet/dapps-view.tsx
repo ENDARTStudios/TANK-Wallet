@@ -23,14 +23,12 @@ const SAMPLE_URLS = [
 const RATING_LABEL: Record<DappShieldResult['rating'], string> = {
   verified: 'Verificado',
   unknown: 'Desconhecido',
-  suspicious: 'Suspeito',
   malicious: 'Malicioso',
 }
 
 const RATING_COLOR: Record<DappShieldResult['rating'], string> = {
   verified: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400',
-  unknown: 'border-zinc-500/40 bg-zinc-500/10 text-zinc-400',
-  suspicious: 'border-amber-500/40 bg-amber-500/10 text-amber-400',
+  unknown: 'border-blue-500/40 bg-blue-500/10 text-blue-400',
   malicious: 'border-red-500/40 bg-red-500/10 text-red-400',
 }
 

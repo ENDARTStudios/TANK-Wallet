@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useWallet } from './wallet-context'
 import { CHAINS } from '@/lib/wallet/data'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,6 +20,16 @@ export function SettingsView() {
   const [newTokenSymbol, setNewTokenSymbol] = useState('')
   const [newTokenContract, setNewTokenContract] = useState('')
   const [newTokenChain, setNewTokenChain] = useState('ethereum')
+
+  // Sync PRO state with localStorage so the footer (outside WalletProvider) can read it
+  useEffect(() => {
+    try {
+      localStorage.setItem('tank:pro', String(isProTier))
+      window.dispatchEvent(new Event('tank:pro-changed'))
+    } catch {
+      // ignore
+    }
+  }, [isProTier])
 
   const addManualBlock = () => {
     if (!newTokenSymbol || !newTokenContract) return

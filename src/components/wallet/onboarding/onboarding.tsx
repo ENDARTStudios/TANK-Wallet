@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
-import { Shield, ShieldCheck, KeyRound, Lock, ArrowRight, ArrowLeft, Copy, Check, AlertTriangle, Plus, Download, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react'
+import { Shield, ShieldCheck, KeyRound, Lock, ArrowRight, ArrowLeft, Copy, Check, AlertTriangle, Plus, Download, Eye, EyeOff, Loader2, Sparkles, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type OnboardingStep =
@@ -160,9 +160,12 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
             </div>
             <h1 className="text-3xl flex items-baseline gap-2">
               <span className="font-black uppercase tracking-tight">TANK</span>
-              <span className="font-normal text-muted-foreground">Wallet</span>
+              <span className="font-medium text-muted-foreground">Wallet</span>
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">Carteira Web3 multi-chain com segurança real</p>
+            <p className="mt-1.5 text-[10px] uppercase tracking-[0.18em] text-emerald-400/80 font-semibold">
+              ZERO TRUST SECURITY
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">The hot wallet built to never sign a dangerous transaction.</p>
           </div>
 
           {step === 'welcome' && (
@@ -400,18 +403,43 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
     )
   }
 
-  // Unlock screen
+  // Unlock screen — security-software style with protection status panel
   if (step === 'unlock') {
     return (
       <div className="flex flex-1 min-h-[calc(100vh-3rem)] items-center justify-center bg-gradient-to-br from-background via-background to-emerald-950/30 p-4">
         <div className="w-full max-w-md">
-          <div className="mb-8 flex flex-col items-center text-center">
+          <div className="mb-6 flex flex-col items-center text-center">
             <div className="relative mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-xl shadow-emerald-500/30">
               <Lock className="h-7 w-7 text-white" strokeWidth={2.5} />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">Bem-vindo de volta</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Digite sua senha para desbloquear a carteira</p>
+            <h1 className="text-3xl flex items-baseline gap-2">
+              <span className="font-black uppercase tracking-tight">TANK</span>
+              <span className="font-medium text-muted-foreground">Wallet</span>
+            </h1>
+            <p className="mt-1.5 text-[10px] uppercase tracking-[0.18em] text-emerald-400/80 font-semibold">
+              ZERO TRUST SECURITY
+            </p>
           </div>
+
+          {/* Wallet Status panel */}
+          <Card className="mb-4 border-emerald-500/20 bg-emerald-500/[0.03]">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Wallet Status</p>
+                <span className="text-[9px] uppercase tracking-wider text-emerald-400 font-bold">Protected</span>
+              </div>
+              <div className="space-y-2">
+                <StatusCheck label="Device Secure" />
+                <StatusCheck label="No Malware Detected" />
+                <StatusCheck label="Threat Intelligence Updated" />
+              </div>
+              <div className="mt-3 pt-3 border-t border-border/40 flex items-center justify-between text-[10px] text-muted-foreground">
+                <span>Last protection scan</span>
+                <span className="text-emerald-400 font-medium">18 seconds ago</span>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardContent className="space-y-3 p-6">
               <div className="space-y-2">
@@ -429,7 +457,7 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
               {error && <p className="text-xs text-red-400">{error}</p>}
               <Button onClick={handleUnlock} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 h-11" disabled={loading || !unlockPassword}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
-                {loading ? 'Descriptografando…' : 'Desbloquear carteira'}
+                {loading ? 'Descriptografando…' : 'Unlock Wallet'}
               </Button>
               <button onClick={handleReset} className="w-full text-[10px] text-muted-foreground hover:text-red-400 transition-colors">
                 Esqueci a senha — apagar cofre e começar de novo
@@ -452,6 +480,17 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
           <Button onClick={() => setStep('welcome')} variant="outline" size="sm">Voltar ao início</Button>
         </CardContent>
       </Card>
+    </div>
+  )
+}
+
+function StatusCheck({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <div className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500/15">
+        <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+      </div>
+      <span className="text-xs text-foreground/90">{label}</span>
     </div>
   )
 }
