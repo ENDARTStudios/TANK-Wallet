@@ -36,7 +36,7 @@ function WalletApp() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex flex-1 bg-background">
       {/* Desktop sidebar */}
       <div className="hidden md:block w-64 shrink-0 border-r border-border/50">
         <div className="sticky top-0 h-screen">

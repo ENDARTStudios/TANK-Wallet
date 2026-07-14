@@ -152,13 +152,16 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
 
   if (step === 'welcome' || step === 'import' || step === 'generate' || step === 'confirm' || step === 'password') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-emerald-950/30 p-4">
+      <div className="flex flex-1 min-h-[calc(100vh-3rem)] items-center justify-center bg-gradient-to-br from-background via-background to-emerald-950/30 p-4">
         <div className="w-full max-w-md">
           <div className="mb-8 flex flex-col items-center text-center">
             <div className="relative mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-xl shadow-emerald-500/30">
               <Shield className="h-7 w-7 text-white" strokeWidth={2.5} />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">FortiX</h1>
+            <h1 className="text-3xl flex items-baseline gap-2">
+              <span className="font-black uppercase tracking-tight">TANK</span>
+              <span className="font-normal text-muted-foreground">Wallet</span>
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">Carteira Web3 multi-chain com segurança real</p>
           </div>
 
@@ -380,7 +383,7 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
   // Deriving screen
   if (step === 'deriving') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-emerald-950/30">
+      <div className="flex flex-1 min-h-[calc(100vh-3rem)] items-center justify-center bg-gradient-to-br from-background to-emerald-950/30">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10">
@@ -400,7 +403,7 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
   // Unlock screen
   if (step === 'unlock') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-emerald-950/30 p-4">
+      <div className="flex flex-1 min-h-[calc(100vh-3rem)] items-center justify-center bg-gradient-to-br from-background via-background to-emerald-950/30 p-4">
         <div className="w-full max-w-md">
           <div className="mb-8 flex flex-col items-center text-center">
             <div className="relative mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-xl shadow-emerald-500/30">
@@ -440,7 +443,7 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
 
   // Error
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex flex-1 min-h-[calc(100vh-3rem)] items-center justify-center p-4">
       <Card className="max-w-md border-red-500/30">
         <CardContent className="space-y-3 p-6 text-center">
           <AlertTriangle className="mx-auto h-10 w-10 text-red-400" />

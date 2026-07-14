@@ -69,14 +69,15 @@ export function WalletSidebar({
           )}
         </div>
         <div>
-          <h1 className="text-base font-bold tracking-tight flex items-center gap-1.5">
-            Tank
+          <h1 className="text-lg leading-none flex items-baseline gap-1.5">
+            <span className="font-black uppercase tracking-tight">TANK</span>
+            <span className="font-normal text-muted-foreground">Wallet</span>
             {isProTier && (
-              <Crown className="h-3 w-3 text-amber-400" />
+              <Crown className="h-3.5 w-3.5 text-amber-400 self-center" />
             )}
           </h1>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-            {isProTier ? 'PRO · Secure Wallet' : 'Secure Wallet'}
+          <p className="mt-1.5 text-[10px] uppercase tracking-widest text-muted-foreground">
+            {isProTier ? 'PRO · SECURE WALLET' : 'SECURE WALLET'}
           </p>
         </div>
       </div>
