@@ -20,6 +20,10 @@ import { TimelineView } from '@/components/wallet/sovereignty/timeline-view'
 import { AssistantView } from '@/components/wallet/sovereignty/assistant-view'
 import { ScannerView } from '@/components/wallet/scanner/scanner-view'
 import { WalletHealthView } from '@/components/wallet/dashboard/wallet-health-view'
+import { SecurityDnaView } from '@/components/wallet/engines/security-dna-view'
+import { RecoveryView } from '@/components/wallet/engines/recovery-view'
+import { BehaviorView } from '@/components/wallet/engines/behavior-view'
+import { ThreatIntelView } from '@/components/wallet/engines/threat-intel-view'
 
 export default function Home() {
   return (
@@ -63,6 +67,10 @@ function WalletApp() {
             {view === 'timeline' && <TimelineView />}
             {view === 'health' && <WalletHealthView />}
             {view === 'assistant' && <AssistantView />}
+            {view === 'threats' && <ThreatIntelView />}
+            {view === 'behavior' && <BehaviorView />}
+            {view === 'recovery' && <RecoveryView />}
+            {view === 'dna' && <SecurityDnaView />}
             {view === 'notifications' && <SettingsView />}
             {view === 'settings' && <SettingsView />}
             {/* Soon views — show placeholder */}

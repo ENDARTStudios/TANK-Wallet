@@ -7,7 +7,7 @@ import {
   Shield,
   LayoutDashboard, ArrowDownToLine, ArrowUpFromLine, Lock, Globe, AlertTriangle, Settings,
   KeyRound, Power, Crown, History, Zap, Activity, Coins, Sparkles, ArrowRightLeft,
-  Bell,
+  Bell, Database, Brain, ShieldCheck, Heart,
 } from 'lucide-react'
 
 export type WalletView =
@@ -30,6 +30,10 @@ export type WalletView =
   | 'timeline'
   | 'health'
   | 'assistant'
+  | 'threats'
+  | 'behavior'
+  | 'recovery'
+  | 'dna'
   | 'notifications'
   | 'settings'
 
@@ -62,15 +66,19 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'SECURITY',
     items: [
       { id: 'vault', label: 'Vault', icon: Lock },
-      { id: 'health', label: 'Wallet Health', icon: Shield },
+      { id: 'health', label: 'Wallet Health', icon: Heart },
       { id: 'risk', label: 'Risk Center', icon: AlertTriangle },
       { id: 'permissions', label: 'Permission Manager', icon: KeyRound },
       { id: 'sovereignty', label: 'Sovereignty Center', icon: Shield },
       { id: 'scanner', label: 'Contract Scanner', icon: Zap },
       { id: 'dapps', label: 'DApp Shield', icon: Globe },
       { id: 'timeline', label: 'Security Timeline', icon: History },
+      { id: 'threats', label: 'Threat Intelligence', icon: Database },
+      { id: 'behavior', label: 'Behavioral Security', icon: Brain },
       { id: 'assistant', label: 'AI Security Assistant', icon: Sparkles, pro: true },
+      { id: 'recovery', label: 'Recovery Center', icon: ShieldCheck },
       { id: 'lockdown', label: 'Lockdown', icon: Power, pro: true },
+      { id: 'dna', label: 'Security DNA', icon: Shield },
     ],
   },
   {

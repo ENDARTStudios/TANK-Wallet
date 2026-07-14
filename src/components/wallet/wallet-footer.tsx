@@ -11,17 +11,23 @@ import { Crown, ShieldCheck, Activity } from 'lucide-react'
  * (que só está disponível dentro do escopo da carteira).
  */
 export function WalletFooter() {
-  const [isProTier, setIsProTier] = useState(false)
+  const [isProTier, setIsProTier] = useState(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      return localStorage.getItem('tank:pro') === 'true'
+    } catch {
+      return false
+    }
+  })
 
   useEffect(() => {
-    // Read PRO state from localStorage (set by settings-view when toggled)
-    try {
-      setIsProTier(localStorage.getItem('tank:pro') === 'true')
-    } catch {
-      // ignore
+    const handler = () => {
+      try {
+        setIsProTier(localStorage.getItem('tank:pro') === 'true')
+      } catch {
+        // ignore
+      }
     }
-    // Listen for changes
-    const handler = () => setIsProTier(localStorage.getItem('tank:pro') === 'true')
     window.addEventListener('storage', handler)
     window.addEventListener('tank:pro-changed', handler)
     return () => {

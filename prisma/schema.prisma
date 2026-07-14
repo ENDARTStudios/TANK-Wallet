@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,20 +10,175 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// ============ Threat Intelligence Backend (Phase 4) ============
+
+/// Known malicious token contracts (honeypots, rug pulls, scam tokens)
+model ThreatToken {
+  id            String   @id @default(cuid())
+  /// Blockchain where the contract lives (ethereum, bsc, polygon, etc.)
+  chain         String
+  /// Contract address (lowercase)
+  address       String
+  /// Token symbol (e.g. "SAFEMOON2")
+  symbol        String
+  /// Token name (e.g. "SafeMoon 2.0")
+  name          String
+  /// Why it's malicious
+  reason        String
+  /// honeypot | rugpull | phishing | fake_token | wash_trading | infinite_tax | hidden_mint
+  category      String
+  /// auto | community | manual | chainpatrol | goplus | scamsniffer | hashdit | phishfort
+  source        String
+  /// Risk score 0-100 (higher = more dangerous)
+  severity      Int      @default(80)
+  /// When the threat was first seen
+  firstSeenAt   DateTime @default(now())
+  /// When the threat was last confirmed
+  lastConfirmedAt DateTime @updatedAt
+  /// Whether the threat is still active
+  active        Boolean  @default(true)
+
+  @@unique([chain, address])
+  @@index([chain])
+  @@index([active])
 }
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+/// Known malicious DApp sites (phishing, drainers, fake marketplaces)
+model ThreatSite {
+  id            String   @id @default(cuid())
+  /// Full domain or URL pattern (lowercase)
+  url           String
+  /// Why it's malicious
+  reason        String
+  /// phishing | drainer | fake_dapp | malware | fake_airdrop | impersonation
+  category      String
+  /// auto | community | manual | chainpatrol | scamsniffer | phishfort
+  source        String
+  severity      Int      @default(80)
+  firstSeenAt   DateTime @default(now())
+  lastConfirmedAt DateTime @updatedAt
+  active        Boolean  @default(true)
+
+  @@unique([url])
+  @@index([active])
+}
+
+/// Known malicious addresses (drainers, sanctioned, mixers, exploiters)
+model ThreatAddress {
+  id            String   @id @default(cuid())
+  chain         String
+  address       String
+  /// Why it's malicious
+  reason        String
+  /// drainer | sanctioned | mixer | exploiter | hacker | blackmail | fake_token_creator
+  category      String
+  source        String
+  severity      Int      @default(80)
+  /// Number of reports from community
+  reportCount   Int      @default(1)
+  firstSeenAt   DateTime @default(now())
+  lastConfirmedAt DateTime @updatedAt
+  active        Boolean  @default(true)
+
+  @@unique([chain, address])
+  @@index([chain])
+  @@index([active])
+}
+
+/// Known exploits and vulnerabilities in DeFi protocols
+model ThreatExploit {
+  id            String   @id @default(cuid())
+  /// Protocol name (e.g. "Wormhole", "Ronin Bridge")
+  protocolName  String
+  /// Affected contract addresses (JSON array)
+  affectedAddresses String
+  /// Description of the exploit
+  description   String
+  /// bridge | lending | dex | nft | staking | other
+  category      String
+  /// Approximate USD value lost
+  lossUsd       Int?
+  /// When the exploit happened
+  exploitedAt   DateTime
+  /// Whether the vulnerability is still exploitable
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  @@index([active])
+}
+
+// ============ Permission audit log (Phase 6) ============
+
+/// Immutable audit log of all permission events
+model PermissionAuditLog {
+  id            String   @id @default(cuid())
+  /// erc20 | erc721 | erc1155 | permit2 | erc4337 | solana_delegate | spl | bitcoin_psbt | lightning_channel
+  permissionType String
+  /// granted | revoked | expired | used
+  action        String
+  chain         String?
+  tokenSymbol   String?
+  tokenAddress  String?
+  spenderAddress String?
+  spenderName   String?
+  amount        String?
+  /// Wallet address that performed the action
+  walletAddress String?
+  timestamp     DateTime @default(now())
+
+  @@index([walletAddress])
+  @@index([timestamp])
+}
+
+// ============ Behavior patterns (Phase 8) ============
+
+/// User behavior profile (learned over time)
+model BehaviorProfile {
+  id            String   @id @default(cuid())
+  /// Wallet address this profile belongs to
+  walletAddress String   @unique
+  /// JSON: { typicalHours, typicalChains, typicalAmounts, typicalDevices, typicalContracts, frequency }
+  profile       String
+  /// Number of actions observed
+  observations  Int      @default(0)
+  /// Last time the profile was updated
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
+}
+
+/// Anomalous actions detected by the behavior engine
+model BehaviorAnomaly {
+  id            String   @id @default(cuid())
+  walletAddress String
+  /// JSON describing the anomalous action
+  action        String
+  /// JSON describing why it's anomalous
+  reasons       String
+  /// Anomaly score 0-100
+  score         Int
+  /// Whether the action was blocked
+  blocked       Boolean  @default(false)
+  timestamp     DateTime @default(now())
+
+  @@index([walletAddress])
+  @@index([timestamp])
+}
+
+// ============ Recovery Center (Phase 7) ============
+
+/// Recovery contacts for social recovery
+model RecoveryContact {
+  id            String   @id @default(cuid())
+  walletAddress String
+  /// Display name
+  name          String
+  /// Contact address (could be wallet, email, phone)
+  contact       String
+  /// Type of contact
+  type          String   @default("wallet") // wallet | email | phone
+  /// Whether this contact is verified
+  verified      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([walletAddress])
 }
