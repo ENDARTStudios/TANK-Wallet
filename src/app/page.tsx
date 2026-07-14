@@ -24,6 +24,8 @@ import { SecurityDnaView } from '@/components/wallet/engines/security-dna-view'
 import { RecoveryView } from '@/components/wallet/engines/recovery-view'
 import { BehaviorView } from '@/components/wallet/engines/behavior-view'
 import { ThreatIntelView } from '@/components/wallet/engines/threat-intel-view'
+import { PolicyView } from '@/components/wallet/production/policy-view'
+import { ProductionHardeningView } from '@/components/wallet/production/hardening-view'
 
 export default function Home() {
   return (
@@ -71,6 +73,8 @@ function WalletApp() {
             {view === 'behavior' && <BehaviorView />}
             {view === 'recovery' && <RecoveryView />}
             {view === 'dna' && <SecurityDnaView />}
+            {view === 'policy' && <PolicyView />}
+            {view === 'hardening' && <ProductionHardeningView />}
             {view === 'notifications' && <SettingsView />}
             {view === 'settings' && <SettingsView />}
             {/* Soon views — show placeholder */}
