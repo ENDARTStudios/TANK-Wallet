@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { WalletProvider } from '@/components/wallet/wallet-context'
+import { WalletProvider, useWallet } from '@/components/wallet/wallet-context'
 import { WalletSidebar, type WalletView } from '@/components/wallet/wallet-sidebar'
 import { WalletHeader } from '@/components/wallet/wallet-header'
 import { DashboardView } from '@/components/wallet/dashboard-view'
@@ -11,6 +11,7 @@ import { VaultView } from '@/components/wallet/vault-view'
 import { DappsView } from '@/components/wallet/dapps-view'
 import { RiskCenterView } from '@/components/wallet/risk-center-view'
 import { SettingsView } from '@/components/wallet/settings-view'
+import { Onboarding } from '@/components/wallet/onboarding/onboarding'
 
 export default function Home() {
   return (
@@ -21,7 +22,13 @@ export default function Home() {
 }
 
 function WalletApp() {
+  const { isLocked, realWallet, setRealWallet, lockWallet } = useWallet()
   const [view, setView] = useState<WalletView>('dashboard')
+
+  // Show onboarding / unlock screen if wallet is locked
+  if (isLocked || !realWallet) {
+    return <Onboarding onUnlocked={setRealWallet} />
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -34,7 +41,7 @@ function WalletApp() {
 
       {/* Main content */}
       <div className="flex flex-1 flex-col min-w-0">
-        <WalletHeader view={view} onViewChange={setView} />
+        <WalletHeader view={view} onViewChange={setView} onLock={lockWallet} />
         <main className="flex-1 p-4 md:p-6">
           <div className="mx-auto max-w-6xl">
             {view === 'dashboard' && <DashboardView onViewChange={setView} />}

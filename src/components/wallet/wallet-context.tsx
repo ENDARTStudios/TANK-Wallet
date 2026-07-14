@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
 import { INITIAL_WALLET_STATE, INITIAL_BLOCKED_TOKENS, INITIAL_BLOCKED_SITES } from '@/lib/wallet/data'
 import type {
   WalletState,
@@ -11,8 +11,30 @@ import type {
   RiskAssessment,
 } from '@/lib/wallet/types'
 import { computeGlobalRiskScore } from '@/lib/wallet/security'
+import type { FullWallet } from '@/lib/wallet-core'
+import { hasStoredVault } from '@/lib/wallet-core/storage'
+import { EvmProvider, formatEtherSafe } from '@/lib/wallet-evm'
+import { chainById } from '@/lib/wallet/data'
+
+interface RealChainBalance {
+  chain: string
+  address: string
+  balanceWei: bigint
+  balanceEther: string
+  loaded: boolean
+  error?: string
+}
 
 interface WalletContextValue extends WalletState {
+  // Real key management
+  realWallet: FullWallet | null
+  isLocked: boolean
+  lockWallet: () => void
+  setRealWallet: (w: FullWallet) => void
+  // Real chain data
+  realBalances: Record<string, RealChainBalance>
+  refreshBalances: () => Promise<void>
+  loadingBalances: boolean
   // Vault actions
   unlockVault: (pin: string) => boolean
   lockVault: () => void
@@ -43,6 +65,103 @@ const VAULT_PIN = '123456' // demo PIN
 
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WalletState>(INITIAL_WALLET_STATE)
+  const [realWallet, setRealWalletState] = useState<FullWallet | null>(null)
+  const [isLocked, setIsLocked] = useState<boolean>(true)
+  const [realBalances, setRealBalances] = useState<Record<string, RealChainBalance>>({})
+  const [loadingBalances, setLoadingBalances] = useState(false)
+
+  // Check on mount if there's a stored vault
+  useEffect(() => {
+    if (!hasStoredVault()) {
+      // No vault — onboarding will handle create/import flow
+      setIsLocked(true)
+    }
+  }, [])
+
+  const setRealWallet = useCallback((w: FullWallet) => {
+    setRealWalletState(w)
+    setIsLocked(false)
+  }, [])
+
+  const lockWallet = useCallback(() => {
+    setRealWalletState(null)
+    setIsLocked(true)
+    setRealBalances({})
+  }, [])
+
+  // ============ Real RPC balance fetching ============
+
+  const refreshBalances = useCallback(async () => {
+    if (!realWallet) return
+    setLoadingBalances(true)
+
+    const evmChains = ['ethereum', 'bsc', 'polygon', 'arbitrum', 'optimism', 'avalanche', 'base']
+    const address = realWallet.evm.address
+
+    const updates: Record<string, RealChainBalance> = {}
+    await Promise.all(
+      evmChains.map(async (chainId) => {
+        try {
+          const provider = new EvmProvider(chainId)
+          const balanceWei = await provider.getBalance(address)
+          updates[chainId] = {
+            chain: chainId,
+            address,
+            balanceWei,
+            balanceEther: formatEtherSafe(balanceWei),
+            loaded: true,
+          }
+        } catch (e) {
+          updates[chainId] = {
+            chain: chainId,
+            address,
+            balanceWei: 0n,
+            balanceEther: '0',
+            loaded: false,
+            error: (e as Error).message,
+          }
+        }
+      })
+    )
+
+    // Solana (no real RPC integrated yet — use derived address)
+    updates['solana'] = {
+      chain: 'solana',
+      address: realWallet.solana.address,
+      balanceWei: 0n,
+      balanceEther: '0',
+      loaded: false,
+      error: 'Solana RPC not yet integrated',
+    }
+    updates['bitcoin'] = {
+      chain: 'bitcoin',
+      address: realWallet.bitcoin.address,
+      balanceWei: 0n,
+      balanceEther: '0',
+      loaded: false,
+      error: 'Bitcoin RPC not yet integrated',
+    }
+    updates['lightning'] = {
+      chain: 'lightning',
+      address: realWallet.lightning.nodeId,
+      balanceWei: 0n,
+      balanceEther: '0',
+      loaded: false,
+      error: 'Lightning node required',
+    }
+
+    setRealBalances(updates)
+    setLoadingBalances(false)
+  }, [realWallet])
+
+  // Auto-fetch balances when wallet is unlocked
+  useEffect(() => {
+    if (realWallet && !isLocked) {
+      refreshBalances()
+    }
+  }, [realWallet, isLocked, refreshBalances])
+
+  // ============ Vault actions ============
 
   const unlockVault = useCallback((pin: string) => {
     if (pin === VAULT_PIN) {
@@ -123,65 +242,54 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  const startSafeSession = useCallback(() => {
-    setState((s) => ({ ...s, safeSessionActive: true }))
-  }, [])
+  const startSafeSession = useCallback(() => setState((s) => ({ ...s, safeSessionActive: true })), [])
+  const endSafeSession = useCallback(() => setState((s) => ({ ...s, safeSessionActive: false })), [])
 
-  const endSafeSession = useCallback(() => {
-    setState((s) => ({ ...s, safeSessionActive: false }))
-  }, [])
-
-  const receiveToken = useCallback(
-    (token: Token) => {
-      if (token.risk.blocked) {
-        const ev: SecurityEvent = {
-          id: `se-${Date.now()}`,
-          type: 'blocked-token',
-          title: 'Token malicioso bloqueado',
-          description: `Recebimento de ${token.symbol} (${token.chain}) bloqueado automaticamente.`,
-          timestamp: Date.now(),
-          severity: 'critical',
-          related: token.symbol,
-        }
-        setState((s) => ({
-          ...s,
-          securityEvents: [ev, ...s.securityEvents],
-          transactions: [
-            {
-              id: `tx-${Date.now()}`,
-              type: 'receive',
-              tokenSymbol: token.symbol,
-              amount: token.balance,
-              usdValue: 0,
-              chain: token.chain,
-              counterparty: token.contract ?? 'unknown',
-              timestamp: Date.now(),
-              status: 'blocked',
-              risk: token.risk,
-              note: 'Recebimento bloqueado',
-            },
-            ...s.transactions,
-          ],
-        }))
-        return { accepted: false, reason: 'Token bloqueado pela verificação de integridade' }
+  const receiveToken = useCallback((token: Token) => {
+    if (token.risk.blocked) {
+      const ev: SecurityEvent = {
+        id: `se-${Date.now()}`,
+        type: 'blocked-token',
+        title: 'Token malicioso bloqueado',
+        description: `Recebimento de ${token.symbol} (${token.chain}) bloqueado automaticamente.`,
+        timestamp: Date.now(),
+        severity: 'critical',
+        related: token.symbol,
       }
-
-      setState((s) => {
-        const existing = s.tokens.find((t) => t.id === token.id)
-        if (existing) {
-          return {
-            ...s,
-            tokens: s.tokens.map((t) =>
-              t.id === token.id ? { ...t, balance: t.balance + token.balance } : t
-            ),
-          }
+      setState((s) => ({
+        ...s,
+        securityEvents: [ev, ...s.securityEvents],
+        transactions: [
+          {
+            id: `tx-${Date.now()}`,
+            type: 'receive',
+            tokenSymbol: token.symbol,
+            amount: token.balance,
+            usdValue: 0,
+            chain: token.chain,
+            counterparty: token.contract ?? 'unknown',
+            timestamp: Date.now(),
+            status: 'blocked',
+            risk: token.risk,
+            note: 'Recebimento bloqueado',
+          },
+          ...s.transactions,
+        ],
+      }))
+      return { accepted: false, reason: 'Token bloqueado pela verificação de integridade' }
+    }
+    setState((s) => {
+      const existing = s.tokens.find((t) => t.id === token.id)
+      if (existing) {
+        return {
+          ...s,
+          tokens: s.tokens.map((t) => (t.id === token.id ? { ...t, balance: t.balance + token.balance } : t)),
         }
-        return { ...s, tokens: [...s.tokens, token] }
-      })
-      return { accepted: true, reason: 'Token aceito — passou na verificação de integridade' }
-    },
-    []
-  )
+      }
+      return { ...s, tokens: [...s.tokens, token] }
+    })
+    return { accepted: true, reason: 'Token aceito — passou na verificação de integridade' }
+  }, [])
 
   const sendTransaction = useCallback(
     (tx: Omit<Transaction, 'id' | 'timestamp' | 'status' | 'risk'>) => {
@@ -191,25 +299,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         reasons: ['Endereço verificado', 'Sem permissões perigosas'],
         blocked: false,
       }
-      // Check if token exists in sufficient balance
       setState((s) => {
         const token = s.tokens.find((t) => t.symbol === tx.tokenSymbol && t.chain === tx.chain)
-        if (!token || token.balance < tx.amount) {
-          return s
-        }
+        if (!token || token.balance < tx.amount) return s
         return {
           ...s,
-          tokens: s.tokens.map((t) =>
-            t.id === token.id ? { ...t, balance: t.balance - tx.amount } : t
-          ),
+          tokens: s.tokens.map((t) => (t.id === token.id ? { ...t, balance: t.balance - tx.amount } : t)),
           transactions: [
-            {
-              ...tx,
-              id: `tx-${Date.now()}`,
-              timestamp: Date.now(),
-              status: 'confirmed',
-              risk,
-            },
+            { ...tx, id: `tx-${Date.now()}`, timestamp: Date.now(), status: 'confirmed', risk },
             ...s.transactions,
           ],
         }
@@ -222,39 +319,34 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const addBlockedToken = useCallback((bt: Omit<BlockedToken, 'id' | 'blockedAt'>) => {
     setState((s) => ({
       ...s,
-      blockedTokens: [
-        { ...bt, id: `bt-${Date.now()}`, blockedAt: Date.now() },
-        ...s.blockedTokens,
-      ],
+      blockedTokens: [{ ...bt, id: `bt-${Date.now()}`, blockedAt: Date.now() }, ...s.blockedTokens],
     }))
   }, [])
 
   const removeBlockedToken = useCallback((id: string) => {
-    setState((s) => ({
-      ...s,
-      blockedTokens: s.blockedTokens.filter((bt) => bt.id !== id),
-    }))
+    setState((s) => ({ ...s, blockedTokens: s.blockedTokens.filter((bt) => bt.id !== id) }))
   }, [])
 
   const addSecurityEvent = useCallback((ev: Omit<SecurityEvent, 'id' | 'timestamp'>) => {
     setState((s) => ({
       ...s,
-      securityEvents: [
-        { ...ev, id: `se-${Date.now()}`, timestamp: Date.now() },
-        ...s.securityEvents,
-      ],
+      securityEvents: [{ ...ev, id: `se-${Date.now()}`, timestamp: Date.now() }, ...s.securityEvents],
     }))
   }, [])
 
-  const clearSecurityEvents = useCallback(() => {
-    setState((s) => ({ ...s, securityEvents: [] }))
-  }, [])
+  const clearSecurityEvents = useCallback(() => setState((s) => ({ ...s, securityEvents: [] })), [])
 
-  // Compute global risk score dynamically
   const globalRiskScore = computeGlobalRiskScore(state.tokens, state.vaultUnlocked, state.safeSessionActive)
 
   const value: WalletContextValue = {
     ...state,
+    realWallet,
+    isLocked,
+    lockWallet,
+    setRealWallet,
+    realBalances,
+    refreshBalances,
+    loadingBalances,
     globalRiskScore,
     unlockVault,
     lockVault,
@@ -280,3 +372,4 @@ export function useWallet() {
 }
 
 export { INITIAL_BLOCKED_TOKENS, INITIAL_BLOCKED_SITES }
+export { chainById }
