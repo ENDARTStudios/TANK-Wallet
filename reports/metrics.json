@@ -1,0 +1,614 @@
+{
+  "generatedAt": "2026-07-15T03:24:20.241Z",
+  "commit": "941e82ec5072d740865224c1aa8a7d89de6320ca",
+  "scriptVersion": "1.0.0",
+  "metrics": {
+    "architecture": {
+      "name": "Architecture Compliance",
+      "description": "Structural conformance of the 10 frozen architecture components. Measures presence, not correctness.",
+      "score": 95,
+      "weight": 0.2,
+      "formula": "(componentes_conformes / 10) × 100",
+      "checks": [
+        {
+          "name": "Security Kernel exists",
+          "description": "src/lib/wallet-security-real/ contains kernel orchestrator",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "src/lib/wallet-security-real/index.ts present"
+        },
+        {
+          "name": "16 Security Engines present",
+          "description": "src/lib/wallet-engines/ has expected engine directories",
+          "weight": 0.15,
+          "passed": true,
+          "evidence": "12 engines in src/lib/wallet-engines/",
+          "notes": "Architecture declares 16 engines; 12 are present as directories. The remaining 4 (device-trust, wallet-guardian, ai-security, governance) are partially embedded in other engines or pending extraction."
+        },
+        {
+          "name": "Tank Security Standard (TSS) documented",
+          "description": "TSS-001 through TSS-010 specs exist",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "Baseline document present (TSS covered in main architecture doc)",
+          "notes": "TSS specs are documented in ARCHITECTURE.md and baseline. Separate per-spec files in docs/tss/ are planned."
+        },
+        {
+          "name": "Tank Security Framework (TSF) documented",
+          "description": "7 domains: User/Blockchain/Wallet/Infra/Privacy/AI/Business Protection",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "ARCHITECTURE.md references 7 protection domains"
+        },
+        {
+          "name": "Security Governance Layer (registries)",
+          "description": "Prisma schema contains threat/policy/trust/audit registries",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "ThreatToken, ThreatSite, ThreatAddress, ThreatExploit, PermissionAuditLog, BehaviorProfile, RecoveryContact present in prisma/schema.prisma"
+        },
+        {
+          "name": "Security Event Bus typed",
+          "description": "Event types declared and used",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "Security event types referenced in src/lib/wallet-core/types.ts and src/lib/wallet/types.ts"
+        },
+        {
+          "name": "Unified Data Model present",
+          "description": "15 shared objects in src/lib/wallet-core/",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "src/lib/wallet-core/index.ts + src/lib/wallet/types.ts present",
+          "notes": "Unified data model is split across wallet-core and wallet/types; consolidation planned for next minor."
+        },
+        {
+          "name": "ChainPlugin Interface (apiVersion 1.0) + 4 plugins",
+          "description": "Plugin system with Ethereum, Bitcoin, Solana, Lightning",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "Plugin engine + EVM/Solana/BTC/Lightning support detected",
+          "notes": "Chain plugins are partially integrated through wallet-evm, wallet-core (BTC), and wallet-sovereignty (Lightning). A unified ChainPlugin interface is planned."
+        },
+        {
+          "name": "Architecture Contracts documented",
+          "description": "15 immutable contracts: SecurityEngine, Event Bus, Data Model, etc.",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "Architecture contracts referenced in baseline document"
+        },
+        {
+          "name": "Decision Engine (evidence-based)",
+          "description": "Decision pipeline produces evidence[], sources[], engineScores{}",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "decision engine not fully typed"
+        }
+      ],
+      "computedAt": "2026-07-15T03:24:20.245Z",
+      "scriptVersion": "1.0.0"
+    },
+    "engineering": {
+      "name": "Engineering Readiness",
+      "description": "Implementation quality: absence of code smells, strict typing, test coverage, crypto validation, reproducibility.",
+      "score": 20,
+      "weight": 0.2,
+      "formula": "Σ(criterion_score × criterion_weight) × 100 — 11 weighted criteria",
+      "checks": [
+        {
+          "name": "No TODO/FIXME/HACK/XXX in src/",
+          "description": "rg 'TODO|FIXME|XXX|HACK' in src/ returns 0 matches",
+          "weight": 0.12,
+          "passed": false,
+          "evidence": "8 matches of TODO/FIXME/XXX/HACK in src/",
+          "notes": "See reports/code-audit.md for full list with file/line/severity."
+        },
+        {
+          "name": "No console.log in src/",
+          "description": "rg 'console.log' in src/ returns 0 matches (excluding tests)",
+          "weight": 0.08,
+          "passed": false,
+          "evidence": "2 matches of console.log in src/"
+        },
+        {
+          "name": "No `any` type in production code",
+          "description": "rg ': any' | 'as any' in src/ (excluding tests)",
+          "weight": 0.08,
+          "passed": false,
+          "evidence": "11 matches of explicit any in src/",
+          "notes": "Strict mode currently has noImplicitAny=false. Needs hardening to noUncheckedIndexedAccess + exactOptionalPropertyTypes."
+        },
+        {
+          "name": "No @ts-ignore in src/",
+          "description": "rg '@ts-ignore' in src/ returns 0 matches",
+          "weight": 0.05,
+          "passed": true,
+          "evidence": "0 matches of @ts-ignore in src/"
+        },
+        {
+          "name": "TypeScript strict mode enabled",
+          "description": "tsconfig.json has strict: true",
+          "weight": 0.05,
+          "passed": true,
+          "evidence": "tsconfig.json: strict=true",
+          "notes": "noImplicitAny=false (should be true). noUncheckedIndexedAccess and exactOptionalPropertyTypes not yet enabled."
+        },
+        {
+          "name": "Conformance suite exists",
+          "description": "Tests covering chain plugin interface (11 tests × 4 plugins)",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "Conformance test files present"
+        },
+        {
+          "name": "Coverage report exists (>=95%)",
+          "description": "Coverage report shows >=95% lines and >=90% branches",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "no coverage/ directory or coverage-summary.json present",
+          "notes": "vitest --coverage or c8 not yet integrated. Will be added when CI Quality Gates land (Sprint 4)."
+        },
+        {
+          "name": "Crypto vectors committed",
+          "description": "15 vector sets (BIP-39, BIP-32, SLIP-10, secp256k1, Ed25519, AES-GCM, HKDF, PBKDF2, HMAC, SHA-256, Shamir SLIP-39, EIP-1559/712/191) present",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "no vector test files committed yet",
+          "notes": "Vector files need to be added at src/lib/wallet-core/__tests__/vectors/ and src/lib/wallet-engines/recovery/__tests__/vectors/. See ENGINEERING-STANDARDS.md §12."
+        },
+        {
+          "name": "Build reproducible",
+          "description": "Two builds produce identical hash",
+          "weight": 0.1,
+          "passed": false,
+          "evidence": "no reproducibility verification in place",
+          "notes": "Will use Next.js deterministic build + locked bun.lockb + container build."
+        },
+        {
+          "name": "SBOM published",
+          "description": "CycloneDX SBOM artefact at release time",
+          "weight": 0.07,
+          "passed": false,
+          "evidence": "no SBOM artefact found",
+          "notes": "Will be generated via @cyclonedx/cyclonedx-npm in CI (Sprint 4)."
+        },
+        {
+          "name": "Releases signed (sigstore)",
+          "description": "Release artefact is signed",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "no signing in place",
+          "notes": "Will use sigstore/cosign in CI (Sprint 4)."
+        }
+      ],
+      "computedAt": "2026-07-15T03:24:20.349Z",
+      "scriptVersion": "1.0.0"
+    },
+    "security": {
+      "name": "Security Readiness",
+      "description": "Per-engine real implementation. Audit engine has 0% weight until Sprint 5; therefore max achievable before audit is 91%.",
+      "score": 90,
+      "weight": 0.25,
+      "formula": "Σ(engine_score × engine_weight) × 100 — 9 engines, Audit weight=0%",
+      "checks": [
+        {
+          "name": "Threat Intel (GoPlus real)",
+          "description": "Weight: 20%",
+          "weight": 0.2,
+          "passed": true,
+          "evidence": "src/app/api/goplus/ routes + Prisma ThreatToken/ThreatSite/ThreatAddress models"
+        },
+        {
+          "name": "Simulation (eth_call real)",
+          "description": "Weight: 15%",
+          "weight": 0.15,
+          "passed": true,
+          "evidence": "src/lib/wallet-evm/ uses viem eth_call"
+        },
+        {
+          "name": "Policy (6 policies + 11 conditions)",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "src/lib/wallet-engines/policy/ present"
+        },
+        {
+          "name": "Permissions (universal: ERC-20/721/1155/Permit2/4337/SPL/BTC/Lightning)",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "src/lib/wallet-sovereignty/ + permission engine"
+        },
+        {
+          "name": "Behavior (anomaly detection)",
+          "description": "Weight: 15%",
+          "weight": 0.15,
+          "passed": true,
+          "evidence": "src/lib/wallet-engines/behavior/ + BehaviorProfile/BehaviorAnomaly models"
+        },
+        {
+          "name": "Network (RPC pool + quorum + failover)",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "src/lib/wallet-evm/ with multi-RPC failover"
+        },
+        {
+          "name": "Device Trust (WebAuthn + WebCrypto)",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "WebAuthn/WebCrypto usage detected in src/"
+        },
+        {
+          "name": "Crypto (vectors validated)",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "passed": false,
+          "evidence": "vector files not yet committed (see Engineering Readiness)",
+          "notes": "Blocked: depends on Engineering Readiness 'Crypto vectors committed' criterion."
+        },
+        {
+          "name": "Audit (external validation)",
+          "description": "Weight: 0%",
+          "weight": 0,
+          "passed": false,
+          "evidence": "no external audit completed yet",
+          "notes": "Weight is 0% by design. After Audit #1 + #2 in Sprint 5, this engine gets weight 15% and other weights are recalibrated."
+        }
+      ],
+      "computedAt": "2026-07-15T03:24:20.363Z",
+      "scriptVersion": "1.0.0"
+    },
+    "assurance": {
+      "name": "Security Assurance",
+      "description": "EXTERNAL validation only. Without audit, max achievable is ~5% (only SECURITY.md). Implementation does not count here.",
+      "score": 0,
+      "weight": 0.25,
+      "formula": "Σ(validation_item × item_weight) × 100 — 7 external validation items",
+      "checks": [
+        {
+          "name": "Audit #1 completed (no criticals)",
+          "description": "External crypto audit by qualified firm, no critical findings",
+          "weight": 0.25,
+          "passed": false,
+          "evidence": "not yet started (planned Sprint 5)"
+        },
+        {
+          "name": "Audit #2 completed (no criticals)",
+          "description": "External audit of engines + decision pipeline",
+          "weight": 0.25,
+          "passed": false,
+          "evidence": "not yet started (planned Sprint 5)"
+        },
+        {
+          "name": "Pentest #1 completed (no criticals)",
+          "description": "Frontend + API + browser extension red team",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "not yet started"
+        },
+        {
+          "name": "Pentest #2 completed (no criticals)",
+          "description": "Infra + deployment + supply chain red team",
+          "weight": 0.1,
+          "passed": false,
+          "evidence": "not yet started"
+        },
+        {
+          "name": "Bug bounty public (no criticals open for 90 days)",
+          "description": "Immunefi or HackerOne program live",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "not yet started (after Audit #1)"
+        },
+        {
+          "name": "SECURITY.md published",
+          "description": "Public disclosure policy + PGP key + SLA",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "no SECURITY.md",
+          "notes": "To be created in Sprint 5."
+        },
+        {
+          "name": "2+ independent validation sources",
+          "description": "Two separate external firms have validated",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "0 sources so far"
+        }
+      ],
+      "computedAt": "2026-07-15T03:24:20.363Z",
+      "scriptVersion": "1.0.0"
+    },
+    "evidence": {
+      "name": "Security Evidence",
+      "description": "Distinct from Readiness and Assurance. Measures whether each engine produces structured, reproducible, source-attributed evidence automatically.",
+      "score": 82,
+      "weight": 0.1,
+      "formula": "Σ(engine_evidence × engine_weight) × 100 — 7 engines",
+      "checks": [
+        {
+          "name": "Threat Intel produces structured evidence",
+          "description": "Weight: 18%",
+          "weight": 0.18,
+          "passed": true,
+          "evidence": "Prisma ThreatToken/Site/Address models with structured fields (source, severity, lastConfirmedAt)"
+        },
+        {
+          "name": "Simulation produces state diff",
+          "description": "Weight: 18%",
+          "weight": 0.18,
+          "passed": true,
+          "evidence": "wallet-evm exposes call/simulate returning structured result"
+        },
+        {
+          "name": "Behavior produces score + reasons",
+          "description": "Weight: 15%",
+          "weight": 0.15,
+          "passed": true,
+          "evidence": "BehaviorAnomaly model with score (Int) + reasons (JSON)"
+        },
+        {
+          "name": "Network produces RPC metadata",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "passed": true,
+          "evidence": "wallet-evm references multiple RPC providers (publicnode, 1rpc, llamarpc)"
+        },
+        {
+          "name": "Decision produces evidence[] + sources[] + engineScores{}",
+          "description": "Weight: 18%",
+          "weight": 0.18,
+          "passed": false,
+          "evidence": "decision lacks evidence structure",
+          "notes": "Verifies type definitions only. Runtime production of evidence is verified by integration tests (pending)."
+        },
+        {
+          "name": "Audit log is HMAC-signed + append-only",
+          "description": "Weight: 15%",
+          "weight": 0.15,
+          "passed": true,
+          "evidence": "PermissionAuditLog model + audit engine present",
+          "notes": "HMAC signing + tamper-evidence not yet verified at runtime. Pending implementation of HMAC chain."
+        },
+        {
+          "name": "Recovery produces Shamir share metadata",
+          "description": "Weight: 6%",
+          "weight": 0.06,
+          "passed": true,
+          "evidence": "Recovery engine + Shamir SSS scripts present"
+        }
+      ],
+      "computedAt": "2026-07-15T03:24:20.363Z",
+      "scriptVersion": "1.0.0"
+    },
+    "operations": {
+      "name": "Operational Readiness",
+      "description": "Production operation capability. Measures infra+process, not runtime SLOs (those kick in post-launch).",
+      "score": 10,
+      "weight": 0.2,
+      "formula": "Σ(op_item × item_weight) × 100 — 10 operational items",
+      "checks": [
+        {
+          "name": "Structured logger exists",
+          "description": "src/lib/observability/logger.ts (Pino or equivalent)",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "no structured logger (currently uses console.* in places — see code-audit)",
+          "notes": "Must be created per ENGINEERING-STANDARDS.md §6. Pino recommended."
+        },
+        {
+          "name": "Prometheus metrics exposed",
+          "description": "Metrics endpoint + client library",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "no prom-client detected"
+        },
+        {
+          "name": "Tracing (OpenTelemetry) integrated",
+          "description": "src/lib/observability/tracing.ts",
+          "weight": 0.1,
+          "passed": false,
+          "evidence": "no OTel SDK detected"
+        },
+        {
+          "name": "Alertmanager + alerts configured",
+          "description": "alerts.yml + routing rules",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "no alert config"
+        },
+        {
+          "name": "Error tracking (Sentry)",
+          "description": "Sentry SDK integrated in client + server",
+          "weight": 0.1,
+          "passed": false,
+          "evidence": "no Sentry SDK in dependencies"
+        },
+        {
+          "name": "Incident Response runbook",
+          "description": "docs/runbooks/incident-response.md",
+          "weight": 0.1,
+          "passed": false,
+          "evidence": "no IR runbook"
+        },
+        {
+          "name": "Disaster Recovery tested",
+          "description": "DR plan + tested in last 90 days",
+          "weight": 0.1,
+          "passed": false,
+          "evidence": "no DR plan"
+        },
+        {
+          "name": "Backup automation + restore tested",
+          "description": "Backup script + restore drill",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "no backup automation"
+        },
+        {
+          "name": "SOC Dashboard operational",
+          "description": "Dashboard with real telemetry",
+          "weight": 0.05,
+          "passed": true,
+          "evidence": "sprint4-dashboard component present (UI exists, data partial)",
+          "notes": "UI exists but consumes hardcoded data; needs to consume reports/metrics.json."
+        },
+        {
+          "name": "Update Cycle SLA documented",
+          "description": "8 components with formal update frequency",
+          "weight": 0.05,
+          "passed": true,
+          "evidence": "referenced in baseline document"
+        }
+      ],
+      "computedAt": "2026-07-15T03:24:20.381Z",
+      "scriptVersion": "1.0.0"
+    },
+    "release": {
+      "name": "Release Readiness",
+      "description": "Release pipeline maturity. Below 100% = no public GA release.",
+      "score": 0,
+      "weight": 0.15,
+      "formula": "Σ(release_item × item_weight) × 100 — 11 release items",
+      "checks": [
+        {
+          "name": "CI/CD pipeline",
+          "description": ".github/workflows/ with build+test+lint",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "no CI config found",
+          "notes": "Pipeline must implement full gate sequence per ENGINEERING-STANDARDS.md §11.2."
+        },
+        {
+          "name": "Reproducible build",
+          "description": "Two builds produce identical hash",
+          "weight": 0.2,
+          "passed": false,
+          "evidence": "not implemented",
+          "notes": "Requires deterministic Next.js build + locked bun.lockb + container build."
+        },
+        {
+          "name": "SBOM published",
+          "description": "CycloneDX SBOM at release",
+          "weight": 0.1,
+          "passed": false,
+          "evidence": "no SBOM artefact"
+        },
+        {
+          "name": "Release signed (sigstore)",
+          "description": "Release artefact signed via sigstore/cosign",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "not implemented"
+        },
+        {
+          "name": "SAST in CI (Semgrep + CodeQL)",
+          "description": "Semgrep + CodeQL running on every PR",
+          "weight": 0.1,
+          "passed": false,
+          "evidence": "no SAST config"
+        },
+        {
+          "name": "DAST in CI (ZAP baseline)",
+          "description": "Weekly ZAP scan in staging",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "not implemented"
+        },
+        {
+          "name": "Dependabot/Renovate",
+          "description": "Auto PRs for dependency updates",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "no Dependabot/Renovate config"
+        },
+        {
+          "name": "Trivy in CI",
+          "description": "Container + dependency scan",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "not implemented"
+        },
+        {
+          "name": "Gitleaks in CI",
+          "description": "Secret scanning on every commit",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "not implemented"
+        },
+        {
+          "name": "CHANGELOG public",
+          "description": "CHANGELOG.md following Keep a Changelog",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "no CHANGELOG"
+        },
+        {
+          "name": "Release notes published",
+          "description": "GitHub Release with notes per minor",
+          "weight": 0.05,
+          "passed": false,
+          "evidence": "no releases yet"
+        }
+      ],
+      "computedAt": "2026-07-15T03:24:20.381Z",
+      "scriptVersion": "1.0.0"
+    },
+    "confidence": {
+      "name": "Overall Confidence",
+      "description": "Composite weighted score. NOT a security claim — only a progress indicator. Real assurance requires external audit (see Assurance metric).",
+      "score": 40,
+      "weight": 1,
+      "formula": "Architecture×20% + Engineering×20% + Avg(SecReadiness, SecAssurance)×15% + Evidence×10% + Operations×20% + Release×15%\nInputs: Arch=95, Eng=20, SecR=90, SecA=0, SecAvg=45.0, Ev=82, Ops=10, Rel=0\nRaw = 39.95",
+      "checks": [
+        {
+          "name": "Architecture Compliance",
+          "description": "20% weight",
+          "weight": 0.2,
+          "passed": false,
+          "evidence": "95% × 0.20 = 19.0"
+        },
+        {
+          "name": "Engineering Readiness",
+          "description": "20% weight",
+          "weight": 0.2,
+          "passed": false,
+          "evidence": "20% × 0.20 = 4.0"
+        },
+        {
+          "name": "Security (avg Readiness + Assurance)",
+          "description": "15% weight",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "(90 + 0) / 2 × 0.15 = 6.8"
+        },
+        {
+          "name": "Security Evidence",
+          "description": "10% weight",
+          "weight": 0.1,
+          "passed": false,
+          "evidence": "82% × 0.10 = 8.2"
+        },
+        {
+          "name": "Operational Readiness",
+          "description": "20% weight",
+          "weight": 0.2,
+          "passed": false,
+          "evidence": "10% × 0.20 = 2.0"
+        },
+        {
+          "name": "Release Readiness",
+          "description": "15% weight",
+          "weight": 0.15,
+          "passed": false,
+          "evidence": "0% × 0.15 = 0.0"
+        }
+      ],
+      "computedAt": "2026-07-15T03:24:20.381Z",
+      "scriptVersion": "1.0.0"
+    }
+  },
+  "inconsistencies": []
+}

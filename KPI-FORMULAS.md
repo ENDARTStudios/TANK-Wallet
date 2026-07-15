@@ -4,11 +4,54 @@
 >
 > Objetivo: qualquer auditor com acesso ao repositório deve conseguir
 > recalcular cada percentual exibido em dashboards e relatórios a partir
-> destas fótrmulas e dos dados em `scripts/metrics/` (a serem implementados).
+> destas fórmulas e dos scripts em `scripts/metrics/`.
 >
 > Status: **Ativo a partir de Architecture Frozen 1.0**
 > Mantenedor: Engineering Lead + Security Lead
 > Princípio: **KPI sem fórmula pública é claim de marketing, não métrica.**
+
+---
+
+## ⚠ Regra Absoluta: Zero Percentuais Hardcoded
+
+> **Nenhum percentual pode aparecer hardcoded em dashboard, documentação
+> ou comunicação.** Todos os números devem ser derivados de
+> `reports/metrics.json`, gerado por `bun run metrics`.
+
+Fluxo obrigatório:
+
+```
+Código
+   ↓
+Testes
+   ↓
+Scanners
+   ↓
+Scripts em scripts/metrics/
+   ↓
+reports/metrics.json
+   ↓
+Dashboard / Documentos / Comunicação
+```
+
+- Dashboards consumindo `reports/metrics.json` em vez de constantes.
+- Documentos referenciam fórmulas, não valores fixos.
+- Comunicação cita valores com data de medição (ex.: "Overall Confidence
+  era 40% em 2026-07-15, commit 941e82ec").
+
+Comando único para regenerar todos os KPIs:
+
+```bash
+bun run metrics
+```
+
+Gera:
+
+```
+reports/
+    metrics.json     # máquina-legível, fonte de verdade
+    metrics.md       # humano-legível, para revisão
+```
 
 ---
 
@@ -22,9 +65,16 @@
    é público e justificado.
 4. **Toda métrica tem data de medição.** Sem data, é instantâneo sem
    contexto.
-5. **KPIs internos ≠ Evidências de segurança.** Os números abaixo são
-   indicadores de progresso do projeto, não claims auditáveis. Evidência
-   objetiva de segurança vem de auditoria independente + testes reproduzíveis.
+5. **KPIs internos ≠ Evidências de segurança.** Os números são indicadores
+   de progresso, não claims auditáveis. Evidência objetiva de segurança vem
+   de auditoria independente + testes reproduzíveis.
+6. **Três dimensões de segurança, não duas.** Toda métrica de segurança
+   se enquadra em:
+   - **Readiness** — foi implementado?
+   - **Evidence** — consegue provar automaticamente?
+   - **Assurance** — terceiros independentes confirmaram?
+7. **Zero hardcoded.** Nenhum percentual é digitado manualmente. Tudo
+   derivado de `reports/metrics.json`.
 
 ---
 
@@ -61,7 +111,8 @@ bun run scripts/metrics/architecture-compliance.ts
 
 ### Status Atual
 
-**100% (10/10 componentes conformes)** — medido em 2026-07-15.
+> Veja `reports/metrics.json` → `metrics.architecture.score`.
+> Regenerado por `bun run metrics`. Não citar valores hardcoded.
 
 ### Limitação
 
@@ -107,8 +158,8 @@ bun run scripts/metrics/engineering-readiness.ts
 
 ### Status Atual
 
-**92% (10 de 11 critérios conformes, SBOM e builds assinados pendentes)** —
-medido em 2026-07-15.
+> Veja `reports/metrics.json` → `metrics.engineering.score`.
+> Regenerado por `bun run metrics`. Não citar valores hardcoded.
 
 ### Limitação
 
@@ -161,23 +212,23 @@ def security_readiness():
 
 ### Status Atual
 
-**91%** — medido em 2026-07-15.
-
-Cálculo: `(1×0.20 + 1×0.15 + 1×0.10 + 1×0.10 + 1×0.15 + 1×0.10 + 1×0.10 + 1×0.10 + 0×0.00) × 100 = 91%`
+> Veja `reports/metrics.json` → `metrics.security.score`.
+> Regenerado por `bun run metrics`. Não citar valores hardcoded.
 
 ### Limitação CRÍTICA
 
 - **Audit (0%)**: sem auditoria externa, esta métrica **não pode atingir
-  100%** por design. Maximum atual = 91% mesmo com implementação perfeita.
-- Os 91% refletem implementação **auto-reportada**, não validação externa.
+  100%** por design. Máximo atual = 91% mesmo com implementação perfeita.
+- O score reflete implementação **auto-reportada**, não validação externa.
 - Após Audit #1 e #2 (Sprint 5), o peso de Audit sobe para 15% e os outros
   pesos são recalibrados.
 
 ### Script de Verificação
 
 ```bash
-bun run scripts/metrics/security-readiness.ts
-# Output: JSON com score por engine + score total + data de medição
+bun run metrics
+# Output: reports/metrics.json + reports/metrics.md
+# Detalhes por engine em metrics.security.checks[]
 ```
 
 ---
@@ -209,7 +260,8 @@ Security Assurance = (Σ(validation_item × item_weight)) × 100
 
 ### Status Atual
 
-**25% (apenas SECURITY.md parcialmente planejado)** — medido em 2026-07-15.
+> Veja `reports/metrics.json` → `metrics.assurance.score`.
+> Regenerado por `bun run metrics`. Não citar valores hardcoded.
 
 ### Limitação CRÍTICA
 
@@ -221,7 +273,87 @@ Security Assurance = (Σ(validation_item × item_weight)) × 100
 
 ---
 
-## 5. Operational Readiness (Target: ≥90%)
+## 5. Security Evidence (Target: ≥95%) — NOVO
+
+### Princípio
+
+> **Evidence ≠ Readiness ≠ Assurance.** São três dimensões distintas.
+>
+> - **Readiness** — foi implementado?
+> - **Evidence** — consegue provar automaticamente, com registro estruturado,
+>   que o engine fez seu trabalho?
+> - **Assurance** — terceiros independentes confirmaram?
+
+Um engine pode estar 100% implementado (Readiness), produzir 100% de
+evidência estruturada (Evidence), mas ainda ter 0% de Assurance até que
+uma auditoria externa valide.
+
+### Fórmula
+
+```
+Security Evidence = (Σ(engine_evidence × engine_weight)) × 100
+```
+
+Um engine "produz evidence" quando seus outputs incluem:
+
+1. **Registros estruturados** (objetos tipados, não strings free-form)
+2. **Atribuição de fonte** (de onde veio o dado: RPC endpoint, API,
+   database, cálculo local)
+3. **Timestamps** (quando o dado foi produzido)
+4. **Reprodutibilidade** (input que permite re-executar e obter mesmo
+   resultado)
+
+### Pesos por Engine
+
+| Engine | Peso | Critério de "produz evidence" |
+|--------|------|-------------------------------|
+| Threat Intel | 18% | Estrutura tipada com source, severity, lastConfirmedAt |
+| Simulation | 18% | State diff estruturado + input reproduzível |
+| Behavior | 15% | Score (Int) + reasons (JSON estruturado) |
+| Network | 10% | RPC metadata (provider, latency, block height) |
+| Decision | 18% | `evidence[]` + `sources[]` + `engineScores{}` + `reproducible` |
+| Audit | 15% | HMAC-signed, append-only, tamper-evident |
+| Recovery | 6% | Shamir share metadata (threshold, shares, group) |
+
+### Exemplo de Cálculo
+
+```
+Threat Engine    Evidence: 100%  × 18% = 18.0
+Simulation       Evidence: 100%  × 18% = 18.0
+Behavior         Evidence:  96%  × 15% = 14.4
+Network          Evidence: 100%  × 10% = 10.0
+Decision         Evidence: 100%  × 18% = 18.0
+Audit            Evidence: 100%  × 15% = 15.0
+Recovery         Evidence: 100%  ×  6% =  6.0
+─────────────────────────────────────────────
+Security Evidence                = 99.4%
+```
+
+### Status Atual
+
+> Veja `reports/metrics.json` → `metrics.evidence.score`.
+> Regenerado por `bun run metrics`. Não citar valores hardcoded.
+
+### Limitação
+
+- Evidence mede **capacidade de produzir prova estruturada**, não a
+  corretude da prova em si.
+- Um engine pode produzir evidence estruturada mas com cálculo errado.
+- Correctness é medida por testes de propriedade + vetores oficiais.
+- Evidence + Correctness + External Audit = Assurance completo.
+
+### Distinção com Evidence Coverage (§7)
+
+- **Security Evidence** (esta seção, §5) — capacidade da plataforma de
+  produzir prova estruturada, por engine.
+- **Evidence Coverage** (§7) — % de decisões que de fato contêm evidence[]
+  não-vazio em runtime.
+
+A primeira é capacidade; a segunda é aderência em uso real.
+
+---
+
+## 6. Operational Readiness (Target: ≥90%)
 
 ### Fórmula
 
@@ -246,8 +378,8 @@ Operational Readiness = (Σ(op_item × item_weight)) × 100
 
 ### Status Atual
 
-**25% (SOC Dashboard parcial + Update Cycle SLA documentado)** — medido
-em 2026-07-15.
+> Veja `reports/metrics.json` → `metrics.operations.score`.
+> Regenerado por `bun run metrics`. Não citar valores hardcoded.
 
 ### Limitação
 
@@ -257,7 +389,7 @@ em 2026-07-15.
 
 ---
 
-## 6. Release Readiness (Target: 100%)
+## 7. Release Readiness (Target: 100%)
 
 ### Fórmula
 
@@ -294,7 +426,7 @@ Release Readiness = (Σ(release_item × item_weight)) × 100
 
 ---
 
-## 7. Evidence Coverage (Target: 100%)
+## 8. Evidence Coverage (Target: 100%)
 
 ### Fórmula
 
@@ -324,52 +456,48 @@ em cache stale).
 
 ---
 
-## 8. Overall Confidence Score (Composto)
+## 9. Overall Confidence Score (Composto)
 
 ### Fórmula
 
 ```
-Overall Confidence = (Arch × 0.20) + (Eng × 0.20) + (Sec × 0.25) + (Ops × 0.20) + (Rel × 0.15)
+Overall Confidence =
+    (Architecture × 0.20)
+  + (Engineering × 0.20)
+  + (Average(Security Readiness, Security Assurance) × 0.15)
+  + (Security Evidence × 0.10)
+  + (Operations × 0.20)
+  + (Release × 0.15)
 ```
 
 Onde:
-- `Arch` = Architecture Compliance (0-100)
-- `Eng` = Engineering Readiness (0-100)
-- `Sec` = (Security Readiness + Security Assurance) / 2 (média aritmética)
-- `Ops` = Operational Readiness (0-100)
-- `Rel` = Release Readiness (0-100)
+- `Architecture` = Architecture Compliance (0-100)
+- `Engineering` = Engineering Readiness (0-100)
+- `Security` = (Security Readiness + Security Assurance) / 2 (média aritmética)
+- `Evidence` = Security Evidence (0-100) — capacidade de prova estruturada
+- `Operations` = Operational Readiness (0-100)
+- `Release` = Release Readiness (0-100)
 
 ### Justificativa dos Pesos
 
 | Componente | Peso | Razão |
 |-----------|------|-------|
-| Architecture | 20% | É a fundação; sem ela nada se sustenta, mas já está 100% |
-| Engineering | 20% | Implementação é onde bugs moram; peso alto reflete risco |
-| Security | 25% | Peso mais alto: produto é de segurança; assurance vale tanto quanto readiness |
-| Operations | 20% | Sem observability, nada se sabe em produção |
-| Release | 15% | Gate final, mas dependente dos anteriores |
+| Architecture | 20% | Fundação; sem ela nada se sustenta. Já é alta e estável. |
+| Engineering | 20% | Implementação é onde bugs moram; peso alto reflete risco. |
+| Security (avg) | 15% | Readiness + Assurance combinados. Assurance sem readiness é vazio; readiness sem assurance é claim. |
+| Evidence | 10% | Distinto dos dois: capacidade de produzir prova estruturada automaticamente. |
+| Operations | 20% | Sem observability, nada se sabe em produção. |
+| Release | 15% | Gate final, mas dependente dos anteriores. |
 
-### Cálculo Atual
-
-```
-Arch = 100
-Eng  = 92
-Sec  = (91 + 25) / 2 = 58
-Ops  = 25
-Rel  = 14
-
-Overall = (100 × 0.20) + (92 × 0.20) + (58 × 0.25) + (25 × 0.20) + (14 × 0.15)
-        = 20.0 + 18.4 + 14.5 + 5.0 + 2.1
-        = 60.0
-```
+Soma dos pesos: **1.00** (20+20+15+10+20+15).
 
 ### Status Atual
 
-**60%** — medido em 2026-07-15.
-
-> Nota: O valor previamente reportado como 68% usava pesos diferentes.
-> Esta fórmula é a oficial. Os 60% refletem mais fielmente o estado real,
-> pois penalizam a baixa Assurance e baixa Operational Readiness.
+> Veja `reports/metrics.json` → `metrics.confidence.score`.
+> Regenerado por `bun run metrics`. Não citar valores hardcoded.
+>
+> Para auditoria: o campo `metrics.confidence.formula` em `metrics.json`
+> contém os inputs e o cálculo passo a passo usados nesta medição.
 
 ### Limitação CRÍTICA
 
@@ -378,10 +506,13 @@ Overall = (100 × 0.20) + (92 × 0.20) + (58 × 0.25) + (25 × 0.20) + (14 × 0.
 - Um sistema com Overall = 90% pode ainda ter bugs críticos não detectados.
 - Use esta métrica como **indicador de progresso**, não como claim de
   qualidade.
+- A única métrica que pode subir com trabalho interno é Engineering,
+  Evidence e Operations. Security (Assurance metade) e Release exigem
+  validação externa.
 
 ---
 
-## 9. Dynamic Security Score (UX)
+## 10. Dynamic Security Score (UX)
 
 ### Princípio
 
@@ -448,7 +579,7 @@ def security_score(threat_intel_risk, device_risk, behavior_risk,
 
 ---
 
-## 10. KPIs Permanentes Pós-v1.0
+## 11. KPIs Permanentes Pós-v1.0
 
 Após release v1.0, os KPIs de readiness perdem relevância (todos devem ser
 100% ou near-100%). KPIs operacionais ganham peso:
@@ -482,34 +613,71 @@ Todos estes KPIs são computados a partir de:
 
 ---
 
-## 11. Script de Verificação Unificado
+## 12. Script de Verificação Unificado
 
 ```bash
 # Computa todos os KPIs acima e gera JSON + markdown report
-bun run scripts/metrics/all-kpis.ts --date=$(date -u +%Y-%m-%d)
-# Output: /home/z/my-project/download/kpi-report-YYYY-MM-DD.json
-#         /home/z/my-project/download/kpi-report-YYYY-MM-DD.md
+bun run metrics
+# Output: reports/metrics.json (fonte de verdade, máquina-legível)
+#         reports/metrics.md   (humano-legível, para revisão)
 ```
 
-O script:
-1. Executa cada verificação individual.
-2. Coleta fonte de dados original (não usa cache).
-3. Aplica fórmulas deste documento.
-4. Gera relatório reproduzível com timestamp, versão do script, hash do
-   commit atual.
-5. Compara com relatório anterior e destaca deltas.
+Estrutura dos scripts (todos em `scripts/metrics/`):
+
+```
+scripts/metrics/
+├── _shared.ts          # tipos, file readers, output emitters
+├── architecture.ts     # §1 Architecture Compliance
+├── engineering.ts      # §2 Engineering Readiness
+├── security.ts         # §3 Security Readiness
+├── assurance.ts        # §4 Security Assurance
+├── evidence.ts         # §5 Security Evidence (NEW)
+├── operations.ts       # §6 Operational Readiness
+├── release.ts          # §7 Release Readiness
+├── confidence.ts       # §9 Overall Confidence (composite)
+└── index.ts            # master runner — chama todos, valida consistência
+```
+
+### O que cada script faz
+
+1. Lê apenas **fontes reais** (filesystem, tsconfig, Prisma schema, source
+   code via `rg`, git commit, CI artifacts quando disponíveis).
+2. **Nunca** lê lógica da aplicação em runtime — KPI é gerado fora dela.
+3. Aplica a fórmula deste documento.
+4. Retorna `MetricResult` com score, weight, checks[], evidence, notes.
+5. Master runner agrega tudo em `MetricsReport`, valida consistência
+   (weight sum = 1.0, score bounds, recomputação, audit cap), escreve
+   JSON + Markdown.
+
+### Regras de consistência (exit 1 se violadas)
+
+1. Soma dos pesos em Overall Confidence = 1.00
+2. Cada peso de métrica em [0, 1]
+3. Cada score de métrica em [0, 100]
+4. Overall Confidence score = recomputação a partir dos inputs
+5. Security Readiness sem Audit ≤ 91%
+6. Security Assurance sem audit/pentest ≤ 5%
 
 ### Reprodutibilidade
 
-- Script versionado em `scripts/metrics/`.
-- Lockfile commitado.
-- Container Docker com versão fixa do runtime para execução determinística.
-- Auditor com acesso ao repo + Docker pode reproduzir o relatório byte-a-byte
-  (salvo timestamps e dados voláteis como IOC freshness).
+- Scripts versionados em `scripts/metrics/` (commited no repo).
+- `bun.lockb` commited — versões de runtime determinísticas.
+- Auditor com acesso ao repo pode executar `bun run metrics` e reproduzir
+  byte-a-byte (salvo timestamp e dados voláteis como commit hash).
+- Output JSON contém `generatedAt`, `commit`, `scriptVersion` para
+  auditoria posterior.
+
+### Integração com Dashboard
+
+- Dashboards (Sprint 4, SOC Dashboard, Executive Dashboard) **não** podem
+  ter percentuais hardcoded.
+- Devem fazer fetch de `/reports/metrics.json` (ou equivalente endpoint
+  que sirva esse JSON) e renderizar a partir dele.
+- Tela de "métricas desatualizadas" aparece se `generatedAt` > 24h.
 
 ---
 
-## 12. Governança das Fórmulas
+## 13. Governança das Fórmulas
 
 ### Alterações
 
@@ -542,11 +710,12 @@ O script:
 
 ---
 
-## 13. Histórico de Versões das Fórmulas
+## 14. Histórico de Versões das Fórmulas
 
 | Versão | Data | Mudança |
 |--------|------|---------|
 | 1.0 | 2026-07-15 | Versão inicial. Fórmulas publicadas pela primeira vez. Substitui claims numéricas não-reproduzíveis usadas anteriormente. |
+| 1.1 | 2026-07-15 | Implementação dos scripts `scripts/metrics/*.ts`. Fórmulas agora são executáveis via `bun run metrics`. Adicionada 3ª dimensão de segurança: **Security Evidence** (§5). Overall Confidence recalibrado: pesos agora somam exatamente 1.00 (Arch 20 + Eng 20 + Sec 15 + Ev 10 + Ops 20 + Rel 15). Removidos todos os percentuais hardcoded do documento — status aponta para `reports/metrics.json`. Adicionada regra absoluta "Zero Percentuais Hardcoded" no topo. |
 
 ---
 

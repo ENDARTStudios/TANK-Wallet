@@ -69,6 +69,32 @@ A Tank Wallet deixou de se enquadrar como uma carteira Web3 convencional. A arqu
 
 Backlog orientado por qualidade, não por funcionalidades.
 
+## KPIs — Fonte Única de Verdade
+
+> **Nenhum percentual é hardcoded.** Todo KPI é derivado automaticamente de
+> fontes reais (filesystem, testes, scanners, CI) pelos scripts em
+> `scripts/metrics/`.
+
+```bash
+bun run metrics      # gera reports/metrics.json + reports/metrics.md
+bun run audit:code   # gera reports/code-audit.md
+```
+
+3 dimensões de segurança, todas reproduzíveis:
+
+| Dimensão | Pergunta | Script |
+|----------|----------|--------|
+| **Readiness** | Foi implementado? | `security.ts` |
+| **Evidence** | Consegue provar automaticamente? | `evidence.ts` |
+| **Assurance** | Terceiros independentes confirmaram? | `assurance.ts` |
+
+Overall Confidence = média ponderada (pesos somam 1.00):
+Architecture 20% + Engineering 20% + Security(avg R+A) 15% + Evidence 10% +
+Operations 20% + Release 15%.
+
+Veja `reports/metrics.json` para valores atuais. Veja `KPI-FORMULAS.md`
+para fórmulas completas e reprodutíveis.
+
 ## Prioridades
 
 1. **Engenharia**: 100% mocks substituídos, chains completas, plugins finalizados, código temporário eliminado, APIs internas estabilizadas
