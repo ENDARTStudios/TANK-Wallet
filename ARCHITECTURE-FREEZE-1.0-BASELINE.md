@@ -112,3 +112,66 @@ Quando todos atendidos → v1.0 sem reavaliar arquitetura.
 ## Avaliação Final
 
 A Tank Wallet evoluiu para uma arquitetura de plataforma de segurança para ativos digitais, onde a carteira é apenas um cliente do Security Kernel. O fator limitante deixa de ser o desenho arquitetural e passa a ser a qualidade da implementação. O maior ganho daqui em diante virá da robustez do código, da validação independente, da operação contínua e da confiança construída por meio de testes, auditorias e transparência técnica.
+
+---
+
+# Governança Final — 3 Estados Formais do Projeto
+
+## 1. Frozen Architecture (Imutável durante 1.x)
+
+Security Kernel, SecurityEngine Interface, Event Bus, Unified Data Model, TSS, TSF, Governance Layer, Decision Pipeline, ChainPlugin Interface, Registries.
+
+Mudanças somente em Architecture Freeze 2.0.
+
+## 2. Stable Platform (Evolui normalmente)
+
+Detectores, policies, IOC database, threat intelligence, AI models, plugins, chains, UX, traduções, documentação, regras de negócio. Atualizações compatíveis com a arquitetura congelada.
+
+## 3. Continuous Operations (Atualização permanente)
+
+IOC feeds, blocklists, allowlists, reputação, telemetria, métricas, monitoramento, incidentes, auditorias, transparency report. Nunca exigem alteração arquitetural.
+
+---
+
+# KPIs Permanentes (pós-v1.0)
+
+| KPI | Meta |
+|-----|------|
+| Decision Accuracy | >99% |
+| False Positive Rate | <1% |
+| False Negative Rate | Tendência decrescente |
+| Mean Decision Time | <100ms |
+| Threat Intel Freshness | <5min |
+| RPC Availability | >99.9% |
+| Engine Availability | >99.9% |
+| Security Incidents | 0 críticos |
+| Mean Time to Detect | Tendência decrescente |
+| Mean Time to Recover | Tendência decrescente |
+
+---
+
+# Versionamento Padronizado
+
+```
+Architecture:      1.0
+Kernel:            1.0.x
+TSS:               1.0.x
+TSF:               1.0.x
+Plugins:           1.x.x
+Threat Database:   YYYY.MM.DD
+IOC Feed:          YYYY.MM.DD.hh
+```
+
+Cada artefato evolui independentemente.
+
+---
+
+# Governance Rule (Definitiva)
+
+> Nenhum novo componente estrutural pode ser adicionado durante a série 1.x. Qualquer necessidade arquitetural deve ser registrada como candidata ao Architecture Freeze 2.0, sem alterar a baseline oficial.
+
+---
+
+# Estado Final
+
+> A Tank Wallet é uma plataforma autocustodial de segurança para ativos digitais, baseada em decisões preventivas, evidências verificáveis e defesa em profundidade.
