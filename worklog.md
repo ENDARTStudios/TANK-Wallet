@@ -473,3 +473,123 @@ Artefatos produzidos:
 - /home/z/my-project/.ai/TASK_TEMPLATE.md
 
 ---
+
+---
+WL-2026-07-15-004
+Task ID: 4 (continuação de Task ID 3 — refatoração da governança .ai/)
+Agent: main (Super Z)
+Task: Refatorar a camada .ai/ com 7 ajustes estruturais propostos pelo
+usuário: (1) subdiretórios por tipo de documento, (2) PROJECT_STATE sem
+duplicar métricas, (3) DECISION_LOG em formato rígido imutável, (4)
+ARCHITECTURE_DECISIONS.md separado, (5) PROJECT_STATE parcialmente
+auto-gerado, (6) worklog com IDs estruturados, (7) GOVERNANCE_VERSION
+no README.
+
+Work Log:
+- Lido prompt do usuário especificando os 7 ajustes.
+- Lido .ai/README.md, .ai/CORE_RULES.md, .ai/PROJECT_STATE.md,
+  .ai/DECISION_LOG.md, .ai/TASK_TEMPLATE.md para entender estado
+  atual da governança.
+- Criado subdiretórios em .ai/: rules/, state/, decisions/, templates/.
+- Movidos arquivos via Bash mv:
+  - CORE_RULES.md → rules/CORE_RULES.md
+  - ENGINEERING_RULES.md → rules/ENGINEERING_RULES.md
+  - OUTPUT_RULES.md → rules/OUTPUT_RULES.md
+  - PROMPTING_RULES.md → rules/PROMPTING_RULES.md
+  - TASK_TEMPLATE.md → templates/TASK_TEMPLATE.md
+  - DECISION_LOG.md → decisions/DECISION_LOG.md
+  - PROJECT_STATE.md → state/PROJECT_STATE.md
+- Reescrito state/PROJECT_STATE.md com split AUTO-GENERATED + MANUAL:
+  - AUTO-GENERATED: snapshot de metrics.json (commit, schema, scores,
+    release decision, code audit summary). Não editar manualmente.
+    Aponta para reports/metrics.json como fonte única.
+  - MANUAL: arquitetura, fase atual, próximos milestones, known
+    risks, roadmap, módulos existentes, módulos congelados, decisões
+    importantes, documentos permanentes.
+  - Removidas duplicações de percentuais que existiam antes (21%,
+    45%, 28%, etc.) — agora aponta para reports/metrics.json.
+  - Adicionada fase 11 "Governance Refactor" ao histórico.
+- Copiado reports/metrics.json → state/metrics.snapshot.json para
+  servir como snapshot imutável da última medição.
+- Reescrito decisions/DECISION_LOG.md com formato rígido imutável:
+  - 9 campos obrigatórios: Status, Date, Context, Decision,
+    Alternatives, Consequences, Architecture Impact, Supersedes,
+    Superseded By.
+  - Migradas 9 decisões existentes (D-001 a D-009) para o novo
+    formato com todos os campos preenchidos.
+  - Adicionada D-010 "Refatoração estrutural da governança .ai/"
+    descrevendo esta refatoração. D-010 marca D-009 como
+    superseded.
+  - Adicionadas regras: imutável, formato rígido, justificativa
+    obrigatória, alternativas obrigatórias, consequences
+    obrigatórias, architecture impact obrigatório.
+- Criado decisions/ARCHITECTURE_DECISIONS.md com 10 ADRs:
+  - ADR-001: Security Kernel como orquestrador único.
+  - ADR-002: Security Event Bus tipado.
+  - ADR-003: SecurityEngine interface.
+  - ADR-004: ChainPlugin Interface (apiVersion 1.0).
+  - ADR-005: Unified Data Model (15 objetos centrais).
+  - ADR-006: Tank Security Standard (TSS) — 10 specs.
+  - ADR-007: Tank Security Framework (TSF) — 7 domínios.
+  - ADR-008: Decision Engine evidence-based.
+  - ADR-009: Security Governance Layer (7 registries).
+  - ADR-010: Architecture Contracts (15 contratos imutáveis).
+  - Cada ADR com formato rígido de 9 campos, igual ao DECISION_LOG.
+- Reescrito .ai/README.md com:
+  - Governance Metadata no topo: Governance Version 1.1,
+    Architecture Freeze 1.0, Last Review 2026-07-15, Next Review.
+  - Nova estrutura em árvore mostrando subdiretórios.
+  - Tabela de separação por tipo de ciclo de mudança.
+  - Hierarquia de autoridade atualizada com novos paths.
+  - Comportamento permanente atualizado (10 passos).
+  - Tabela "Quando Atualizar" atualizada com novos paths.
+  - Tabela de versionamento da governança (1.0 → 1.1).
+- Atualizadas referências internas em rules/:
+  - rules/PROMPTING_RULES.md: lista de documentos para ler agora
+    usa paths .ai/rules/*, .ai/state/*, .ai/decisions/*.
+  - rules/CORE_RULES.md: "Ler .ai/ completo" atualizado para listar
+    arquivos por subdiretório.
+  - rules/ENGINEERING_RULES.md: mesma atualização.
+- Esta entrada de worklog passa a usar novo formato de ID:
+  WL-2026-07-15-004 (WL-YYYY-MM-DD-NNN).
+- Executado `bun run metrics` para confirmar que pipeline de
+  métricas continua funcionando após refatoração (sem alterações
+  em código de métricas, mas validação preventiva). All consistency
+  checks passed.
+- Atualizado state/metrics.snapshot.json com último metrics.json.
+
+Stage Summary:
+- Estrutura .ai/ refatorada em 4 subdiretórios por tipo de ciclo
+  de mudança: rules/ (normativo), state/ (estado), decisions/
+  (histórico imutável), templates/ (template).
+- PROJECT_STATE.md agora tem seção AUTO-GENERATED (derivada de
+  metrics.json, não editar) + MANUAL (fase, módulos, roadmap,
+  riscos). Elimina duplicação de percentuais — aponta para
+  reports/metrics.json como fonte única de verdade.
+- DECISION_LOG.md em formato rígido imutável com 9 campos
+  obrigatórios. 9 decisões migradas + D-010 adicionada.
+- ARCHITECTURE_DECISIONS.md criado com 10 ADRs (ADR-001 a ADR-010),
+  um por componente arquitetural congelado. Segue padrão ADR da
+  indústria.
+- README.md com Governance Version 1.1 e tabela de versionamento
+  da própria governança.
+- Worklog passa a usar IDs WL-YYYY-MM-DD-NNN para referência
+  cruzada estruturada.
+- Princípio "zero duplicação" estabelecido: sempre que um dado
+  puder ser derivado automaticamente (KPIs, status de release,
+  métricas), documentos apontam para a fonte oficial em vez de
+  manter cópia.
+
+Artefatos produzidos:
+- /home/z/my-project/.ai/README.md (reescrito com Governance Version)
+- /home/z/my-project/.ai/rules/CORE_RULES.md (movido, refs atualizadas)
+- /home/z/my-project/.ai/rules/ENGINEERING_RULES.md (movido, refs atualizadas)
+- /home/z/my-project/.ai/rules/OUTPUT_RULES.md (movido)
+- /home/z/my-project/.ai/rules/PROMPTING_RULES.md (movido, refs atualizadas)
+- /home/z/my-project/.ai/state/PROJECT_STATE.md (reescrito com split AUTO/MANUAL)
+- /home/z/my-project/.ai/state/metrics.snapshot.json (NOVO)
+- /home/z/my-project/.ai/decisions/DECISION_LOG.md (reescrito formato rígido)
+- /home/z/my-project/.ai/decisions/ARCHITECTURE_DECISIONS.md (NOVO com 10 ADRs)
+- /home/z/my-project/.ai/templates/TASK_TEMPLATE.md (movido)
+
+---

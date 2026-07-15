@@ -25,12 +25,13 @@ partes, mas todas as partes devem ser lidas — não basta ler o início.
 ### Documentos a ler integralmente antes de qualquer tarefa
 
 - `.ai/README.md`
-- `.ai/CORE_RULES.md`
-- `.ai/ENGINEERING_RULES.md`
-- `.ai/OUTPUT_RULES.md`
-- `.ai/PROJECT_STATE.md`
-- `.ai/DECISION_LOG.md`
-- `.ai/TASK_TEMPLATE.md`
+- `.ai/rules/CORE_RULES.md`
+- `.ai/rules/ENGINEERING_RULES.md`
+- `.ai/rules/OUTPUT_RULES.md`
+- `.ai/state/PROJECT_STATE.md`
+- `.ai/decisions/DECISION_LOG.md`
+- `.ai/decisions/ARCHITECTURE_DECISIONS.md`
+- `.ai/templates/TASK_TEMPLATE.md`
 - `worklog.md`
 - `reports/metrics.json`
 - `reports/code-audit.md`
@@ -83,7 +84,7 @@ Quando o usuário envia um prompt, o modelo deve:
 
 **Fluxo correto**:
 
-1. Ler `.ai/` completo.
+1. Ler `.ai/` completo (README + 4 arquivos em rules/ + 2 em state/ + 2 em decisions/ + 1 em templates/).
 2. Ler `worklog.md` — ver que Task ID 1 identificou logger como
    pendência.
 3. Ler `reports/metrics.json` — confirmar que Operational Readiness

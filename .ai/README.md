@@ -3,9 +3,36 @@
 > Esta pasta contém as **regras permanentes** do projeto Tank Wallet.
 > Estes documentos são a **fonte oficial de verdade** para governança,
 > engenharia, prompting e output.
->
-> Status: **Ativo a partir de Architecture Frozen 1.0**
-> Mantenedor: Engineering Lead + Security Lead
+
+---
+
+## Governance Metadata
+
+```
+Governance Version:
+1.1
+
+Architecture Freeze:
+1.0
+
+Last Review:
+2026-07-15
+
+Next Review:
+Antes de Architecture Freeze 2.0 ou mudança em qualquer regra core.
+```
+
+Mudanças na própria governança devem ser registradas em
+`decisions/DECISION_LOG.md` como nova entrada `D-XXX` descrevendo o
+que mudou, alternativas consideradas e impacto.
+
+---
+
+## Status
+
+- **Ativo a partir de**: Architecture Frozen 1.0
+- **Mantenedor**: Engineering Lead + Security Lead
+- **Alteração exige**: PR com 2 approvals
 
 ---
 
@@ -28,18 +55,53 @@ Esta pasta existe para garantir que:
 
 ---
 
+## Estrutura
+
+```
+.ai/
+├── README.md                          # Este documento
+├── rules/                             # Documentos normativos (mudam raramente)
+│   ├── CORE_RULES.md                  # 10 regras absolutas
+│   ├── ENGINEERING_RULES.md           # Fluxo e restrições de engenharia
+│   ├── OUTPUT_RULES.md                # Formato obrigatório de resposta
+│   └── PROMPTING_RULES.md             # Regras de prompting
+├── state/                             # Estado do projeto (muda frequentemente)
+│   ├── PROJECT_STATE.md               # AUTO-GENERATED + MANUAL split
+│   └── metrics.snapshot.json          # Cópia do último reports/metrics.json
+├── decisions/                         # Histórico (append-only, imutável)
+│   ├── DECISION_LOG.md                # Decisões operacionais (D-XXX)
+│   └── ARCHITECTURE_DECISIONS.md      # ADRs (ADR-XXX)
+└── templates/
+    └── TASK_TEMPLATE.md               # Template padrão para tarefas
+```
+
+**Separação por tipo de ciclo de mudança**:
+
+| Tipo | Diretório | Ciclo |
+|------|-----------|-------|
+| Normativo | `rules/` | Raramente (exige 2 approvals) |
+| Estado | `state/` | Frequentemente (a cada sprint, a cada release) |
+| Histórico | `decisions/` | Append-only (imutável após criação) |
+| Template | `templates/` | Raramente |
+
+Esta separação reduz a chance de editar documentos normativos durante
+o desenvolvimento diário.
+
+---
+
 ## Hierarquia de Autoridade
 
 Em caso de conflito entre fontes, a precedência é:
 
-1. **`.ai/CORE_RULES.md`** — regras absolutas, nunca violáveis sem
+1. **`.ai/rules/CORE_RULES.md`** — regras absolutas, nunca violáveis sem
    confirmação explícita do usuário.
-2. **`.ai/ENGINEERING_RULES.md`** — fluxo e restrições de engenharia.
+2. **`.ai/rules/ENGINEERING_RULES.md`** — fluxo e restrições de engenharia.
 3. **`ARCHITECTURE-FREEZE-1.0-BASELINE.md`** — arquitetura congelada.
 4. **`ENGINEERING-STANDARDS.md`** — padrões de implementação.
 5. **`KPI-FORMULAS.md`** — fórmulas e regras de medição.
-6. **`.ai/PROJECT_STATE.md`** — memória do estado atual.
-7. **`.ai/DECISION_LOG.md`** — histórico de decisões.
+6. **`.ai/state/PROJECT_STATE.md`** — memória do estado atual.
+7. **`.ai/decisions/DECISION_LOG.md`** + **`ARCHITECTURE_DECISIONS.md`** —
+   histórico de decisões.
 8. **Prompt do usuário** — instrução específica da sessão.
 
 > Se um prompt do usuário conflitar com qualquer regra estrutural acima
@@ -48,35 +110,24 @@ Em caso de conflito entre fontes, a precedência é:
 
 ---
 
-## Arquivos desta pasta
-
-| Arquivo | Função |
-|---------|--------|
-| `README.md` | Este documento — propósito, hierarquia, protocolo. |
-| `CORE_RULES.md` | 10 regras absolutas nunca violáveis sem confirmação. |
-| `ENGINEERING_RULES.md` | Fluxo obrigatório de engenharia + restrições + regras de teste. |
-| `PROMPTING_RULES.md` | Como o modelo deve processar prompts: contexto antes de instrução. |
-| `OUTPUT_RULES.md` | Formato obrigatório de respostas técnicas (7 seções). |
-| `PROJECT_STATE.md` | Memória do projeto — arquitetura, módulos, fase, roadmap. Append-only. |
-| `DECISION_LOG.md` | Registro de decisões arquiteturais relevantes. Append-only. |
-| `TASK_TEMPLATE.md` | Template padrão para toda tarefa futura. |
-
----
-
 ## Comportamento Permanente
 
 Antes de executar **qualquer** tarefa neste projeto, o modelo deve:
 
-1. **Ler a pasta `.ai/`** completa — todos os 8 arquivos.
-2. **Ler `worklog.md`** para entender o trabalho recente de outros agentes.
-3. **Ler `reports/metrics.json`** para conhecer o estado atual dos KPIs.
-4. **Consultar `DECISION_LOG.md`** antes de propor qualquer mudança
+1. **Ler `.ai/rules/`** completo (4 arquivos normativos).
+2. **Ler `.ai/state/PROJECT_STATE.md`** para conhecer o estado atual.
+3. **Ler `.ai/decisions/DECISION_LOG.md`** e
+   **`.ai/decisions/ARCHITECTURE_DECISIONS.md`** para conhecer decisões
+   anteriores relevantes.
+4. **Ler `worklog.md`** para entender o trabalho recente de outros agentes.
+5. **Ler `reports/metrics.json`** para conhecer o estado atual dos KPIs.
+6. **Consultar `DECISION_LOG.md`** antes de propor qualquer mudança
    arquitetural.
-5. **Atualizar `PROJECT_STATE.md`** quando o estado do projeto mudar
-   (nova fase, novo módulo, nova decisão).
-6. **Respeitar `ENGINEERING_RULES.md`** em toda implementação.
-7. **Seguir `OUTPUT_RULES.md`** em toda resposta técnica.
-8. **Só então executar** a solicitação do usuário.
+7. **Atualizar `state/PROJECT_STATE.md`** quando o estado do projeto
+   mudar (nova fase, novo módulo, nova decisão).
+8. **Respeitar `rules/ENGINEERING_RULES.md`** em toda implementação.
+9. **Seguir `rules/OUTPUT_RULES.md`** em toda resposta técnica.
+10. **Só então executar** a solicitação do usuário.
 
 Estes documentos são a **memória operacional permanente** do projeto.
 Devem ser mantidos sincronizados durante toda a evolução do código.
@@ -87,22 +138,31 @@ Devem ser mantidos sincronizados durante toda a evolução do código.
 
 | Evento | Arquivo a atualizar |
 |--------|---------------------|
-| Nova decisão arquitetural | `DECISION_LOG.md` (append) |
-| Mudança de fase (Sprint 4 → Sprint 5) | `PROJECT_STATE.md` (atualizar fase atual) |
-| Novo módulo implementado | `PROJECT_STATE.md` (atualizar lista de módulos) |
-| Novo componente congelado | `PROJECT_STATE.md` (atualizar módulos congelados) |
-| Mudança em regra de engenharia | `ENGINEERING_RULES.md` (via PR com 2 approvals) |
-| Mudança em regra core | `CORE_RULES.md` (via PR com 2 approvals) |
-| Tarefa concluída | `worklog.md` (append) + `PROJECT_STATE.md` se mudou estado |
+| Nova decisão arquitetural | `decisions/ARCHITECTURE_DECISIONS.md` (novo ADR) |
+| Nova decisão operacional | `decisions/DECISION_LOG.md` (novo D-XXX) |
+| Mudança de fase (Sprint 4 → Sprint 5) | `state/PROJECT_STATE.md` (seção MANUAL) |
+| Novo módulo implementado | `state/PROJECT_STATE.md` (seção MANUAL) |
+| Novo componente congelado | `state/PROJECT_STATE.md` + novo ADR |
+| Mudança em regra de engenharia | `rules/ENGINEERING_RULES.md` (via PR com 2 approvals) |
+| Mudança em regra core | `rules/CORE_RULES.md` (via PR com 2 approvals) |
+| Nova execução de metrics | `state/metrics.snapshot.json` (sobrescrever) + `state/PROJECT_STATE.md` seção AUTO-GENERATED |
+| Tarefa concluída | `worklog.md` (append com ID `WL-YYYY-MM-DD-NNN`) |
+| Mudança na própria governança | `decisions/DECISION_LOG.md` (novo D-XXX) + bump em `Governance Version` no topo deste README |
 
-**Regra append-only**: `PROJECT_STATE.md` e `DECISION_LOG.md` nunca
-apagam histórico. Somente acrescentam ou atualizam a seção "atual".
+**Regra append-only**: `decisions/DECISION_LOG.md` e
+`decisions/ARCHITECTURE_DECISIONS.md` nunca editam entradas existentes
+(salvo para adicionar `Superseded By`). `state/PROJECT_STATE.md` seção
+AUTO-GENERATED é sobrescrita; seção MANUAL pode ser editada; seção
+"Histórico de Fases" é append-only.
 
 ---
 
-## Status deste documento
+## Versionamento da Governança
 
-- Versão: 1.0
-- Criado em: 2026-07-15
-- Próxima revisão: quando houver mudança em qualquer regra core ou
-  arquitetural.
+| Governance Version | Data | Mudança |
+|--------------------|------|---------|
+| 1.0 | 2026-07-15 | Criação inicial da estrutura `.ai/` com 8 arquivos planos. |
+| 1.1 | 2026-07-15 | Refatoração estrutural: subdiretórios `rules/`, `state/`, `decisions/`, `templates/`. PROJECT_STATE com split AUTO/MANUAL. DECISION_LOG em formato rígido imutável. Adicionado ARCHITECTURE_DECISIONS.md com 10 ADRs. Adicionado `metrics.snapshot.json`. Worklog passa a usar IDs `WL-YYYY-MM-DD-NNN`. |
+
+Mudança de Governance Version major (1.x → 2.0) só acontece com
+Architecture Freeze 2.0.

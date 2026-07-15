@@ -16,7 +16,7 @@
 
 Antes de qualquer implementação, o modelo deve:
 
-- Ler `.ai/` completo (8 arquivos).
+- Ler `.ai/` completo: `README.md` + 4 em `rules/` + 2 em `state/` + 2 em `decisions/` + 1 em `templates/`.
 - Ler `worklog.md` para entender trabalho recente.
 - Ler `reports/metrics.json` para conhecer estado atual dos KPIs.
 - Ler os arquivos relevantes ao escopo da tarefa (não assumir que
