@@ -54,3 +54,61 @@ Toda ameaça gera conhecimento: Threat → Detection → Mitigation → Recovery
 ### 10. Avaliação Final
 
 A Tank Wallet deixou de se enquadrar como uma carteira Web3 convencional. A arquitetura definida é mais próxima de uma **plataforma de segurança para ativos digitais**, na qual a carteira é apenas um dos pontos de interação. O foco correto agora é consolidar a implementação: eliminar código provisório, ampliar cobertura de testes, realizar auditorias independentes, validar desempenho em cenários reais e estabelecer processos operacionais.
+
+---
+
+# 5 Pilares Permanentes — Estado Final
+
+| Pilar | Estado |
+|-------|--------|
+| Arquitetura | Congelada |
+| Engenharia | Em implementação |
+| Segurança | Em validação |
+| Operação | Em preparação |
+| Produto | Evolução incremental |
+
+Backlog orientado por qualidade, não por funcionalidades.
+
+## Prioridades
+
+1. **Engenharia**: 100% mocks substituídos, chains completas, plugins finalizados, código temporário eliminado, APIs internas estabilizadas
+2. **Qualidade**: ≥95% cobertura, integração, E2E, fuzz, property, chaos, memória
+3. **Segurança**: auditoria criptográfica, smart contracts, frontend, pentest, bug bounty, ASVS
+4. **Operação**: observabilidade, métricas, alertas, incident response, DR, backup, playbooks
+5. **Release**: builds reproduzíveis, SBOM, assinatura, CI/CD, SECURITY.md, disclosure, docs públicas
+
+## Freeze 2.0 Candidates (NÃO na 1.x)
+
+- Mudança do Security Kernel
+- Alteração do Event Bus
+- Mudança do contrato SecurityEngine
+- Novo Unified Data Model
+- Alteração do TSS
+- Alteração do TSF
+- Mudança do pipeline de decisão
+- Mudança dos registries
+
+## Checklist Executivo v1.0
+
+| Categoria | Meta |
+|-----------|------|
+| Architecture Compliance | 100% |
+| Engineering Readiness | ≥95% |
+| Security Readiness | ≥95% |
+| Security Assurance | 100% |
+| Operational Readiness | ≥90% |
+| Release Readiness | 100% |
+| Cobertura de testes | ≥95% |
+| Vulnerabilidades críticas | 0 |
+| Vulnerabilidades altas | 0 |
+| Auditorias independentes | 2 concluídas |
+| Bug bounty | Sem críticos abertos |
+| Builds reproduzíveis | Sim |
+| SBOM | Publicado |
+| Release assinada | Sim |
+
+Quando todos atendidos → v1.0 sem reavaliar arquitetura.
+
+## Avaliação Final
+
+A Tank Wallet evoluiu para uma arquitetura de plataforma de segurança para ativos digitais, onde a carteira é apenas um cliente do Security Kernel. O fator limitante deixa de ser o desenho arquitetural e passa a ser a qualidade da implementação. O maior ganho daqui em diante virá da robustez do código, da validação independente, da operação contínua e da confiança construída por meio de testes, auditorias e transparência técnica.
