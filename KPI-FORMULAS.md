@@ -37,7 +37,7 @@ Dashboard / Documentos / Comunicação
 - Dashboards consumindo `reports/metrics.json` em vez de constantes.
 - Documentos referenciam fórmulas, não valores fixos.
 - Comunicação cita valores com data de medição (ex.: "Overall Confidence
-  era 40% em 2026-07-15, commit 941e82ec").
+  era 28% em 2026-07-15, commit 8eebfbeff2e8").
 
 Comando único para regenerar todos os KPIs:
 
@@ -49,9 +49,188 @@ Gera:
 
 ```
 reports/
-    metrics.json     # máquina-legível, fonte de verdade
-    metrics.md       # humano-legível, para revisão
+    metrics.json                          # snapshot atual (sobrescrito)
+    metrics.md                            # humano-legível
+    history/
+        2026-07-15-8eebfbeff2e8.json      # snapshot imutável por commit
 ```
+
+---
+
+## Schema do Report (v1.1)
+
+Cada execução de `bun run metrics` produz um `MetricsReport` com a
+seguinte estrutura. Esta é a fonte canônica — dashboards e auditorias
+devem consumir estes campos.
+
+### Campos de Topo
+
+```json
+{
+  "schemaVersion": "1.1",
+  "generatedAt": "2026-07-15T14:40:13.447Z",
+  "generatedBy": "scripts/metrics/index.ts",
+  "commit": "8eebfbeff2e82050dcd3d040ea72f2a16c60b47b",
+  "scriptVersion": "1.1.0",
+  "sha256": "f3ba1e94cdd66524826e7cf7bd14892b26864ab40cdb5c3622102644d68e4f83",
+  "metrics": { ... },
+  "releaseDecision": { ... },
+  "inconsistencies": []
+}
+```
+
+- **schemaVersion** — para migração de parsers. Quebra de schema exige bump.
+- **generatedBy** — path do script que gerou o report (auditoria).
+- **commit** — git HEAD no momento da geração.
+- **sha256** — hash SHA-256 do JSON canônico (excluindo o próprio campo).
+  Permite verificação de integridade. Mais adiante pode ser assinado
+  (Ed25519 ou Sigstore).
+
+### Modelo de 3 Estados por Check
+
+Cada check (não cada métrica) tem um `state` que distingue três níveis:
+
+| State | Significado | Score |
+|-------|-------------|-------|
+| `verified` | Implementação existe **E** é sustentada por artefacto automatizado (teste passando, arquivo commitado, CI verde, audit completo) | 1.0 × peso |
+| `implemented_unverified` | Código existe mas sem prova automatizada | 0.5 × peso |
+| `not_implemented` | Nada existe | 0 |
+
+Isso separa "ausência de evidência" de "não implementado". Um componente
+pode estar implementado mas sem testes — isso vale 0.5, não 0.
+
+### Evidence Estruturada por Check
+
+Cada check traz um objeto `evidence`:
+
+```json
+{
+  "evidence": {
+    "status": true,
+    "artifact": "src/lib/wallet-core/__tests__/vectors/bip39.json",
+    "source": "filesystem",
+    "verifiedAt": "2026-07-15T14:40:13.465Z"
+  }
+}
+```
+
+- **status** — true se o artefato existe.
+- **artifact** — caminho concreto do artefato (file path, URL, command output). `null` se ausente.
+- **source** — onde o artefato foi procurado (filesystem, ripgrep, prisma schema, scanner output, CI).
+- **verifiedAt** — timestamp da última verificação. `null` se nunca verificado.
+
+Isso elimina ambiguidade sobre **por que** um check recebeu determinada nota.
+
+### Pesos Configuráveis
+
+Pesos não são hardcoded. São lidos de `config/kpi-weights.json`:
+
+```json
+{
+  "version": "1.0",
+  "weights": {
+    "architecture": 0.20,
+    "engineering": 0.20,
+    "security": 0.15,
+    "evidence": 0.10,
+    "operations": 0.20,
+    "release": 0.15
+  },
+  "securitySubWeights": {
+    "readiness": 0.5,
+    "assurance": 0.5
+  }
+}
+```
+
+- Soma de `weights` deve ser exatamente 1.0000.
+- Soma de `securitySubWeights` deve ser exatamente 1.0000.
+- Se config ausente ou inválido, script usa defaults e adiciona warning em `inconsistencies`.
+- Mudança de peso exige PR com 2 approvals (Engineering Lead + Security Lead).
+
+### Release Decision — Hard Gates (booleanos, não percentuais)
+
+A decisão de release **não** é baseada em percentuais. É baseada em uma
+lista de Hard Gates booleanos. Todos devem ser `met: true` para GA.
+
+```json
+{
+  "releaseDecision": {
+    "decision": "BLOCKED",
+    "blockingGates": [
+      "Critical vulns resolved",
+      "SBOM published",
+      "Audit #2 completed",
+      ...
+    ],
+    "gates": [
+      {
+        "name": "SBOM published",
+        "description": "CycloneDX SBOM artefact published with release",
+        "met": false,
+        "evidence": { "status": false, "artifact": null, "source": null, "verifiedAt": null },
+        "blockingReason": "SBOM not yet generated (@cyclonedx/cyclonedx-npm pending)"
+      },
+      ...
+    ],
+    "decidedAt": "2026-07-15T14:40:13.447Z"
+  }
+}
+```
+
+#### Estados possíveis
+
+| Decision | Condição |
+|----------|----------|
+| `BLOCKED` | >30% dos gates não cumpridos |
+| `READY_FOR_BETA` | ≥70% dos gates cumpridos (release interno fechado) |
+| `READY_FOR_GA` | 100% dos gates cumpridos |
+
+#### Lista de 17 Hard Gates (GA)
+
+1. Critical vulns resolved
+2. High vulns resolved
+3. Coverage ≥ 95%
+4. Crypto vectors validated
+5. SBOM published
+6. Reproducible build
+7. Release signed (sigstore)
+8. SAST in CI (Semgrep + CodeQL)
+9. Gitleaks in CI
+10. Trivy in CI
+11. SECURITY.md published
+12. Audit #1 completed
+13. Audit #2 completed
+14. Pentest #1 completed
+15. Pentest #2 completed
+16. Bug bounty public (no criticals open for 90 days)
+17. Incident Response runbook
+
+Definição completa em `scripts/metrics/hard-gates.ts`. Adicionar ou remover
+gate exige PR com 2 approvals.
+
+### Histórico Imutável
+
+Cada execução também grava:
+
+```
+reports/history/<YYYY-MM-DD>-<commit-short>.json
+```
+
+Este arquivo **não é sobrescrito**. Permite gráficos de evolução reais
+(como Overall Confidence variou ao longo do tempo, qual check passou de
+`implemented_unverified` para `verified` em qual data).
+
+### Regras de Consistência (exit 1 se violadas)
+
+1. Soma dos pesos em `config/kpi-weights.json` = 1.0000
+2. Soma de `securitySubWeights` = 1.0000
+3. Cada peso de métrica em [0, 1]
+4. Cada score de métrica em [0, 100]
+5. Overall Confidence score = recomputação a partir dos inputs
+6. Security Readiness sem Audit ≤ 91%
+7. Security Assurance sem audit/pentest ≤ 5%
+8. Se `releaseDecision.decision === "READY_FOR_GA"`, então `blockingGates.length === 0`
 
 ---
 
@@ -716,6 +895,7 @@ scripts/metrics/
 |--------|------|---------|
 | 1.0 | 2026-07-15 | Versão inicial. Fórmulas publicadas pela primeira vez. Substitui claims numéricas não-reproduzíveis usadas anteriormente. |
 | 1.1 | 2026-07-15 | Implementação dos scripts `scripts/metrics/*.ts`. Fórmulas agora são executáveis via `bun run metrics`. Adicionada 3ª dimensão de segurança: **Security Evidence** (§5). Overall Confidence recalibrado: pesos agora somam exatamente 1.00 (Arch 20 + Eng 20 + Sec 15 + Ev 10 + Ops 20 + Rel 15). Removidos todos os percentuais hardcoded do documento — status aponta para `reports/metrics.json`. Adicionada regra absoluta "Zero Percentuais Hardcoded" no topo. |
+| 1.2 | 2026-07-15 | Schema 1.1 do `metrics.json`. Sete aprimoramentos: (1) modelo de 3 estados por check (`verified` / `implemented_unverified` / `not_implemented`); (2) campos de metadata `schemaVersion`, `generatedBy`; (3) histórico imutável em `reports/history/<date>-<commit>.json`; (4) pesos configuráveis via `config/kpi-weights.json`; (5) evidence estruturada por check (`{status, artifact, source, verifiedAt}`); (6) Release Decision baseada em 17 Hard Gates booleanos (não percentuais); (7) hash SHA-256 do report para integridade. Adicionada seção "Schema do Report (v1.1)" documentando todos os campos. |
 
 ---
 

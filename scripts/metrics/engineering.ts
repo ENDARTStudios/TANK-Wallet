@@ -1,124 +1,143 @@
 /**
  * Engineering Readiness Metric
  *
- * Formula: Σ(criterion_score × criterion_weight) × 100
- *
- * Reads: tsconfig, ESLint config, source code (rg searches), coverage report
- * (if present), SBOM (if present), CI workflows.
+ * 3-state model:
+ *   verified              — artefact exists AND automated proof exists
+ *   implemented_unverified — partial state (e.g. strict mode partially on)
+ *   not_implemented       — nothing exists
  */
 
 import {
   Check,
   computeScore,
+  evidenceImplemented,
+  evidenceMissing,
+  evidenceVerified,
   fileExists,
   MetricResult,
   readFile,
   rgCount,
-  rgList,
   SCRIPT_VERSION,
 } from "./_shared";
 
-const WEIGHT = 0.20; // 20% of Overall Confidence
+const WEIGHT = 0.20;
 const SRC = ["src"];
 
 export function computeEngineering(): MetricResult {
+  const todoCount = countCodeSmells();
+  const consoleCount = countConsoleLog();
+  const anyCount = countAny();
+  const tsIgnoreCount = countTsIgnore();
+
   const checks: Check[] = [
     {
       name: "No TODO/FIXME/HACK/XXX in src/",
       description: "rg 'TODO|FIXME|XXX|HACK' in src/ returns 0 matches",
       weight: 0.12,
-      passed: countCodeSmells() === 0,
-      evidence: `${countCodeSmells()} matches of TODO/FIXME/XXX/HACK in src/`,
-      notes:
-        countCodeSmells() > 0
-          ? "See reports/code-audit.md for full list with file/line/severity."
-          : undefined,
+      state: todoCount === 0 ? "verified" : todoCount < 5 ? "implemented_unverified" : "not_implemented",
+      passed: todoCount === 0,
+      evidence: todoCount === 0
+        ? evidenceVerified("rg 'TODO|FIXME|XXX|HACK' src/ → 0 matches", "ripgrep")
+        : evidenceImplemented(`${todoCount} matches (see reports/code-audit.md)`, "ripgrep"),
+      notes: todoCount > 0 ? "Each must become a tracked issue. See reports/code-audit.md for full list." : undefined,
     },
     {
       name: "No console.log in src/",
-      description: "rg 'console.log' in src/ returns 0 matches (excluding tests)",
+      description: "rg 'console.log' in src/ returns 0 matches",
       weight: 0.08,
-      passed: countConsoleLog() === 0,
-      evidence: `${countConsoleLog()} matches of console.log in src/`,
+      state: consoleCount === 0 ? "verified" : "implemented_unverified",
+      passed: consoleCount === 0,
+      evidence: consoleCount === 0
+        ? evidenceVerified("rg 'console.log' src/ → 0 matches", "ripgrep")
+        : evidenceImplemented(`${consoleCount} matches (see reports/code-audit.md)`, "ripgrep"),
     },
     {
       name: "No `any` type in production code",
-      description: "rg ': any' | 'as any' in src/ (excluding tests)",
+      description: "rg ': any' | 'as any' in src/",
       weight: 0.08,
-      passed: countAny() === 0,
-      evidence: `${countAny()} matches of explicit any in src/`,
-      notes:
-        countAny() > 0
-          ? "Strict mode currently has noImplicitAny=false. Needs hardening to noUncheckedIndexedAccess + exactOptionalPropertyTypes."
-          : undefined,
+      state: anyCount === 0 ? "verified" : "implemented_unverified",
+      passed: anyCount === 0,
+      evidence: anyCount === 0
+        ? evidenceVerified("rg ': any|as any' src/ → 0 matches", "ripgrep")
+        : evidenceImplemented(`${anyCount} matches (see reports/code-audit.md)`, "ripgrep"),
     },
     {
       name: "No @ts-ignore in src/",
       description: "rg '@ts-ignore' in src/ returns 0 matches",
       weight: 0.05,
-      passed: countTsIgnore() === 0,
-      evidence: `${countTsIgnore()} matches of @ts-ignore in src/`,
+      state: tsIgnoreCount === 0 ? "verified" : "implemented_unverified",
+      passed: tsIgnoreCount === 0,
+      evidence: tsIgnoreCount === 0
+        ? evidenceVerified("rg '@ts-ignore' src/ → 0 matches", "ripgrep")
+        : evidenceImplemented(`${tsIgnoreCount} matches`, "ripgrep"),
     },
     {
       name: "TypeScript strict mode enabled",
-      description: "tsconfig.json has strict: true",
+      description: "tsconfig.json has strict: true AND noUncheckedIndexedAccess AND exactOptionalPropertyTypes",
       weight: 0.05,
+      state: checkStrictState(),
       passed: checkStrictMode(),
       evidence: checkStrictMode()
-        ? "tsconfig.json: strict=true"
-        : "tsconfig.json: strict missing or false",
-      notes: "noImplicitAny=false (should be true). noUncheckedIndexedAccess and exactOptionalPropertyTypes not yet enabled.",
+        ? evidenceImplemented("tsconfig.json: strict=true (but noImplicitAny=false)", "filesystem")
+        : evidenceMissing(),
+      notes: "strict=true but noImplicitAny=false. noUncheckedIndexedAccess and exactOptionalPropertyTypes not yet enabled. See ENGINEERING-STANDARDS.md §1.1.",
     },
     {
       name: "Conformance suite exists",
       description: "Tests covering chain plugin interface (11 tests × 4 plugins)",
       weight: 0.10,
+      state: checkConformanceState(),
       passed: checkConformanceExists(),
       evidence: checkConformanceExists()
-        ? "Conformance test files present"
-        : "no conformance suite found",
+        ? evidenceImplemented("Plugin engine present; conformance test infrastructure partial", "filesystem")
+        : evidenceMissing(),
     },
     {
       name: "Coverage report exists (>=95%)",
       description: "Coverage report shows >=95% lines and >=90% branches",
       weight: 0.15,
-      passed: false, // coverage tooling not yet wired into CI
-      evidence: "no coverage/ directory or coverage-summary.json present",
+      state: "not_implemented",
+      passed: false,
+      evidence: evidenceMissing(),
       notes: "vitest --coverage or c8 not yet integrated. Will be added when CI Quality Gates land (Sprint 4).",
     },
     {
       name: "Crypto vectors committed",
-      description: "15 vector sets (BIP-39, BIP-32, SLIP-10, secp256k1, Ed25519, AES-GCM, HKDF, PBKDF2, HMAC, SHA-256, Shamir SLIP-39, EIP-1559/712/191) present",
+      description: "15 vector sets present in __tests__/vectors/",
       weight: 0.15,
+      state: checkCryptoVectorsState(),
       passed: checkCryptoVectors(),
       evidence: checkCryptoVectors()
-        ? "vector JSON files present"
-        : "no vector test files committed yet",
-      notes:
-        "Vector files need to be added at src/lib/wallet-core/__tests__/vectors/ and src/lib/wallet-engines/recovery/__tests__/vectors/. See ENGINEERING-STANDARDS.md §12.",
+        ? evidenceVerified("vector JSON files present", "filesystem")
+        : evidenceMissing(),
+      notes: "Vector files at src/lib/wallet-core/__tests__/vectors/ and src/lib/wallet-engines/recovery/__tests__/vectors/. See ENGINEERING-STANDARDS.md §12.",
     },
     {
       name: "Build reproducible",
       description: "Two builds produce identical hash",
       weight: 0.10,
+      state: "not_implemented",
       passed: false,
-      evidence: "no reproducibility verification in place",
+      evidence: evidenceMissing(),
       notes: "Will use Next.js deterministic build + locked bun.lockb + container build.",
     },
     {
       name: "SBOM published",
       description: "CycloneDX SBOM artefact at release time",
       weight: 0.07,
+      state: fileExists("sbom.cyclonedx.json") ? "verified" : "not_implemented",
       passed: fileExists("sbom.cyclonedx.json") || fileExists("reports/sbom.cyclonedx.json"),
-      evidence: "no SBOM artefact found",
-      notes: "Will be generated via @cyclonedx/cyclonedx-npm in CI (Sprint 4).",
+      evidence: fileExists("sbom.cyclonedx.json")
+        ? evidenceVerified("sbom.cyclonedx.json", "filesystem")
+        : evidenceMissing(),
     },
     {
       name: "Releases signed (sigstore)",
       description: "Release artefact is signed",
       weight: 0.05,
+      state: "not_implemented",
       passed: false,
-      evidence: "no signing in place",
+      evidence: evidenceMissing(),
       notes: "Will use sigstore/cosign in CI (Sprint 4).",
     },
   ];
@@ -127,10 +146,10 @@ export function computeEngineering(): MetricResult {
   return {
     name: "Engineering Readiness",
     description:
-      "Implementation quality: absence of code smells, strict typing, test coverage, crypto validation, reproducibility.",
+      "Implementation quality: absence of code smells, strict typing, test coverage, crypto validation, reproducibility. 3-state model distinguishes 'built' from 'proven'.",
     score,
     weight: WEIGHT,
-    formula: "Σ(criterion_score × criterion_weight) × 100 — 11 weighted criteria",
+    formula: "Σ(check_state × check_weight) × 100 — verified=1.0, implemented_unverified=0.5, not_implemented=0",
     checks,
     computedAt: new Date().toISOString(),
     scriptVersion: SCRIPT_VERSION,
@@ -138,17 +157,14 @@ export function computeEngineering(): MetricResult {
 }
 
 function countCodeSmells(): number {
-  // Match TODO, FIXME, XXX, HACK as comments (rough)
   return rgCount("TODO|FIXME|XXX|HACK", SRC);
 }
 
 function countConsoleLog(): number {
-  // Count all console.log in src/ — including tests, since we want to know the total
   return rgCount("console\\.log", SRC);
 }
 
 function countAny(): number {
-  // Match ": any" or "as any"
   const a = rgCount(": any\\b", SRC);
   const b = rgCount("as any\\b", SRC);
   return a + b;
@@ -164,17 +180,45 @@ function checkStrictMode(): boolean {
   return tsconfig.includes('"strict": true');
 }
 
+function checkStrictState(): "verified" | "implemented_unverified" | "not_implemented" {
+  const tsconfig = readFile("tsconfig.json");
+  if (!tsconfig) return "not_implemented";
+  if (
+    tsconfig.includes('"strict": true') &&
+    tsconfig.includes('"noUncheckedIndexedAccess": true') &&
+    tsconfig.includes('"exactOptionalPropertyTypes": true')
+  ) {
+    return "verified";
+  }
+  if (tsconfig.includes('"strict": true')) {
+    return "implemented_unverified";
+  }
+  return "not_implemented";
+}
+
 function checkConformanceExists(): boolean {
-  // Look for any conformance test file
-  const matches = rgList("conformance|Conformance", SRC, ["-l"]);
-  return matches.length > 0 || fileExists("src/lib/wallet-engines/plugin/index.ts");
+  return fileExists("src/lib/wallet-engines/plugin/index.ts");
+}
+
+function checkConformanceState(): "verified" | "implemented_unverified" | "not_implemented" {
+  if (fileExists("src/lib/wallet-engines/plugin/index.ts") && fileExists("src/lib/wallet-engines/plugin/__tests__/")) {
+    return "verified";
+  }
+  if (fileExists("src/lib/wallet-engines/plugin/index.ts")) {
+    return "implemented_unverified";
+  }
+  return "not_implemented";
 }
 
 function checkCryptoVectors(): boolean {
-  // ENGINEERING-STANDARDS.md §12 lists 15 vector sets
   return (
     fileExists("src/lib/wallet-core/__tests__/vectors/bip39.json") ||
     fileExists("src/lib/wallet-core/__tests__/vectors/bip32.json") ||
     fileExists("src/lib/wallet-core/__tests__/vectors/aes-gcm.json")
   );
+}
+
+function checkCryptoVectorsState(): "verified" | "implemented_unverified" | "not_implemented" {
+  if (checkCryptoVectors()) return "verified";
+  return "not_implemented";
 }

@@ -5,114 +5,115 @@
  * validated?). Evidence answers: "can the platform PROVE automatically that
  * the engine did its job, with structured, reproducible evidence?"
  *
- * Formula: Σ(engine_evidence × engine_weight) × 100
- *
- * An engine "produces evidence" when its outputs include:
- *   - Structured records (typed objects, not free-form strings)
- *   - Source attribution (where the data came from)
- *   - Timestamps
- *   - Reproducibility info (input that allows re-running)
+ * 3-state model:
+ *   verified              — structured evidence types/records confirmed in code
+ *   implemented_unverified — partial structured output (some fields missing)
+ *   not_implemented       — engine outputs unstructured data only
  */
 
 import {
   Check,
   computeScore,
+  evidenceImplemented,
+  evidenceMissing,
+  evidenceVerified,
   fileExists,
   MetricResult,
   readFile,
-  rgCount,
   SCRIPT_VERSION,
 } from "./_shared";
 
-const WEIGHT = 0.10; // 10% weight in Overall Confidence (separate dimension)
-
-interface EvidenceCheck {
-  name: string;
-  weight: number;
-  passed: boolean;
-  evidence: string;
-  notes?: string;
-}
+const WEIGHT = 0.10;
 
 export function computeEvidence(): MetricResult {
-  const engines: EvidenceCheck[] = [
+  const checks: Check[] = [
     {
       name: "Threat Intel produces structured evidence",
+      description: "Weight: 18%",
       weight: 0.18,
+      state: checkThreatIntelEvidence() ? "verified" : "not_implemented",
       passed: checkThreatIntelEvidence(),
       evidence: checkThreatIntelEvidence()
-        ? "Prisma ThreatToken/Site/Address models with structured fields (source, severity, lastConfirmedAt)"
-        : "no structured threat records",
+        ? evidenceVerified(
+            "Prisma ThreatToken/Site/Address with fields source, severity, lastConfirmedAt, firstSeenAt",
+            "prisma/schema.prisma"
+          )
+        : evidenceMissing(),
     },
     {
       name: "Simulation produces state diff",
+      description: "Weight: 18%",
       weight: 0.18,
+      state: checkSimulationEvidence() ? "implemented_unverified" : "not_implemented",
       passed: checkSimulationEvidence(),
       evidence: checkSimulationEvidence()
-        ? "wallet-evm exposes call/simulate returning structured result"
-        : "no state diff output",
+        ? evidenceImplemented("wallet-evm exposes call/simulate returning structured result", "filesystem + rg")
+        : evidenceMissing(),
+      notes: "Function exists but no test verifies state diff structure.",
     },
     {
       name: "Behavior produces score + reasons",
+      description: "Weight: 15%",
       weight: 0.15,
+      state: checkBehaviorEvidence() ? "verified" : "not_implemented",
       passed: checkBehaviorEvidence(),
       evidence: checkBehaviorEvidence()
-        ? "BehaviorAnomaly model with score (Int) + reasons (JSON)"
-        : "no structured anomaly records",
+        ? evidenceVerified("BehaviorAnomaly model with score (Int) + reasons (JSON)", "prisma/schema.prisma")
+        : evidenceMissing(),
     },
     {
       name: "Network produces RPC metadata",
+      description: "Weight: 10%",
       weight: 0.10,
+      state: checkNetworkEvidence() ? "implemented_unverified" : "not_implemented",
       passed: checkNetworkEvidence(),
       evidence: checkNetworkEvidence()
-        ? "wallet-evm references multiple RPC providers (publicnode, 1rpc, llamarpc)"
-        : "no RPC metadata",
+        ? evidenceImplemented("wallet-evm references multiple RPC providers", "filesystem + rg")
+        : evidenceMissing(),
+      notes: "Provider names present but no structured RPC metadata type (latency, block height, failover count) committed.",
     },
     {
       name: "Decision produces evidence[] + sources[] + engineScores{}",
+      description: "Weight: 18%",
       weight: 0.18,
-      passed: checkDecisionEvidence(),
-      evidence: checkDecisionEvidence()
-        ? "decision types include evidence, sources, engineScores fields"
-        : "decision lacks evidence structure",
-      notes: "Verifies type definitions only. Runtime production of evidence is verified by integration tests (pending).",
+      state: checkDecisionEvidence(),
+      passed: checkDecisionEvidence() !== "not_implemented",
+      evidence: checkDecisionEvidence() !== "not_implemented"
+        ? evidenceImplemented("DecisionResult / SecurityResult types include evidence field", "src/lib/wallet/types.ts")
+        : evidenceMissing(),
+      notes: "Types reference evidence fields but no runtime integration test verifies that decisions actually populate them.",
     },
     {
       name: "Audit log is HMAC-signed + append-only",
+      description: "Weight: 15%",
       weight: 0.15,
-      passed: checkAuditEvidence(),
-      evidence: checkAuditEvidence()
-        ? "PermissionAuditLog model + audit engine present"
-        : "audit log incomplete",
-      notes: "HMAC signing + tamper-evidence not yet verified at runtime. Pending implementation of HMAC chain.",
+      state: checkAuditEvidence(),
+      passed: checkAuditEvidence() !== "not_implemented",
+      evidence: checkAuditEvidence() !== "not_implemented"
+        ? evidenceImplemented("PermissionAuditLog model + audit engine present", "prisma schema + filesystem")
+        : evidenceMissing(),
+      notes: "HMAC chain + tamper-evidence not yet implemented. Currently append-only via Prisma but no signature.",
     },
     {
       name: "Recovery produces Shamir share metadata",
+      description: "Weight: 6%",
       weight: 0.06,
-      passed: checkRecoveryEvidence(),
-      evidence: checkRecoveryEvidence()
-        ? "Recovery engine + Shamir SSS scripts present"
-        : "recovery evidence incomplete",
+      state: checkRecoveryEvidence(),
+      passed: checkRecoveryEvidence() !== "not_implemented",
+      evidence: checkRecoveryEvidence() !== "not_implemented"
+        ? evidenceImplemented("Recovery engine + Shamir SSS scripts present", "filesystem")
+        : evidenceMissing(),
     },
   ];
-
-  const checks: Check[] = engines.map((e) => ({
-    name: e.name,
-    description: `Weight: ${(e.weight * 100).toFixed(0)}%`,
-    weight: e.weight,
-    passed: e.passed,
-    evidence: e.evidence,
-    notes: e.notes,
-  }));
 
   const score = computeScore(checks);
   return {
     name: "Security Evidence",
     description:
-      "Distinct from Readiness and Assurance. Measures whether each engine produces structured, reproducible, source-attributed evidence automatically.",
+      "Distinct from Readiness and Assurance. Measures whether each engine produces structured, reproducible, source-attributed evidence automatically. 3-state model.",
     score,
     weight: WEIGHT,
-    formula: "Σ(engine_evidence × engine_weight) × 100 — 7 engines",
+    formula: "Σ(engine_evidence_state × engine_weight) × 100 — 7 engines",
     checks,
     computedAt: new Date().toISOString(),
     scriptVersion: SCRIPT_VERSION,
@@ -140,22 +141,30 @@ function checkNetworkEvidence(): boolean {
   return !!evm && (evm.includes("publicnode") || evm.includes("1rpc") || evm.includes("llamarpc"));
 }
 
-function checkDecisionEvidence(): boolean {
+function checkDecisionEvidence(): "verified" | "implemented_unverified" | "not_implemented" {
   const types = readFile("src/lib/wallet/types.ts");
-  if (!types) return false;
-  return types.includes("evidence") || types.includes("Evidence") || types.includes("DecisionResult");
+  if (!types) return "not_implemented";
+  if (types.includes("evidence") || types.includes("Evidence") || types.includes("DecisionResult")) {
+    return "implemented_unverified";
+  }
+  return "not_implemented";
 }
 
-function checkAuditEvidence(): boolean {
+function checkAuditEvidence(): "verified" | "implemented_unverified" | "not_implemented" {
   const schema = readFile("prisma/schema.prisma");
-  return (
-    !!schema && schema.includes("model PermissionAuditLog") && fileExists("src/lib/wallet-engines/audit/index.ts")
-  );
+  if (!schema) return "not_implemented";
+  if (schema.includes("model PermissionAuditLog") && fileExists("src/lib/wallet-engines/audit/index.ts")) {
+    return "implemented_unverified"; // append-only via Prisma but HMAC chain missing
+  }
+  return "not_implemented";
 }
 
-function checkRecoveryEvidence(): boolean {
-  return (
+function checkRecoveryEvidence(): "verified" | "implemented_unverified" | "not_implemented" {
+  if (
     fileExists("src/lib/wallet-engines/recovery/index.ts") &&
     fileExists("scripts/test-shamir.ts")
-  );
+  ) {
+    return "implemented_unverified";
+  }
+  return "not_implemented";
 }

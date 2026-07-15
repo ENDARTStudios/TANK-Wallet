@@ -202,3 +202,136 @@ Artefatos produzidos:
 - /home/z/my-project/package.json (scripts adicionados)
 
 ---
+
+Task ID: 2
+Agent: main (Super Z)
+Task: Implementar 7 aprimoramentos no pipeline de métricas: (1) modelo de
+3 estados por check, (2) versionamento do schema, (3) histórico imutável,
+(4) pesos configuráveis, (5) evidence estruturada por requisito, (6) release
+decision baseada em Hard Gates, (7) assinatura SHA-256 do report.
+
+Work Log:
+- Reescrito `scripts/metrics/_shared.ts`:
+  - Adicionado `CheckState = "not_implemented" | "implemented_unverified" | "verified"`.
+  - Adicionado interface `Evidence { status, artifact, source, verifiedAt }`.
+  - Adicionado `HardGate` e `ReleaseDecision` interfaces.
+  - Adicionado `stateToScore()` (verified=1.0, impl_unverified=0.5, not_impl=0).
+  - Adicionado helpers `evidenceVerified()`, `evidenceImplemented()`, `evidenceMissing()`.
+  - Atualizado `computeScore()` para usar modelo de 3 estados.
+  - Adicionado `computeReportHash()` usando node:crypto SHA-256 sobre JSON
+    canônico (excluindo o próprio campo sha256).
+  - Adicionado `writeHistorySnapshot()` que grava em
+    `reports/history/<YYYY-MM-DD>-<commit-short>.json`.
+  - Adicionado `readJson<T>()` para carregar config.
+  - Adicionado constantes SCHEMA_VERSION="1.1", GENERATED_BY.
+  - Atualizado `renderMetricMarkdown()` para mostrar state (✅/🟡/❌) por check.
+  - Atualizado `MetricsReport` para incluir schemaVersion, generatedBy, sha256,
+    releaseDecision, history.
+- Criado `config/kpi-weights.json` com pesos configuráveis:
+  - weights: arch 0.20, eng 0.20, security 0.15, evidence 0.10, ops 0.20,
+    release 0.15 (soma 1.00).
+  - securitySubWeights: readiness 0.5, assurance 0.5 (soma 1.00).
+- Atualizado `scripts/metrics/architecture.ts`: cada um dos 10 checks agora
+  usa 3-state model + structured evidence. Score caiu de 95% para 70%
+  porque muitos checks são implemented_unverified (código existe mas sem
+  teste automatizado) — antes contavam como 1.0, agora 0.5.
+- Atualizado `scripts/metrics/engineering.ts`: 11 checks com 3-state.
+  Score subiu levemente (21%) devido a meio crédito em alguns itens.
+- Atualizado `scripts/metrics/security.ts`: 9 engines com 3-state. Score
+  caiu de 90% para 45% porque todos engines são implemented_unverified
+  (código existe mas sem integration test automatizado).
+- Atualizado `scripts/metrics/assurance.ts`: 7 itens, todos not_implemented.
+- Atualizado `scripts/metrics/evidence.ts`: 7 engines. Score 58%.
+- Atualizado `scripts/metrics/operations.ts`: 10 itens. Score 5%.
+- Atualizado `scripts/metrics/release.ts`: 11 itens. Score 0%.
+- Reescrito `scripts/metrics/confidence.ts`:
+  - Adicionado `loadWeights()` que lê config/kpi-weights.json.
+  - Valida soma dos pesos = 1.0 e soma dos sub-pesos = 1.0.
+  - Se config inválido, usa defaults e adiciona warning.
+  - `computeConfidence()` aceita weights e subWeights como parâmetros.
+- Criado `scripts/metrics/hard-gates.ts`:
+  - Define `HardGateSpec[]` com 17 gates (critical vulns, high vulns,
+    coverage, crypto vectors, SBOM, reproducible build, signing, SAST,
+    DAST, Dependabot, Trivy, Gitleaks, SECURITY.md, 2 audits, 2 pentests,
+    bug bounty, IR runbook).
+  - `evaluateHardGates()` retorna gates[] + decision.
+  - decision = READY_FOR_GA se 0 gates falhando, READY_FOR_BETA se ≥70%
+    cumpridos, BLOCKED caso contrário.
+  - Cada gate tem `blockingReason` preenchido quando met=false.
+- Reescrito `scripts/metrics/index.ts`:
+  - Carrega pesos de config/kpi-weights.json.
+  - Adiciona warnings de config em `inconsistencies` se houver.
+  - Adiciona 6ª regra de consistência: se decision=READY_FOR_GA, gates
+    blocking devem ser 0.
+  - Constrói MetricsReport com todos os novos campos.
+  - Calcula SHA-256 do report (excluindo o próprio campo).
+  - Escreve reports/metrics.json (sobrescreve).
+  - Escreve reports/metrics.md.
+  - Escreve reports/history/<date>-<short-commit>.json (imutável).
+  - Console summary agora mostra SHA-256 e Release Decision com lista
+    de blocking gates.
+- Atualizado `KPI-FORMULAS.md`:
+  - Adicionada seção "Schema do Report (v1.1)" com:
+    - Campos de topo (schemaVersion, generatedBy, sha256).
+    - Modelo de 3 estados (tabela com score 1.0/0.5/0).
+    - Evidence estruturada por check (status/artifact/source/verifiedAt).
+    - Pesos configuráveis via config/kpi-weights.json.
+    - Release Decision com 17 Hard Gates (estados BLOCKED/BETA/GA).
+    - Histórico imutável.
+    - 8 regras de consistência.
+  - Atualizado exemplo de comunicação (28% em 2026-07-15 commit 8eebfbeff2e8).
+  - Adicionada entrada v1.2 no histórico de versões.
+- Executado `bun run metrics` com sucesso:
+  - Schema 1.1 ativo.
+  - Pesos carregados de config/kpi-weights.json.
+  - reports/metrics.json + reports/metrics.md gerados.
+  - reports/history/2026-07-15-8eebfbeff2e8.json gravado (imutável).
+  - SHA-256 verificado: re-cálculo no Bun produz hash idêntico.
+  - 8 regras de consistência: todas passaram.
+  - Release Decision: BLOCKED (17 gates falhando).
+- Resultado real (medido, commit 8eebfbeff2e8):
+  - Architecture Compliance: 70% (4✅ 5🟡 1❌)
+  - Engineering Readiness: 21% (1✅ 4🟡 6❌)
+  - Security Readiness: 45% (0✅ 7🟡 2❌)
+  - Security Assurance: 0% (0✅ 0🟡 7❌)
+  - Security Evidence: 58% (2✅ 4🟡 1❌)
+  - Operational Readiness: 5% (0✅ 2🟡 8❌)
+  - Release Readiness: 0% (0✅ 0🟡 11❌)
+  - Overall Confidence: 28% (0✅ 5🟡 1❌)
+  - Release Decision: BLOCKED (17 gates)
+
+Stage Summary:
+- Pipeline agora é artefato de governança auditável, não apenas medição.
+- 3-state model revelou verdade: a maioria das engines é implemented_unverified
+  (código existe mas sem teste automatizado). Antes contavam como 1.0,
+  agora 0.5. Security Readiness caiu de 90% para 45% — esta é a realidade.
+- Cada check tem evidence estruturada (status/artifact/source/verifiedAt)
+  eliminando ambiguidade sobre por que recebeu determinada nota.
+- Pesos são configuráveis via config/kpi-weights.json (sem hardcode).
+- Release Decision baseada em 17 Hard Gates booleanos, não em percentual.
+- Cada execução grava snapshot imutável em reports/history/ permitindo
+  gráficos de evolução reais.
+- SHA-256 do report permite verificação de integridade. Mais adiante pode
+  ser assinado (Ed25519/Sigstore).
+- 8 regras de consistência enforced — exit 1 se qualquer uma violada.
+- Documentação KPI-FORMULAS.md atualizada com seção completa do Schema v1.1.
+
+Artefatos produzidos:
+- /home/z/my-project/scripts/metrics/_shared.ts (rewrite)
+- /home/z/my-project/scripts/metrics/architecture.ts (3-state)
+- /home/z/my-project/scripts/metrics/engineering.ts (3-state)
+- /home/z/my-project/scripts/metrics/security.ts (3-state)
+- /home/z/my-project/scripts/metrics/assurance.ts (3-state)
+- /home/z/my-project/scripts/metrics/evidence.ts (3-state)
+- /home/z/my-project/scripts/metrics/operations.ts (3-state)
+- /home/z/my-project/scripts/metrics/release.ts (3-state)
+- /home/z/my-project/scripts/metrics/confidence.ts (config-driven)
+- /home/z/my-project/scripts/metrics/hard-gates.ts (NEW)
+- /home/z/my-project/scripts/metrics/index.ts (rewrite with new fields)
+- /home/z/my-project/config/kpi-weights.json (NEW)
+- /home/z/my-project/reports/metrics.json (auto-gerado, schema 1.1)
+- /home/z/my-project/reports/metrics.md (auto-gerado)
+- /home/z/my-project/reports/history/2026-07-15-8eebfbeff2e8.json (NEW, imutável)
+- /home/z/my-project/KPI-FORMULAS.md (atualizado com seção Schema)
+
+---

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://tankwallet.dev/schemas/kpi-weights.json",
+  "version": "1.0",
+  "description": "Weights for Overall Confidence composite. Must sum to exactly 1.0. Changes require PR with 2 approvals (Engineering Lead + Security Lead). See KPI-FORMULAS.md §9.",
+  "weights": {
+    "architecture": 0.20,
+    "engineering": 0.20,
+    "security": 0.15,
+    "evidence": 0.10,
+    "operations": 0.20,
+    "release": 0.15
+  },
+  "securitySubWeights": {
+    "readiness": 0.5,
+    "assurance": 0.5
+  }
+}
