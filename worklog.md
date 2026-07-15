@@ -335,3 +335,141 @@ Artefatos produzidos:
 - /home/z/my-project/KPI-FORMULAS.md (atualizado com seção Schema)
 
 ---
+
+Task ID: 3
+Agent: main (Super Z)
+Task: Criar camada permanente de governança em .ai/ com 8 arquivos:
+README, CORE_RULES, ENGINEERING_RULES, PROMPTING_RULES, OUTPUT_RULES,
+PROJECT_STATE, DECISION_LOG, TASK_TEMPLATE. Estes documentos passam a
+ser a memória operacional permanente do projeto e devem ser consultados
+antes de qualquer implementação futura.
+
+Work Log:
+- Lido prompt do usuário com especificação detalhada de cada arquivo.
+- Lido /home/z/my-project/ARCHITECTURE-FREEZE-1.0-BASELINE.md para
+  confirmar estado congelado.
+- Lido /home/z/my-project/reports/metrics.json para snapshot atual
+  (Schema 1.1, Overall Confidence 28%, Release Decision BLOCKED,
+  17 hard gates falhando).
+- Lido worklog.md para entender Tasks 0, 1, 2 anteriores.
+- Criado diretório /home/z/my-project/.ai/.
+- Escrito .ai/README.md — propósito, hierarquia de autoridade (8
+  níveis: CORE_RULES > ENGINEERING_RULES > ARCHITECTURE-FREEZE >
+  ENGINEERING-STANDARDS > KPI-FORMULAS > PROJECT_STATE >
+  DECISION_LOG > prompt do usuário), comportamento permanente
+  (8 passos antes de qualquer tarefa), regra append-only para
+  PROJECT_STATE e DECISION_LOG.
+- Escrito .ai/CORE_RULES.md — 10 regras absolutas com justificativa
+  e exemplos de violação para cada:
+  1. Contexto primeiro (ler máximo antes de responder).
+  2. Instrução somente depois da leitura.
+  3. Jamais inventar APIs.
+  4. Nunca criar ficções técnicas (funções/classes/endpoints/schemas/
+     contratos imaginários).
+  5. Sempre reutilizar componentes existentes (duplicação proibida).
+  6. Identificar dependentes antes de alterar.
+  7. Escopo mínimo (uma PR = uma preocupação).
+  8. Não modificar arquitetura congelada (lista componentes frozen).
+  9. Nenhuma implementação pode quebrar compatibilidade.
+  10. Preservar comportamento anterior.
+  Inclui protocolo de violação (parar, declarar, reverter, documentar).
+- Escrito .ai/ENGINEERING_RULES.md — fluxo obrigatório de 6 etapas
+  (Ler → Mapear dependências → Criar plano → Executar → Validar →
+  Documentar), restrições (não adicionar deps sem necessidade, não
+  renomear, não mover, não criar abstrações prematuras, não
+  refatorar fora do escopo), regras de testes (unit/property/fuzz/
+  regression/integration/E2E/conformance/vectors), build necessário,
+  validações obrigatórias.
+- Escrito .ai/PROMPTING_RULES.md — context window usage (não resumir
+  quando pode ser integral), contexto antes de instrução (fluxo:
+  Contexto → Restrições → Objetivo), ambiguidade (parar, explicar,
+  pedir confirmação), engenharia (raciocínio máximo para tarefas
+  complexas, planejar antes de gerar código), nunca assumir
+  (requisitos/arquitetura/intenção/comportamento sem evidência),
+  maximização de contexto entre sessões.
+- Escrito .ai/OUTPUT_RULES.md — formato obrigatório de 7 seções:
+  1. Resumo da análise
+  2. Arquivos afetados (criados/alterados/deletados)
+  3. Plano
+  4. Implementação
+  5. Validação
+  6. Riscos
+  7. Próximos passos
+  Inclui exemplo completo para "substituir console.log por logger".
+- Escrito .ai/PROJECT_STATE.md — memória do projeto:
+  - Snapshot corrente (Architecture Frozen 1.0, 10 componentes
+    congelados, 12 engines implementadas, Sprint 4 em andamento 13%).
+  - Lista completa de módulos existentes em src/.
+  - Lista de módulos congelados.
+  - Roadmap (Sprint 1-3 concluído, Sprint 4 em andamento, Sprint 5
+    planejado).
+  - KPIs atuais (snapshot em 2026-07-15, commit 8eebfbeff2e8).
+  - Resumo de 9 decisões importantes (referência a DECISION_LOG.md).
+  - Dívida técnica ativa (49 findings de code-audit.md).
+  - 17 hard gates bloqueando GA.
+  - Lista de documentos permanentes.
+  - Histórico de fases (Fase 0-10, append-only).
+  - Próximas fases planejadas.
+- Escrito .ai/DECISION_LOG.md — pre-populado com 9 decisões já
+  tomadas:
+  - D-001: Architecture Freeze 1.0
+  - D-002: Security Evidence como 3ª dimensão
+  - D-003: Release Decision via Hard Gates (não percentuais)
+  - D-004: Modelo de 3 estados por check
+  - D-005: Zero percentuais hardcoded
+  - D-006: Pesos configuráveis via config/kpi-weights.json
+  - D-007: Histórico imutável em reports/history/
+  - D-008: SHA-256 do report para integridade
+  - D-009: Governance layer .ai/ como memória operacional
+  Cada entrada com data, arquivos envolvidos, alternativas
+  descartadas, justificativa, impacto, estado.
+- Escrito .ai/TASK_TEMPLATE.md — template padrão de tarefa com 9
+  seções (Objetivo, Contexto, Arquivos envolvidos, Dependências,
+  Plano, Implementação, Validação, Resultado, Pendências). Inclui
+  regras de preenchimento e exemplo completo para "criar logger
+  estruturado".
+- Verificado: 8 arquivos criados em .ai/:
+  .ai/README.md
+  .ai/CORE_RULES.md
+  .ai/ENGINEERING_RULES.md
+  .ai/PROMPTING_RULES.md
+  .ai/OUTPUT_RULES.md
+  .ai/PROJECT_STATE.md
+  .ai/DECISION_LOG.md
+  .ai/TASK_TEMPLATE.md
+
+Stage Summary:
+- Camada permanente de governança estabelecida em .ai/.
+- 8 arquivos normativos criados, todos alinhados com:
+  - Architecture Frozen 1.0
+  - ENGINEERING-STANDARDS.md
+  - KPI-FORMULAS.md
+  - Pipeline de métricas (scripts/metrics/)
+  - 17 Hard Gates
+  - Modelo de 3 estados por check
+  - Histórico imutável + SHA-256
+- Hierarquia de autoridade definida: CORE_RULES > ENGINEERING_RULES
+  > ARCHITECTURE-FREEZE > ENGINEERING-STANDARDS > KPI-FORMULAS >
+  PROJECT_STATE > DECISION_LOG > prompt do usuário.
+- Regra de conflito: se prompt do usuário violar regra estrutural,
+  modelo deve parar e pedir confirmação antes de proceder.
+- PROJECT_STATE.md captura snapshot real (28% Overall Confidence,
+  BLOCKED, 17 gates falhando, 49 findings de dívida técnica).
+- DECISION_LOG.md pre-populado com 9 decisões para continuidade
+  entre sessões.
+- TASK_TEMPLATE.md fornece modelo padronizado para toda tarefa
+  futura.
+- Próximo agente que iniciar sessão deve ler .ai/ completo antes
+  de qualquer implementação.
+
+Artefatos produzidos:
+- /home/z/my-project/.ai/README.md
+- /home/z/my-project/.ai/CORE_RULES.md
+- /home/z/my-project/.ai/ENGINEERING_RULES.md
+- /home/z/my-project/.ai/PROMPTING_RULES.md
+- /home/z/my-project/.ai/OUTPUT_RULES.md
+- /home/z/my-project/.ai/PROJECT_STATE.md
+- /home/z/my-project/.ai/DECISION_LOG.md
+- /home/z/my-project/.ai/TASK_TEMPLATE.md
+
+---
