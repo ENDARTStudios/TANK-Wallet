@@ -26,6 +26,7 @@ import { BehaviorView } from '@/components/wallet/engines/behavior-view'
 import { ThreatIntelView } from '@/components/wallet/engines/threat-intel-view'
 import { PolicyView } from '@/components/wallet/production/policy-view'
 import { ProductionHardeningView } from '@/components/wallet/production/hardening-view'
+import { Sprint4Dashboard } from '@/components/wallet/sprint4/sprint4-dashboard'
 
 export default function Home() {
   return (
@@ -75,6 +76,7 @@ function WalletApp() {
             {view === 'dna' && <SecurityDnaView />}
             {view === 'policy' && <PolicyView />}
             {view === 'hardening' && <ProductionHardeningView />}
+            {view === 'sprint4' && <Sprint4Dashboard />}
             {view === 'notifications' && <SettingsView />}
             {view === 'settings' && <SettingsView />}
             {/* Soon views — show placeholder */}

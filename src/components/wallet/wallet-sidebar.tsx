@@ -35,7 +35,7 @@ export type WalletView =
   | 'recovery'
   | 'dna'
   | 'policy'
-  | 'hardening'
+  | 'hardening' | 'sprint4'
   | 'notifications'
   | 'settings'
 
@@ -83,6 +83,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'lockdown', label: 'Lockdown', icon: Power, pro: true },
       { id: 'dna', label: 'Security DNA', icon: Shield },
       { id: 'hardening', label: 'Production Hardening', icon: ShieldCheck },
+      { id: 'sprint4', label: 'Engineering Status', icon: Zap },
     ],
   },
   {
