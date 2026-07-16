@@ -17,6 +17,7 @@ import {
   MetricResult,
   readFile,
   rgCount,
+  rgList,
   SCRIPT_VERSION,
 } from "./_shared";
 
@@ -153,17 +154,24 @@ export function computeEngineering(): MetricResult {
 }
 
 function countCodeSmells(): number {
-  return rgCount("TODO|FIXME|XXX|HACK", SRC);
+  return rgCount("(?<![-A-Za-z])(TODO|FIXME|XXX|HACK)(?::|\\s|$)", SRC);
 }
 
 function countConsoleLog(): number {
-  return rgCount("console\\.log", SRC);
+  const all = rgList("console\\.(log|error|warn|info|debug)", SRC);
+  return all.filter((m) =>
+    !m.file.includes(".test.") && !m.file.includes(".spec.") &&
+    !m.file.includes("/observability/") && !m.file.includes("/components/ui/")
+  ).length;
 }
 
 function countAny(): number {
-  const a = rgCount(": any\\b", SRC);
-  const b = rgCount("as any\\b", SRC);
-  return a + b;
+  const a = rgList(": any\\b", SRC);
+  const b = rgList("as any\\b", SRC);
+  return [...a, ...b].filter((m) =>
+    !m.file.includes(".test.") && !m.file.includes(".spec.") &&
+    !m.file.includes("/components/ui/")
+  ).length;
 }
 
 function countTsIgnore(): number {
