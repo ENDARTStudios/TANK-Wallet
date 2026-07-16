@@ -1,0 +1,14 @@
+/** Feature flags for plan tiers. @stable */
+export type PlanTier = "free" | "pro" | "enterprise-starter" | "enterprise-business" | "enterprise-custom";
+export interface PlanDefinition { tier: PlanTier; name: string; priceMonthly: number; description: string; features: PlanFeatures }
+export interface PlanFeatures { allEnginesVisible: boolean; visibleEngines: string[]; continuousProtection: boolean; smartAccess: boolean; smartAccounts: boolean; privacy: boolean; zeroSwapFee: boolean; enterpriseFeatures: boolean; maxUsers: number | null; slaUptime: number | null }
+export const PLAN_DEFINITIONS: Record<PlanTier, PlanDefinition> = {
+  free: { tier: "free", name: "Free", priceMonthly: 0, description: "Daily protection.", features: { allEnginesVisible: false, visibleEngines: ["eng-004-threat-intel","eng-003-simulation","eng-012-wallet-guardian"], continuousProtection: false, smartAccess: false, smartAccounts: false, privacy: false, zeroSwapFee: false, enterpriseFeatures: false, maxUsers: 1, slaUptime: null } },
+  pro: { tier: "pro", name: "PRO", priceMonthly: 19.99, description: "Institutional security.", features: { allEnginesVisible: true, visibleEngines: [], continuousProtection: true, smartAccess: true, smartAccounts: true, privacy: true, zeroSwapFee: true, enterpriseFeatures: false, maxUsers: 1, slaUptime: null } },
+  "enterprise-starter": { tier: "enterprise-starter", name: "Enterprise Starter", priceMonthly: 499, description: "MPC, HSM, RBAC.", features: { allEnginesVisible: true, visibleEngines: [], continuousProtection: true, smartAccess: true, smartAccounts: true, privacy: true, zeroSwapFee: true, enterpriseFeatures: true, maxUsers: 10, slaUptime: 99.9 } },
+  "enterprise-business": { tier: "enterprise-business", name: "Enterprise Business", priceMonthly: 1499, description: "Unlimited users, SOC2.", features: { allEnginesVisible: true, visibleEngines: [], continuousProtection: true, smartAccess: true, smartAccounts: true, privacy: true, zeroSwapFee: true, enterpriseFeatures: true, maxUsers: null, slaUptime: 99.9 } },
+  "enterprise-custom": { tier: "enterprise-custom", name: "Enterprise Custom", priceMonthly: 0, description: "Dedicated HSM, on-prem.", features: { allEnginesVisible: true, visibleEngines: [], continuousProtection: true, smartAccess: true, smartAccounts: true, privacy: true, zeroSwapFee: true, enterpriseFeatures: true, maxUsers: null, slaUptime: 99.99 } },
+};
+export function getPlan(tier: PlanTier): PlanDefinition { return PLAN_DEFINITIONS[tier] ?? PLAN_DEFINITIONS.free; }
+export function getVisibleEngines(tier: PlanTier): string[] | null { const p = getPlan(tier); return p.features.allEnginesVisible ? null : p.features.visibleEngines; }
+export function filterEnginesByPlan<T extends { id: string }>(engines: T[], tier: PlanTier): T[] { const v = getVisibleEngines(tier); return v === null ? engines : engines.filter(e => v.includes(e.id)); }

@@ -122,3 +122,12 @@ export interface WalletState {
   safeSessionActive: boolean
   globalRiskScore: number
 }
+
+// ============ Decision Engine types (Architecture Freeze 1.0) ============
+/** @stable */
+export interface EngineScore { engineId: string; score: number; confidence: number; rationale?: string }
+/** @stable */
+export interface DecisionResult { decision: "allow" | "block" | "challenge"; securityLevel: "L0" | "L1" | "L2" | "L3" | "L4"; engineScores: Record<string, EngineScore>; evidence: Evidence[]; sources: string[]; violations: Array<{ policyId: string; reason: string }>; errors: Array<{ code: string; message: string }>; reproducible: boolean; decidedAt: string }
+/** @stable */
+export interface Evidence { source: string; kind: string; payload: Record<string, unknown>; collectedAt: string }
+

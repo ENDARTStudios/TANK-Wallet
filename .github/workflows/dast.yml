@@ -1,0 +1,38 @@
+name: DAST
+
+on:
+  schedule:
+    - cron: "0 2 * * 0"
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "Target URL"
+        required: true
+        default: "https://tankwallet.dev"
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  zap-baseline:
+    name: OWASP ZAP Baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: zaproxy/action-baseline@v0.13.0
+        with:
+          target: ${{ github.event.inputs.target_url || 'https://tankwallet.dev' }}
+          cmd_options: "-a -j"
+          allow_issue_writing: false
+          fail_action: false
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-report
+          path: |
+            report_json.json
+            report_html.html
+            report_md.md
+          retention-days: 30

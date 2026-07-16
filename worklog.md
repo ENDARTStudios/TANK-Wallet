@@ -593,3 +593,4 @@ Artefatos produzidos:
 - /home/z/my-project/.ai/templates/TASK_TEMPLATE.md (movido)
 
 ---
+WL-2026-07-16-010 appended

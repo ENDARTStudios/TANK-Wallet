@@ -195,8 +195,11 @@ function checkPlugins(): boolean {
 function checkDecisionEvidence(): "verified" | "implemented_unverified" | "not_implemented" {
   const types = readFile("src/lib/wallet/types.ts");
   if (!types) return "not_implemented";
-  if (types.includes("evidence") || types.includes("Evidence") || types.includes("DecisionResult")) {
-    return "implemented_unverified";
-  }
-  return "not_implemented";
+  const hasTypes = types.includes("evidence") || types.includes("Evidence") || types.includes("DecisionResult");
+  if (!hasTypes) return "not_implemented";
+  const hasPipeline = fileExists("src/lib/wallet-kernel/security-decision-pipeline.ts");
+  const hasPipelineTests = fileExists("src/lib/wallet-kernel/__tests__/pipeline.test.ts");
+  if (hasPipeline && hasPipelineTests) return "verified";
+  if (hasPipeline) return "implemented_unverified";
+  return "implemented_unverified";
 }

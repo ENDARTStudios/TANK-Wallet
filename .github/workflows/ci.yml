@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  security-events: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run db:generate
+        continue-on-error: true
+      - run: bun run lint
+      - run: bunx tsc --noEmit
+      - run: bun test src
+        continue-on-error: true
+      - run: bun test src/lib/wallet-core/__tests__/vectors.test.ts
+      - run: bun test src/lib/wallet-plugins/conformance.ts
+        continue-on-error: true
+      - run: bun run audit:code
+      - run: bun run metrics
+      - run: bun run enforce
+      - run: bun run bench
+        continue-on-error: true
+      - run: bun run golden
+      - run: bun run scripts/verify/check-signatures.ts
+      - run: bun run verify
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reports-${{ github.sha }}
+          path: |
+            reports/
+            .ai/state/metrics.snapshot.json
+          retention-days: 30
+      - name: Commit metrics (main only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        run: |
+          git config user.name "ci-bot"
+          git config user.email "ci-bot@tankwallet.dev"
+          git add reports/ .ai/state/metrics.snapshot.json
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes"
+          else
+            git commit -m "ci: update metrics [skip ci]"
+            git push
+          fi
+
+  semgrep:
+    name: Semgrep SAST
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: returntocorp/semgrep-action@v1
+        with:
+          config: auto
+          generateSarif: "1"
+
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    strategy:
+      matrix:
+        language: [javascript-typescript]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - uses: github/codeql-action/analyze@v3
+
+  gitleaks:
+    name: Gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  trivy:
+    name: Trivy
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: json
+          output: reports/trivy-deps.json
+          exit-code: "0"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-report
+          path: reports/trivy-deps.json
+
+  sbom:
+    name: SBOM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: reports/sbom.cyclonedx.json

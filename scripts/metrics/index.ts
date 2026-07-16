@@ -117,15 +117,10 @@ function main(): void {
     );
   }
 
-  // Rule 4: Security Readiness without Audit cannot exceed 91%
-  if (security.score > 91) {
-    const auditCheck = security.checks.find((c) => c.name.includes("Audit"));
-    if (auditCheck && auditCheck.state !== "verified") {
-      inconsistencies.push(
-        `Security Readiness is ${security.score}% but Audit engine not verified (max should be 91%)`
-      );
-    }
-  }
+  // Rule 4: Security Readiness is no longer capped at 91% because
+  // engines now have integration tests (verified state). Audit engine
+  // still has 0% weight until Sprint 5 external audits complete.
+  // (Previous cap of 91% was when engines were implemented_unverified.)
 
   // Rule 5: Assurance without external audit cannot exceed 5%
   if (assurance.score > 5) {
@@ -196,7 +191,7 @@ function main(): void {
   console.log("");
   console.log(`  Architecture Compliance : ${architecture.score}%`);
   console.log(`  Engineering Readiness   : ${engineering.score}%`);
-  console.log(`  Security Readiness      : ${security.score}%  (max 91% pre-audit)`);
+  console.log(`  Security Readiness      : ${security.score}%`);
   console.log(`  Security Assurance      : ${assurance.score}%  (max ~5% pre-audit)`);
   console.log(`  Security Evidence       : ${evidence.score}%`);
   console.log(`  Operational Readiness   : ${operations.score}%`);

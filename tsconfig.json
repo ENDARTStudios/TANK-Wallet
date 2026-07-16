@@ -37,6 +37,11 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "examples",
+    "skills",
+    "download",
+    "scripts/debug-gf.ts",
+    "scripts/debug-shamir.ts"
   ]
 }

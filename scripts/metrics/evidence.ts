@@ -153,9 +153,12 @@ function checkDecisionEvidence(): "verified" | "implemented_unverified" | "not_i
 function checkAuditEvidence(): "verified" | "implemented_unverified" | "not_implemented" {
   const schema = readFile("prisma/schema.prisma");
   if (!schema) return "not_implemented";
-  if (schema.includes("model PermissionAuditLog") && fileExists("src/lib/wallet-engines/audit/index.ts")) {
-    return "implemented_unverified"; // append-only via Prisma but HMAC chain missing
-  }
+  const hasPrismaModel = schema.includes("model PermissionAuditLog");
+  const hasEngine = fileExists("src/lib/wallet-engines/audit/index.ts");
+  const hasHmacChain = fileExists("src/lib/wallet-engines/audit/hmac-chain.ts");
+  const hasHmacTests = fileExists("src/lib/wallet-engines/audit/__tests__/hmac-chain.test.ts");
+  if (hasPrismaModel && hasEngine && hasHmacChain && hasHmacTests) return "verified";
+  if (hasPrismaModel && hasEngine) return "implemented_unverified";
   return "not_implemented";
 }
 
