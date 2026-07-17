@@ -1,0 +1,76 @@
+name: Fuzzing (Echidna + Foundry)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "contracts/**"
+      - "src/contracts/**"
+  schedule:
+    # Weekly fuzzing run on Sundays at 03:00 UTC
+    - cron: "0 3 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  foundry:
+    name: Foundry Fuzz Tests
+    runs-on: ubuntu-latest
+    if: hashFiles('contracts/**/*.sol') != '' || hashFiles('src/contracts/**/*.sol') != ''
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Build contracts
+        run: forge build
+        continue-on-error: true
+
+      - name: Run fuzz tests
+        run: forge test --fuzz-runs 10000
+        continue-on-error: true  # advisory — findings don't block
+
+      - name: Upload fuzz results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: foundry-fuzz-results
+          path: out/
+          retention-days: 14
+
+  echidna:
+    name: Echidna Property Tests
+    runs-on: ubuntu-latest
+    if: hashFiles('contracts/**/*.sol') != '' || hashFiles('src/contracts/**/*.sol') != ''
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Echidna
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsecp256k1-0 libfftw3-3
+          wget -q https://github.com/crytic/echidna/releases/download/v2.2.0/echidna-2.2.0-x86_64-Linux.tar.gz
+          tar xzf echidna-2.2.0-x86_64-Linux.tar.gz
+          sudo mv echidna /usr/local/bin/
+          echidna --version
+
+      - name: Run Echidna
+        run: bash scripts/security/run-echidna.sh
+        continue-on-error: true  # advisory
+
+      - name: Upload Echidna results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: echidna-results
+          path: echidna-corpus/
+          retention-days: 14

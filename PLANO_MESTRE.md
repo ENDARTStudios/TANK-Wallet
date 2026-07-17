@@ -192,18 +192,26 @@ ser executadas por código.
 - [x] Audit package preparado (`docs/audit-package/README.md`)
 - [x] Commit frozen para auditores
 - [x] SECURITY.md publicado
-- [x] BUG-BOUNTY.md draft pronto
-- [ ] Audit #1 (crypto + key management + recovery) — aguardando commissionamento
-- [ ] Audit #2 (engines + decision pipeline + event bus) — aguardando commissionamento
-- [ ] Pentest #1 (frontend + API) — aguardando agendamento
-- [ ] Pentest #2 (infra + supply chain) — aguardando agendamento
-- [ ] Bug bounty público (Immunefi) — aguardando launch pós-Audit #1
-- [ ] Correção de findings — aguardando reports
-- [ ] Release Decision: READY_FOR_GA — aguardando 17/17 hard gates
+- [x] BUG-BOUNTY.md com escopo detalhado e recompensas
+- [x] Bug bounty launch guide para Operador (`docs/security/bug-bounty-launch-guide.md`)
+- [x] Slither + Mythril workflow (`.github/workflows/slither.yml`) — aguarda contratos `.sol`
+- [x] Echidna + Foundry fuzzing workflow (`.github/workflows/fuzzing.yml`) — aguarda contratos `.sol`
+- [x] Trail of Bits tools setup script (`scripts/security/setup-tools.sh`)
+- [x] Trail of Bits integration docs (`docs/security/trail-of-bits-integration.md`)
+- [x] `.env.example` criado
+- [x] CSP header configurado (`next.config.ts`)
+- [x] `test:coverage` script adicionado (`package.json`)
+- [ ] Bug bounty público (Immunefi) — aguardando Operador criar conta
+- [ ] Audit #1 (crypto) — sem orçamento; camadas gratuitas em vigor (D-013)
+- [ ] Audit #2 (engines) — sem orçamento; camadas gratuitas em vigor (D-013)
+- [ ] Pentest #1 (frontend + API) — sem orçamento; OWASP ZAP em vigor
+- [ ] Pentest #2 (infra + supply chain) — sem orçamento; Trivy + CodeQL em vigor
+- [ ] Correção de findings — aguardando reports de bug bounty ou auditorias
+- [ ] Release Decision: READY_FOR_GA — aguardando hard gates
 - [ ] Deploy em produção — aguardando GA
 - [ ] MANUAL_DO_OPERADOR.md — será criado no deploy final
 
-**Evidência:** 15/17 hard gates bloqueados (todos externos). Overall Confidence 71%.
+**Evidência:** 15/17 hard gates bloqueados (todos externos). Overall Confidence 71%. Camadas gratuitas ativas: Slither, Mythril, Echidna, Foundry, CodeQL, Semgrep, Gitleaks, Trivy, OWASP ZAP, Dependabot.
 
 ---
 

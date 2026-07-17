@@ -157,3 +157,7 @@ Alternativas consideradas: Aprovação manual por comitê (descartada — subjet
 Motivo: <por quê>
 Alternativas consideradas: <se houver>
 -->
+
+## [2026-07-17] Decisão: D-013 — Camadas de segurança gratuitas em vez de auditoria paga
+Motivo: Operador confirmou que não há orçamento para auditorias externas pagas. Thinker propôs empilhar todas as camadas gratuitas disponíveis (Slither, Mythril, Echidna, Foundry, Trail of Bits tools, CodeQL, Semgrep, Gitleaks, Trivy, OWASP ZAP, bug bounty público) como alternativa. Isso não substitui o selo de uma firma reconhecida, mas maximiza a confiança alcançável sem orçamento.
+Alternativas consideradas: Auditoria paga (descartada — sem orçamento); lançar sem nenhuma validação externa (descartada — risco inaceitável); esperar por orçamento futuro (descartada — opera em paralelo com camadas gratuitas).

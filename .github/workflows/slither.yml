@@ -1,0 +1,54 @@
+name: Slither (Smart Contract Analysis)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "contracts/**"
+      - "src/contracts/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "contracts/**"
+      - "src/contracts/**"
+  workflow_dispatch:
+
+permissions:
+  security-events: write
+
+jobs:
+  slither:
+    name: Slither Static Analysis
+    runs-on: ubuntu-latest
+    # Only run if Solidity contracts exist
+    if: hashFiles('contracts/**/*.sol') != '' || hashFiles('src/contracts/**/*.sol') != ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Slither
+        run: pip install slither-analyzer
+
+      - name: Run Slither
+        uses: crytic/slither-action@v0.3.1
+        with:
+          fail-on: none  # advisory mode — findings don't block
+          sarif: results.sarif
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+
+      - name: Upload Slither report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: slither-report
+          path: results.sarif
+          retention-days: 30

@@ -13,6 +13,7 @@
     "verify": "bun run scripts/verify/index.ts",
     "bench": "bun run scripts/bench/index.ts",
     "golden": "bun run scripts/golden-vectors/transaction-flow.ts",
+    "test:coverage": "bun test src --coverage",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

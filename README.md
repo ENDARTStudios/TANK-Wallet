@@ -2,7 +2,15 @@
 
 > **Status: AUDIT_READY** — Plataforma autocustodial de segurança para ativos digitais.
 >
-> Architecture Freeze 1.0.0 | Governance 1.3 | Overall Confidence: 65%
+> Architecture Freeze 1.0.0 | Governance 1.3 | Overall Confidence: 71%
+
+## 🛡️ Bug Bounty
+
+We welcome security research on Tank Wallet. See [`BUG-BOUNTY.md`](BUG-BOUNTY.md) for scope, rules, and rewards.
+
+- **Platform**: Immunefi (launch pending — see [launch guide](docs/security/bug-bounty-launch-guide.md))
+- **Critical**: $1,000 – $5,000
+- **Report**: security@tankwallet.dev (PGP) or via Immunefi when live
 
 ## O que é
 
