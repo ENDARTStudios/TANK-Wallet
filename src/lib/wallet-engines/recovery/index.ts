@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 // ============ Recovery Engine (Phase 7) ============

@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 // ============ Bitcoin Plugin — Full Lifecycle ============

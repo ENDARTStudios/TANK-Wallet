@@ -1,6 +1,7 @@
 /** HMAC chain for tamper-evident audit log. @stable */
 import { createHmac, randomBytes } from "node:crypto";
-import { InternalError } from "@/lib/wallet-core/errors";
+import { InternalError } from "../../wallet-core/errors";
+// Path: src/lib/wallet-engines/audit/hmac-chain.ts → ../../wallet-core/errors.ts
 export interface ChainedAuditEntry { sequence: number; timestamp: string; eventType: string; walletAddress: string; payload: Record<string, unknown>; hmac: string; prevHmac: string | null; }
 let chainSecret: string | null = null; let lastHmac: string | null = null; let seq = 0;
 export function initAuditChain(secret: string): void { chainSecret = secret; }

@@ -21,6 +21,7 @@
 import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { signArtifact } from "../metrics/_shared";
 
 const PROJECT_ROOT = resolve(__dirname, "..", "..");
 const REPORTS_DIR = join(PROJECT_ROOT, "reports");
@@ -235,6 +236,15 @@ function main(): void {
 
   writeFileSync(join(REPORTS_DIR, "code-audit.md"), lines.join("\n") + "\n", "utf8");
   console.log(`[audit] wrote reports/code-audit.md`);
+
+  // Sign the code-audit.md artifact
+  try {
+    signArtifact("reports/code-audit.md", "scripts/audit/code-audit.ts");
+    console.log(`[audit] wrote reports/code-audit.md.sig`);
+  } catch (e) {
+    console.log(`[audit] ⚠ could not sign: ${(e as Error).message}`);
+  }
+
   console.log(`[audit] ${findings.length} findings (${bySeverity.get("critical") ?? 0} critical, ${bySeverity.get("high") ?? 0} high, ${bySeverity.get("medium") ?? 0} medium, ${bySeverity.get("low") ?? 0} low)`);
 }
 

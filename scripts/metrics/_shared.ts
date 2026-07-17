@@ -318,6 +318,63 @@ export function writeMarkdown(filename: string, content: string): void {
   writeFileSync(path, content, "utf8");
 }
 
+// ─── Artifact Signing ───────────────────────────────────────────────────
+
+export interface ArtifactSignature {
+  schemaVersion: "1.0";
+  artifact: string;
+  integrityHash: string;
+  algorithm: "sha256";
+  signature: string | null;
+  signatureAlgorithm: "ed25519" | null;
+  keyId: string | null;
+  signedAt: string;
+  commit: string;
+  signedBy: string;
+}
+
+export function signArtifact(artifactRelativePath: string, signedBy: string): ArtifactSignature {
+  const absPath = join(PROJECT_ROOT, artifactRelativePath);
+  if (!existsSync(absPath)) {
+    throw new Error(`Cannot sign missing artifact: ${artifactRelativePath}`);
+  }
+  const content = readFileSync(absPath);
+  const integrityHash = createHash("sha256").update(content).digest("hex");
+  const sig: ArtifactSignature = {
+    schemaVersion: "1.0",
+    artifact: artifactRelativePath,
+    integrityHash,
+    algorithm: "sha256",
+    signature: null,
+    signatureAlgorithm: null,
+    keyId: null,
+    signedAt: new Date().toISOString(),
+    commit: gitCommit(),
+    signedBy,
+  };
+  const sigPath = absPath + ".sig";
+  writeFileSync(sigPath, JSON.stringify(sig, null, 2) + "\n", "utf8");
+  return sig;
+}
+
+export function verifyArtifact(artifactRelativePath: string): { valid: boolean; reason?: string } {
+  const absPath = join(PROJECT_ROOT, artifactRelativePath);
+  const sigPath = absPath + ".sig";
+  if (!existsSync(absPath)) return { valid: false, reason: `artifact missing: ${artifactRelativePath}` };
+  if (!existsSync(sigPath)) return { valid: false, reason: `signature missing: ${artifactRelativePath}.sig` };
+  try {
+    const sig = JSON.parse(readFileSync(sigPath, "utf8")) as ArtifactSignature;
+    const content = readFileSync(absPath);
+    const expected = createHash("sha256").update(content).digest("hex");
+    if (expected !== sig.integrityHash) {
+      return { valid: false, reason: `integrity hash mismatch for ${artifactRelativePath}` };
+    }
+    return { valid: true };
+  } catch (e) {
+    return { valid: false, reason: `failed to parse signature: ${(e as Error).message}` };
+  }
+}
+
 /**
  * Save a history snapshot: reports/history/YYYY-MM-DD-<short-commit>.json
  */

@@ -26,6 +26,7 @@ import {
   writeJson,
   writeMarkdown,
   writeHistorySnapshot,
+  signArtifact,
   renderMetricMarkdown,
   gitCommit,
   computeReportHash,
@@ -179,6 +180,14 @@ function main(): void {
   // Write history snapshot (immutable, per commit)
   const historyPath = writeHistorySnapshot(report);
   console.log(`[metrics] wrote history snapshot ${historyPath}`);
+
+  // Sign the metrics.json artifact
+  try {
+    signArtifact("reports/metrics.json", "scripts/metrics/index.ts");
+    console.log(`[metrics] wrote reports/metrics.json.sig`);
+  } catch (e) {
+    console.log(`[metrics] ⚠ could not sign: ${(e as Error).message}`);
+  }
   console.log("");
 
   // Console summary

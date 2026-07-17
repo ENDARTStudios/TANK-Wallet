@@ -21,6 +21,7 @@ export type WalletView =
   | 'bridge'
   | 'staking'
   | 'vault'
+  | 'dapps'
   | 'risk'
   | 'sovereignty'
   | 'scanner'

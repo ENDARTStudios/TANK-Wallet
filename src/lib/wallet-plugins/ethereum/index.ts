@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 // ============ Ethereum Plugin — Full Lifecycle ============

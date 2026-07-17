@@ -14,6 +14,7 @@ export const RISK_LABEL: Record<RiskLevel, string> = {
   medium: 'Médio risco',
   high: 'Alto risco',
   blocked: 'Bloqueado',
+  critical: 'Crítico',
 }
 
 export const RISK_COLOR: Record<RiskLevel, string> = {
@@ -22,6 +23,7 @@ export const RISK_COLOR: Record<RiskLevel, string> = {
   medium: 'text-amber-400',
   high: 'text-orange-400',
   blocked: 'text-red-400',
+  critical: 'text-red-500',
 }
 
 export const RISK_BG: Record<RiskLevel, string> = {
@@ -30,6 +32,7 @@ export const RISK_BG: Record<RiskLevel, string> = {
   medium: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
   high: 'bg-orange-500/10 border-orange-500/30 text-orange-400',
   blocked: 'bg-red-500/10 border-red-500/30 text-red-400',
+  critical: 'bg-red-500/20 border-red-500/40 text-red-500',
 }
 
 export const RISK_DOT: Record<RiskLevel, string> = {
@@ -38,6 +41,7 @@ export const RISK_DOT: Record<RiskLevel, string> = {
   medium: 'bg-amber-500',
   high: 'bg-orange-500',
   blocked: 'bg-red-500',
+  critical: 'bg-red-600',
 }
 
 // ============ Token integrity verification ============

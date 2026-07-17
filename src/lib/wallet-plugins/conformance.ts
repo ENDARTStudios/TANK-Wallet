@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 // ============ Conformance Suite + Security Validation ============

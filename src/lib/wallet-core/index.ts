@@ -1,5 +1,6 @@
 // ============ wallet-core: BIP-39 mnemonic + HD derivation ============
 
+import { InternalError, WalletError } from './errors'
 import { generateMnemonic, mnemonicToSeed, validateMnemonic } from '@scure/bip39'
 import { wordlist } from '@scure/bip39/wordlists/english.js'
 import { HDKey } from '@scure/bip32'
@@ -10,7 +11,7 @@ import { derivePath as slip10Derive } from 'ed25519-hd-key'
 import * as ed25519 from '@noble/ed25519'
 import { secp256k1 } from '@noble/curves/secp256k1.js'
 
-export type { Mnemonic } from '@scure/bip39'
+export type Mnemonic = string
 
 export interface DerivedEvmAccount {
   path: string
@@ -66,7 +67,7 @@ export async function deriveEvmAccount(
   const path = `m/44'/60'/0'/0/${index}`
   const child = hd.derive(path)
   if (!child.privateKey || !child.publicKey) {
-    throw new Error('Failed to derive EVM private key')
+    throw new WalletError('TANK-6006', 'Failed to derive EVM private key')
   }
   // EVM address = last 20 bytes of keccak256(publicKey)
   const publicKeyUncompressed = child.publicKey.slice(1) // drop 0x04 prefix
@@ -119,7 +120,7 @@ export async function deriveBtcAccount(
   const path = `m/84'/0'/0'/0/${index}` // Native SegWit (bech32)
   const child = hd.derive(path)
   if (!child.privateKey || !child.publicKey) {
-    throw new Error('Failed to derive BTC private key')
+    throw new WalletError('TANK-6006', 'Failed to derive BTC private key')
   }
   // Use compressed public key directly with bitcoinjs-lib payments (no ECPair needed)
   const { address } = btcPayments.p2wpkh({ pubkey: Buffer.from(child.publicKey) })
@@ -142,7 +143,7 @@ export async function deriveLightningAccount(
   const path = `m/44'/0'/0'/0/${index}`
   const child = hd.derive(path)
   if (!child.privateKey || !child.publicKey) {
-    throw new Error('Failed to derive Lightning key')
+    throw new WalletError('TANK-6006', 'Failed to derive Lightning key')
   }
   // Lightning node id is the compressed 33-byte public key
   const nodeId = `02${toHex(child.publicKey.slice(1))}`

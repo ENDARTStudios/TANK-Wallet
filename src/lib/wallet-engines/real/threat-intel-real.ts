@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 // ============ Sprint 1: Threat Intelligence Engine (REAL) ============

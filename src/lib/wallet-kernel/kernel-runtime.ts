@@ -102,15 +102,18 @@ const contractScannerEngine: PipelineEngine = {
       // Dynamic import to avoid circular dependencies
       const { scanContract } = await import("@/lib/wallet-scanner");
       const result = await scanContract(context.chain, context.contractAddress);
+      if (!result) throw new Error("scanContract returned null");
+      const score = result.riskScore;
+      const findings = result.findings.map((f: { description: string }) => f.description);
 
       return {
         engineId: "eng-012-wallet-guardian",
         engineVersion: "1.0.0",
-        score: result.score,
-        level: result.score >= 80 ? "safe" : result.score >= 50 ? "medium" : result.score >= 25 ? "high" : "critical",
-        blocked: result.score < 40,
-        evidence: result.findings,
-        explanation: result.humanExplanation,
+        score,
+        level: score >= 80 ? "safe" : score >= 50 ? "medium" : score >= 25 ? "high" : "critical",
+        blocked: score < 40,
+        evidence: findings,
+        explanation: `Contract Scanner: riskLevel=${result.riskLevel}, verified=${result.isVerified}, findings=${findings.length}`,
         evaluatedAt: Date.now(),
         durationMs: Date.now() - start,
       };
@@ -205,4 +208,5 @@ export async function analyzeTransaction(
   return result;
 }
 
-export default { analyzeTransaction, KERNEL_ENGINES };
+const kernelRuntime = { analyzeTransaction, KERNEL_ENGINES };
+export default kernelRuntime;

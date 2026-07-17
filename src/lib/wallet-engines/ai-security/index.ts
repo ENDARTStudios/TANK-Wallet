@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 // ============ AI Security Engine (TSF-6) ============

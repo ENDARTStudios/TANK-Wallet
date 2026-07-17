@@ -12,6 +12,7 @@ import type {
 } from '@/lib/wallet/types'
 import { computeGlobalRiskScore } from '@/lib/wallet/security'
 import type { FullWallet } from '@/lib/wallet-core'
+import { InternalError } from '@/lib/wallet-core/errors'
 import { hasStoredVault } from '@/lib/wallet-core/storage'
 import { EvmProvider, formatEtherSafe } from '@/lib/wallet-evm'
 import { chainById } from '@/lib/wallet/data'
@@ -551,7 +552,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
 export function useWallet() {
   const ctx = useContext(WalletContext)
-  if (!ctx) throw new Error('useWallet must be used within WalletProvider')
+  if (!ctx) throw new InternalError('TANK-8002', 'useWallet must be used within WalletProvider')
   return ctx
 }
 

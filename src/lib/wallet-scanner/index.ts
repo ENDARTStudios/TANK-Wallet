@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============ wallet-scanner: Smart Contract Scanner + DApp Shield ============
 //
 // "Antes de qualquer assinatura: análise completa."

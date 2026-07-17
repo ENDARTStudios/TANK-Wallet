@@ -9,13 +9,10 @@
  */
 
 import { describe, it, expect } from "bun:test";
+import * as sovereignty from "../../../wallet-sovereignty";
 
 describe("Permission Engine (integration)", () => {
   it("builds correct ERC-20 revoke calldata", () => {
-    // Import the real sovereignty module
-    const sovereignty = require("../../../wallet-sovereignty");
-
-    // buildRevokeErc20ApprovalCalldata should produce approve(spender, 0)
     const spender = "0x1234567890123456789012345678901234567890";
     const calldata = sovereignty.buildRevokeErc20ApprovalCalldata(spender);
 
@@ -26,8 +23,6 @@ describe("Permission Engine (integration)", () => {
   });
 
   it("builds correct NFT revoke calldata (setApprovalForAll)", () => {
-    const sovereignty = require("../../../wallet-sovereignty");
-
     const spender = "0x1234567890123456789012345678901234567890";
     const calldata = sovereignty.buildRevokeNftApprovalCalldata(spender);
 
@@ -37,14 +32,10 @@ describe("Permission Engine (integration)", () => {
   });
 
   it("executeLockdown returns structured result", () => {
-    const sovereignty = require("../../../wallet-sovereignty");
-
-    // executeLockdown should accept approvals + sessions and return result
     expect(typeof sovereignty.executeLockdown).toBe("function");
   });
 
   it("detects infinite ERC-20 approvals", () => {
-    // max uint256 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
     const maxUint256 = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
     const isMax = maxUint256.toLowerCase() === "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
     expect(isMax).toBe(true);

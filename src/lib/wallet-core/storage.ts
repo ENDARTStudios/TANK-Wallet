@@ -24,7 +24,7 @@ async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey>
   const enc = new TextEncoder()
   const baseKey = await crypto.subtle.importKey(
     'raw',
-    enc.encode(password),
+    enc.encode(password) as BufferSource,
     { name: 'PBKDF2' },
     false,
     ['deriveKey']
@@ -32,7 +32,7 @@ async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey>
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt,
+      salt: salt as BufferSource,
       iterations: PBKDF2_ITERATIONS,
       hash: 'SHA-256',
     },
@@ -86,9 +86,9 @@ export async function storeMnemonic(
   const enc = new TextEncoder()
   const plaintext = enc.encode(mnemonic)
   const ciphertextBuf = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
+    { name: 'AES-GCM', iv: iv as BufferSource },
     key,
-    plaintext
+    plaintext as BufferSource
   )
   const ciphertext = new Uint8Array(ciphertextBuf)
   // Concatenate salt || iv || ciphertext for storage
@@ -122,9 +122,9 @@ export async function loadMnemonic(password: string): Promise<{ mnemonic: string
   const key = await deriveKey(password, salt)
   try {
     const plaintextBuf = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv },
+      { name: 'AES-GCM', iv: iv as BufferSource },
       key,
-      ciphertext
+      ciphertext as BufferSource
     )
     const dec = new TextDecoder()
     return {

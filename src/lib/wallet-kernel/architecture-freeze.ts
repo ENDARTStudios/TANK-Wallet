@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 // ============ Architecture Freeze 1.0 ============

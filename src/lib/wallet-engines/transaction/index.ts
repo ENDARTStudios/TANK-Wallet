@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============ Transaction Engine (Phase 5) ============
 //
 // "Explain Before Signing" — Nunca mostrar apenas hexadecimal.

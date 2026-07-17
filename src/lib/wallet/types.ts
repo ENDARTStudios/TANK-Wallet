@@ -32,7 +32,7 @@ export type TokenStandard =
   | 'BRC-20'
   | 'Ordinals'
 
-export type RiskLevel = 'safe' | 'low' | 'medium' | 'high' | 'blocked'
+export type RiskLevel = 'safe' | 'low' | 'medium' | 'high' | 'critical' | 'blocked'
 
 export interface RiskAssessment {
   level: RiskLevel
