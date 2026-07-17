@@ -11,6 +11,7 @@ We welcome security research on Tank Wallet. See [`BUG-BOUNTY.md`](BUG-BOUNTY.md
 - **Platform**: Immunefi (launch pending — see [launch guide](docs/security/bug-bounty-launch-guide.md))
 - **Critical**: $1,000 – $5,000
 - **Report**: security@tankwallet.dev (PGP) or via Immunefi when live
+- **Hall of Fame**: See our [Security Hall of Fame](docs/security/hall-of-fame.md) for recognized researchers
 
 ## O que é
 
