@@ -34,7 +34,7 @@ jobs:
         run: pip install slither-analyzer
 
       - name: Run Slither
-        uses: crytic/slither-action@v0.3.1
+        uses: crytic/slither-action@v0.4.2
         with:
           fail-on: none  # advisory mode — findings don't block
           sarif: results.sarif
