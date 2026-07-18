@@ -77,4 +77,4 @@ Ver `docs/audit-package/README.md` para o pacote completo de auditoria:
 
 ## Licença
 
-Copyright © 2026 END ART
+Copyright © 2026 END ART Studios
