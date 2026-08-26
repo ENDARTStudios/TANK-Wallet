@@ -10,6 +10,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ============ Multi-tenant foundation (Workspaces & Users) ============
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  tier      String   @default("free")
+  users     User[]
+  createdAt DateTime @default(now())
+
+  @@index([tier])
+}
+
+model User {
+  id          String     @id @default(cuid())
+  email       String     @unique
+  role        String     @default("member")
+  tier        String?
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
+  createdAt   DateTime   @default(now())
+
+  @@index([workspaceId])
+  @@index([role])
+}
+
 // ============ Threat Intelligence Backend (Phase 4) ============
 
 /// Known malicious token contracts (honeypots, rug pulls, scam tokens)
@@ -124,9 +149,11 @@ model PermissionAuditLog {
   amount        String?
   /// Wallet address that performed the action
   walletAddress String?
+  workspaceId   String?
   timestamp     DateTime @default(now())
 
   @@index([walletAddress])
+  @@index([workspaceId])
   @@index([timestamp])
 }
 
@@ -137,6 +164,7 @@ model BehaviorProfile {
   id            String   @id @default(cuid())
   /// Wallet address this profile belongs to
   walletAddress String   @unique
+  workspaceId   String?
   /// JSON: { typicalHours, typicalChains, typicalAmounts, typicalDevices, typicalContracts, frequency }
   profile       String
   /// Number of actions observed
@@ -144,12 +172,15 @@ model BehaviorProfile {
   /// Last time the profile was updated
   updatedAt     DateTime @updatedAt
   createdAt     DateTime @default(now())
+
+  @@index([workspaceId])
 }
 
 /// Anomalous actions detected by the behavior engine
 model BehaviorAnomaly {
   id            String   @id @default(cuid())
   walletAddress String
+  workspaceId   String?
   /// JSON describing the anomalous action
   action        String
   /// JSON describing why it's anomalous
@@ -161,6 +192,7 @@ model BehaviorAnomaly {
   timestamp     DateTime @default(now())
 
   @@index([walletAddress])
+  @@index([workspaceId])
   @@index([timestamp])
 }
 
@@ -170,6 +202,7 @@ model BehaviorAnomaly {
 model RecoveryContact {
   id            String   @id @default(cuid())
   walletAddress String
+  workspaceId   String?
   /// Display name
   name          String
   /// Contact address (could be wallet, email, phone)
@@ -181,4 +214,5 @@ model RecoveryContact {
   createdAt     DateTime @default(now())
 
   @@index([walletAddress])
+  @@index([workspaceId])
 }

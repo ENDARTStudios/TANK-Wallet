@@ -12,3 +12,21 @@ export const PLAN_DEFINITIONS: Record<PlanTier, PlanDefinition> = {
 export function getPlan(tier: PlanTier): PlanDefinition { return PLAN_DEFINITIONS[tier] ?? PLAN_DEFINITIONS.free; }
 export function getVisibleEngines(tier: PlanTier): string[] | null { const p = getPlan(tier); return p.features.allEnginesVisible ? null : p.features.visibleEngines; }
 export function filterEnginesByPlan<T extends { id: string }>(engines: T[], tier: PlanTier): T[] { const v = getVisibleEngines(tier); return v === null ? engines : engines.filter(e => v.includes(e.id)); }
+
+export type FeatureFlagKey = "owl_behavior" | "persistence_recovery" | "admin_rbac" | "bot_mode";
+export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagKey, boolean> = {
+  owl_behavior: false,
+  persistence_recovery: false,
+  admin_rbac: false,
+  bot_mode: true,
+};
+export function isFeatureOn(
+  flag: FeatureFlagKey,
+  ctx?: { tier?: PlanTier; overrides?: Partial<Record<FeatureFlagKey, boolean>> },
+): boolean {
+  const envKey = `FEATURE_${flag.toUpperCase()}`;
+  const envRaw = (process.env as Record<string, string | undefined>)[envKey];
+  if (envRaw !== undefined) return envRaw === "1" || envRaw.toLowerCase() === "true";
+  if (ctx?.overrides && flag in ctx.overrides) return !!ctx.overrides[flag];
+  return DEFAULT_FEATURE_FLAGS[flag] ?? false;
+}

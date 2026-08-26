@@ -2,67 +2,66 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 2 — E2E Playwright + Gate de Qualidade (maior impacto para evitar regressões)
+## Sprint 3 — WAF/Bot Fight + RBAC/RLS Foundation + Catálogo Modular
 
-**Objetivo:** garantir que mudanças de UI/segurança não quebrem fluxos críticos e que a cobertura não regrida. É o próximo menor custo com maior proteção contra regressões visuais e de segurança.
+**Objetivo:** fechar a superfície de ataque de rede (bot) e fundar isolamento multi-tenant (RBAC + RLS app-layer) sem migrar para Postgres ainda. Maior impacto em segurança após rate-limit, com complexidade média e reversível.
 
-**Issues mãe:** `docs/ISSUES-BACKLOG.md` #5, #6, #14
+**Issues mãe:** `docs/ISSUES-BACKLOG.md` #7, #8, #9, #10
 
 ### Tarefas
 
-#### T1 — Playwright E2E (CRÍTICO)
-- **Arquivos:** `playwright.config.ts` (novo), `e2e/` (novo), `package.json`, `.github/workflows/ci.yml`, `docs/TESTING.md`
+#### T1 — WAF / Bot fight mode (MÉDIO)
+- **Arquivos:** `src/lib/security/bot-guard.ts` (novo), `src/lib/security/__tests__/bot-guard.test.ts` (novo), `src/proxy.ts`, `.env.example`, `docs/SECURITY-GATE.md`
 - **Ações:**
-  - Instalar `playwright` + `playwright.config.ts` (baseURL `http://localhost:3000`, webServer `next dev`)
-  - Criar `e2e/onboarding.spec.ts` (criar wallet → unlock), `e2e/lockdown.spec.ts` (L1-L3), `e2e/security.spec.ts` (HSTS header, error.tsx fallback)
-  - Validar que skeleton aparece antes do dado (`[data-skeleton]`) e que animações Motion não quebram em 375/390/768
-- **Critério:** `npx playwright test` verde local e CI; screenshots/vídeo em CI
-- **Testes:** `bunx playwright test --reporter=list` verde; PR falha se E2E quebrar
-- **Ref:** `Closes #5`
+  - Implementar `analyzeBotSignal(req)` — UA vazio/suspeito (`curl`, `python`, `headless`, `puppeteer`), `Sec-Fetch-*` ausente, `X-Forwarded-For` anômalo, ausência de `Accept-Language`
+  - `BOT_MODE=monitor` → loga `warn` com `botScore`; `BOT_MODE=block` → `403` com `X-Bot-Score`
+  - Integrar em `src/proxy.ts` antes do rate-limit; não bloquear `/api/health`
+  - Env `BOT_MODE` em `.env.example`
+- **Critério:** `BOT_MODE=monitor` loga bot simulado; `BOT_MODE=block` retorna `403` para `User-Agent: curl/8.0`; teste reproduz
+- **Testes:** `bun test src/lib/security/__tests__/bot-guard.test.ts` 6 pass
+- **Ref:** `Closes #7`
 
-#### T2 — Gate Codecov + `test:coverage` (MÉDIO)
-- **Arquivos:** `codecov.yml` (novo), `.github/workflows/ci.yml`, `package.json`, `docs/TESTING.md`
+#### T2 — RBAC foundation (ALTO)
+- **Arquivos:** `prisma/schema.prisma` (novos models `Workspace`, `User`), `src/lib/auth/rbac.ts` (novo), `src/lib/auth/__tests__/rbac.test.ts` (novo), `docs/RBAC.md`
 - **Ações:**
-  - Adicionar step `bun run test:coverage` + upload Codecov no `ci.yml`
-  - Configurar `codecov.yml` com alvo 80% em `src/lib` e `status.project.default.threshold: 0%` (não reduzir cobertura)
-  - Documentar em `docs/TESTING.md` §5
-- **Critério:** PR com queda de cobertura falha; badge Codecov no README
-- **Testes:** `bun run test:coverage` gera `coverage/lcov.info`; upload simulado
-- **Ref:** `Closes #5` (parte 2)
+  - Prisma: `Workspace { id, name, tier, createdAt }`, `User { id, email, role, tier, workspaceId→Workspace, createdAt }`, `role` enum `viewer|member|admin|security|owner`
+  - `src/lib/auth/rbac.ts`: `ROLE_PERMISSIONS`, `hasPermission(role, perm)`, `requirePermission(ctx, perm)` → `401`/`403`, `deny-by-default`
+  - Helper `getSessionContext(req)` stub (lê `x-workspace-id` + `x-user-role` headers para teste; prod usará `next-auth`)
+- **Critério:** `viewer` não acessa `POST /api/threats/seed` (`403`), sem sessão → `401`, `owner` passa; `bun test rbac` verde
+- **Testes:** `bun test src/lib/auth/__tests__/rbac.test.ts` cobrindo matriz `viewer/member/admin/security/owner`
+- **Ref:** `Closes #8`
 
-#### T3 — Rate limiting em `/api/*` (ALTO — segurança)
-- **Arquivos:** `src/lib/security/rate-limit.ts` (novo), `src/middleware.ts` (novo), `src/app/api/*/route.ts`, `.env.example`, `docs/SECURITY-GATE.md`
+#### T3 — RLS app-layer (MÉDIO)
+- **Arquivos:** `prisma/schema.prisma` (add `workspaceId` em `PermissionAuditLog`, `BehaviorProfile`, `BehaviorAnomaly`, `RecoveryContact` + índices), `src/lib/db/rls.ts` (novo), `src/lib/db/__tests__/rls.test.ts` (novo), `docs/RLS.md`
 - **Ações:**
-  - Implementar token bucket in-memory (fallback Redis) com `API_RATE_LIMIT_PER_MIN=120` (escrita `30/min`)
-  - Middleware Next: `X-RateLimit-*` + `429 Retry-After` em `/api/threats/*`, `/api/whois`, `/api/goplus/*`
-  - Teste de integração por rota (primeiro `200`, após limite `429`)
-- **Critério:** `curl` 121 req/min → `429`; teste reproduz limite; sem regressão em rotas públicas
-- **Testes:** `bun test src/lib/security/__tests__/rate-limit.test.ts`
-- **Ref:** `Closes #6`
+  - Add `workspaceId String?` + `@@index([workspaceId])` nos 4 models; manter compat com dados existentes (nullable)
+  - `src/lib/db/rls.ts`: `withWorkspaceFilter(workspaceId, where)` + `assertSameWorkspace(recordWorkspaceId, ctx)`
+  - Migrar com `prisma db push` (SQLite compat)
+- **Critério:** registro de `workspace-A` não é visível com `workspace-B`; `bun test rls` verde; `prisma generate` verde
+- **Testes:** `bun test src/lib/db/__tests__/rls.test.ts`
+- **Ref:** `Closes #9`
 
-#### T4 — Strict build (`typescript.ignoreBuildErrors` + `reactStrictMode`) (MÉDIO)
-- **Arquivos:** `next.config.ts`, `tsconfig.json` (se necessário), `src/lib/db.ts` (já corrigido), `docs/SECURITY-GATE.md`
+#### T4 — Catálogo modular + feature flags (MÉDIO)
+- **Arquivos:** `src/lib/config/feature-flags.ts` (expandir), `src/lib/config/__tests__/feature-flags.test.ts` (novo), `docs/ARCHITECTURE-MODULES.md`
 - **Ações:**
-  - `next.config.ts:typescript.ignoreBuildErrors=false`, `reactStrictMode=true` (reverter se quebrar)
-  - Corrigir erros de tipo (`any` não justificado, `zod` na entrada)
-  - Validar `bunx tsc --noEmit` e `next build`
-- **Critério:** `tsc --noEmit` verde; `next build` verde; sem `any` novo
-- **Testes:** CI `tsc` + `build` verdes
-- **Ref:** `Closes #14`
+  - Expandir `feature-flags.ts`: `FeatureFlagKey` (`owl_behavior`, `persistence_recovery`, `admin_rbac`, `bot_mode`) + `isFeatureOn(flag, ctx)` (env > banco override > default) + `getVisibleEngines` já existe
+  - Teste cobrindo `tier × flag`
+- **Critério:** `isFeatureOn` respeita env e override; `bun test feature-flags` verde
+- **Ref:** `Closes #10`
 
 ### Fora de escopo neste sprint
 
-- WAF/bot fight mode (`#7`, SPRINT-3)
-- RBAC/RLS (`#8`/`#9`, SPRINT-3) — requer model `User`/`Workspace` e decisão Postgres
-- Catálogo modular `src/features/` (`#10`, SPRINT-4)
-- SEO/GEO (`#12`) e limpeza Knip (`#13`) — sprint dedicado após gates estáveis
+- WAF edge avançado (Cloudflare) — futuro
+- Migração Postgres `FORCE RLS` — SPRINT-4 (quando multi-tenant real)
+- `next-auth` completo + OAuth — SPRINT-4
+- SEO/GEO `#12` e Knip `#13` — sprint dedicado após gates
 
 ### Definição de pronto (DoD)
 
-- [ ] PRs com `Closes #N` e labels (`testing`, `security`, `chore`)
-- [ ] `npx playwright test` verde + Codecov sem queda
-- [ ] `429` comprovado em `/api/*` após limite
-- [ ] `tsc --noEmit` + `next build` verdes com `strict` ligado
+- [ ] PRs `Closes #7 #8 #9 #10` com labels `security`
+- [ ] `bun test src/lib/security/__tests__/bot-guard.test.ts` + `rbac` + `rls` + `feature-flags` verdes
+- [ ] `bunx tsc --noEmit` verde; `next build --webpack` compila (Turbopack proxy ok)
+- [ ] `/api/health` livre de bot/rate; `/api/threats/seed` exige `security|admin|owner` (`403` caso contrário)
+- [ ] `workspaceId` filtra 0 rows em tentativa cross-tenant
 - [ ] Deploy gate verde: ESLint, `tsc`, `bun test`, Playwright, Semgrep, CodeQL, Gitleaks, Trivy, SBOM
-- [ ] `error.tsx` + HSTS verificados em E2E
-- [ ] Docs vivos atualizados (TESTING, SECURITY-GATE) e SPRINT.md marcado concluído
+- [ ] Docs vivos atualizados (RBAC, RLS, SECURITY-GATE, ARCHITECTURE-MODULES) e SPRINT.md marcado concluído
