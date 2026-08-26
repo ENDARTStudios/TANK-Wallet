@@ -2,63 +2,67 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 1 — Hardening de Segurança do Repo (maior impacto, menor complexidade)
+## Sprint 2 — E2E Playwright + Gate de Qualidade (maior impacto para evitar regressões)
 
-**Objetivo:** eliminar segredos versionados, corrigir headers críticos de segurança e habilitar instrumentação mínima de observabilidade sem quebrar o app. É o sprint de menor complexidade com maior redução de risco.
+**Objetivo:** garantir que mudanças de UI/segurança não quebrem fluxos críticos e que a cobertura não regrida. É o próximo menor custo com maior proteção contra regressões visuais e de segurança.
 
-**Issue mãe:** ver `docs/ISSUES-BACKLOG.md` #1, #2, #3 (repo hygiene + HSTS + observabilidade mínima).
+**Issues mãe:** `docs/ISSUES-BACKLOG.md` #5, #6, #14
 
 ### Tarefas
 
-#### T1 — Remover `.env` do git e garantir `.gitignore` (CRÍTICO)
-- **Arquivos:** `.env` (remover do índice), `.gitignore`, `.env.example` (já criado), `docs/SECRETS.md`
+#### T1 — Playwright E2E (CRÍTICO)
+- **Arquivos:** `playwright.config.ts` (novo), `e2e/` (novo), `package.json`, `.github/workflows/ci.yml`, `docs/TESTING.md`
 - **Ações:**
-  - `git rm --cached .env`
-  - Confirmar `git ls-files .env` vazio
-  - Validar `.gitignore` contém `.env` e `.env.*.local`
-  - Documentar rotação se o valor já vazou (ver `docs/SECRETS.md` §5)
-- **Critério de fechamento:** `git ls-files | grep "^\.env$"` retorna vazio; `gitleaks` verde; PR referencia `Closes #1`
-- **Testes:** `gitleaks detect --source . --verbose` sem achado; CI verde
+  - Instalar `playwright` + `playwright.config.ts` (baseURL `http://localhost:3000`, webServer `next dev`)
+  - Criar `e2e/onboarding.spec.ts` (criar wallet → unlock), `e2e/lockdown.spec.ts` (L1-L3), `e2e/security.spec.ts` (HSTS header, error.tsx fallback)
+  - Validar que skeleton aparece antes do dado (`[data-skeleton]`) e que animações Motion não quebram em 375/390/768
+- **Critério:** `npx playwright test` verde local e CI; screenshots/vídeo em CI
+- **Testes:** `bunx playwright test --reporter=list` verde; PR falha se E2E quebrar
+- **Ref:** `Closes #5`
 
-#### T2 — Remover chave PGP privada do repo (ALTO)
-- **Arquivos:** `docs/security/pgp-private-key-DELETE-ME.asc` (remover), `docs/security/pgp-key.asc` (manter pública), `docs/SECRETS.md`
+#### T2 — Gate Codecov + `test:coverage` (MÉDIO)
+- **Arquivos:** `codecov.yml` (novo), `.github/workflows/ci.yml`, `package.json`, `docs/TESTING.md`
 - **Ações:**
-  - `git rm docs/security/pgp-private-key-DELETE-ME.asc`
-  - Gerar nova chave fora do repo se necessário e importar via secrets manager; revogar exposta
-  - Se histórico contém a chave, planejar `filter-repo`/`BFG` em sprint dedicado (não neste PR)
-- **Critério de fechamento:** arquivo removido do índice; `gitleaks` sem segredo; PR `Closes #2`
-- **Testes:** `gitleaks` + `git log --all --full-history -- docs/security/pgp-private-key-DELETE-ME.asc` documentado no PR
+  - Adicionar step `bun run test:coverage` + upload Codecov no `ci.yml`
+  - Configurar `codecov.yml` com alvo 80% em `src/lib` e `status.project.default.threshold: 0%` (não reduzir cobertura)
+  - Documentar em `docs/TESTING.md` §5
+- **Critério:** PR com queda de cobertura falha; badge Codecov no README
+- **Testes:** `bun run test:coverage` gera `coverage/lcov.info`; upload simulado
+- **Ref:** `Closes #5` (parte 2)
 
-#### T3 — HSTS + headers de segurança (MÉDIO)
-- **Arquivos:** `next.config.ts`, `Caddyfile`, `docs/SECURITY-GATE.md`
+#### T3 — Rate limiting em `/api/*` (ALTO — segurança)
+- **Arquivos:** `src/lib/security/rate-limit.ts` (novo), `src/middleware.ts` (novo), `src/app/api/*/route.ts`, `.env.example`, `docs/SECURITY-GATE.md`
 - **Ações:**
-  - Adicionar `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` em `next.config.ts:headers()`
-  - Atualizar `Caddyfile` para `:443` com `tls` e `header_down Strict-Transport-Security ...` + redirect 80→443 (ou documentar edge externo)
-  - Corrigir `typescript.ignoreBuildErrors: false` e `reactStrictMode: true` se não quebrar build (se quebrar, criar issue follow-up)
-- **Critério de fechamento:** `curl -I https://localhost` retorna HSTS; `next build` sem `ignoreBuildErrors`; PR `Closes #3`
-- **Testes:** `bun run build` verde; E2E Playwright verifica header; Lighthouse sem regressão
+  - Implementar token bucket in-memory (fallback Redis) com `API_RATE_LIMIT_PER_MIN=120` (escrita `30/min`)
+  - Middleware Next: `X-RateLimit-*` + `429 Retry-After` em `/api/threats/*`, `/api/whois`, `/api/goplus/*`
+  - Teste de integração por rota (primeiro `200`, após limite `429`)
+- **Critério:** `curl` 121 req/min → `429`; teste reproduz limite; sem regressão em rotas públicas
+- **Testes:** `bun test src/lib/security/__tests__/rate-limit.test.ts`
+- **Ref:** `Closes #6`
 
-#### T4 — Observabilidade mínima (instrumentação + error boundary) (ALTO)
-- **Arquivos:** `src/instrumentation.ts` (novo), `src/app/error.tsx`, `src/app/global-error.tsx`, `src/lib/observability/*`, `docs/OBSERVABILITY.md`, `.env.example`
+#### T4 — Strict build (`typescript.ignoreBuildErrors` + `reactStrictMode`) (MÉDIO)
+- **Arquivos:** `next.config.ts`, `tsconfig.json` (se necessário), `src/lib/db.ts` (já corrigido), `docs/SECURITY-GATE.md`
 - **Ações:**
-  - Criar `instrumentation.ts` chamando `Sentry.init` + `initTracing()` condicional ao DSN
-  - Criar `error.tsx`/`global-error.tsx` com `Sentry.captureException` e UI de recuperação
-  - Adicionar `NEXT_PUBLIC_SENTRY_DSN` e `OTEL_EXPORTER_OTLP_ENDPOINT` no `.env.example` (sem valor)
-- **Critério de fechamento:** `sentryError` dispara em erro simulado; `error.tsx` renderiza fallback; PR `Closes #4`
-- **Testes:** `bun test` para logger masking; Playwright E2E que provoca erro e verifica fallback + traceId
+  - `next.config.ts:typescript.ignoreBuildErrors=false`, `reactStrictMode=true` (reverter se quebrar)
+  - Corrigir erros de tipo (`any` não justificado, `zod` na entrada)
+  - Validar `bunx tsc --noEmit` e `next build`
+- **Critério:** `tsc --noEmit` verde; `next build` verde; sem `any` novo
+- **Testes:** CI `tsc` + `build` verdes
+- **Ref:** `Closes #14`
 
 ### Fora de escopo neste sprint
 
-- Migração para Postgres/RLS (SPRINT-4)
-- Rate limiting / WAF / bot fight (SPRINT-4)
-- Catálogo modular `src/features/` (SPRINT-5)
-- Rotação completa de histórico git com `filter-repo` (sprint dedicado)
+- WAF/bot fight mode (`#7`, SPRINT-3)
+- RBAC/RLS (`#8`/`#9`, SPRINT-3) — requer model `User`/`Workspace` e decisão Postgres
+- Catálogo modular `src/features/` (`#10`, SPRINT-4)
+- SEO/GEO (`#12`) e limpeza Knip (`#13`) — sprint dedicado após gates estáveis
 
 ### Definição de pronto (DoD)
 
-- [ ] Todos os PRs com `Closes #N` e labels (`security`, `chore`)
-- [ ] Deploy gate verde: ESLint, `tsc --noEmit`, `bun test`, Semgrep, CodeQL, Gitleaks, Trivy, SBOM
-- [ ] Nenhum segredo em `git ls-files`
-- [ ] HSTS presente em resposta HTTPS
-- [ ] `error.tsx` cobre rota crítica e Sentry recebe evento de teste
-- [ ] Docs vivos atualizados no PR (este SPRINT.md marcado como concluído)
+- [ ] PRs com `Closes #N` e labels (`testing`, `security`, `chore`)
+- [ ] `npx playwright test` verde + Codecov sem queda
+- [ ] `429` comprovado em `/api/*` após limite
+- [ ] `tsc --noEmit` + `next build` verdes com `strict` ligado
+- [ ] Deploy gate verde: ESLint, `tsc`, `bun test`, Playwright, Semgrep, CodeQL, Gitleaks, Trivy, SBOM
+- [ ] `error.tsx` + HSTS verificados em E2E
+- [ ] Docs vivos atualizados (TESTING, SECURITY-GATE) e SPRINT.md marcado concluído
