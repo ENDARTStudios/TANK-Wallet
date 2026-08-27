@@ -105,3 +105,29 @@ export function getSessionContext(headers: Headers): AuthContext | null {
   if (!role) return null;
   return { workspaceId, role, userId };
 }
+
+export async function getServerAuthContext(): Promise<AuthContext | null> {
+  try {
+    const { getServerSession } = await import("next-auth/next");
+    const { authOptions } = await import("./nextauth");
+    const session = (await getServerSession(authOptions)) as unknown as {
+      user?: Record<string, unknown>;
+    } | null;
+    if (!session?.user) return null;
+    const u = session.user as Record<string, unknown>;
+    return {
+      userId: (u.id as string) ?? undefined,
+      workspaceId: (u.workspaceId as string) ?? undefined,
+      role: (u.role as string) ?? undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function getAuthContextFromRequest(req: Request | { headers: Headers }): Promise<AuthContext | null> {
+  const headers = (req as { headers: Headers }).headers;
+  const fromHeaders = getSessionContext(headers);
+  if (fromHeaders) return fromHeaders;
+  return getServerAuthContext();
+}

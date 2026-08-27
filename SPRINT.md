@@ -2,62 +2,54 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 5 — Auditoria Completa (Segurança + Performance + Banco + SEO + QA hostil)
+## Sprint 6 — Postgres FORCE RLS + next-auth Prod (Etapa 1/3)
 
-**Objetivo:** executar as skills de auditoria previstas em `AGENTS.md:5-9` sobre o estado pós-Sprint 4 (`main:bf4755a`). Não é feature, é verificação — gerar evidências, transformar achados em issues/testes reprodutíveis e fechar gaps sem introduzir regressão.
+**Objetivo:** fundar multi-tenant real com Postgres e autenticação prod, sem quebrar SQLite dev. É a base para RBAC/RLS `FORCE` e sessão.
 
-**Issues mãe:** `docs/ISSUES-BACKLOG.md` #1-#14 (re-auditar) + novos achados deste sprint
+**Issues mãe:** `docs/ISSUES-BACKLOG.md` #8, #9 (e novas #19, #20)
 
 ### Tarefas
 
-#### T1 — Auditoria de Segurança (CRÍTICO)
-- **Arquivos:** `docs/audit/SECURITY-AUDIT.md` (novo), `src/lib/auth/__tests__/rbac.test.ts` (já cobre 401/403), `src/lib/db/__tests__/rls.test.ts`, `src/proxy.ts`, `next.config.ts`, `.env.example`, `prisma/schema.prisma`
+#### T1 — Postgres + Docker + Prisma RLS (ALTO)
+- **Arquivos:** `docker-compose.yml` (novo), `prisma/schema.prisma`, `prisma/migrations/` (gerado), `prisma/rls.sql` (novo), `.env.example`, `docs/RLS.md`, `docs/disaster-recovery.md`
 - **Ações:**
-  - Checklist zero-trust: auth (401/403), RBAC (matriz `docs/RBAC.md`), RLS (`workspaceId` + `withWorkspaceFilter`), inputs (`zod` em rotas), secrets (`.env` fora do git, `gitleaks` verde), HSTS (header + Caddy), rate-limit (429), bot (403 `X-Bot-Score`), CSP/X-Frame/nosniff
-  - Testes "tenta acessar o que não é seu": `viewer→POST /api/threats/seed 403`, cross-workspace `filterByWorkspace 0 rows`, sem sessão `401`
-  - Varredura `grep` por `any` não justificado, `console.log`, `TODO` sem issue
-- **Critério:** `docs/audit/SECURITY-AUDIT.md` com tabela impacto/severidade/correção; `bun test rbac+rls+bot+rate` verde; sem segredo em `git ls-files`
-- **Ref:** `Closes #15`
+  - `docker-compose.yml`: `postgres:16` + `pgadmin` (opcional) com `POSTGRES_DB=tank_wallet`, `DATABASE_URL=postgresql://...`
+  - `schema.prisma`: manter `sqlite` para dev, documentar `postgresql` para prod via `// provider = postgresql` comentado + `rls.sql` com `CREATE POLICY` + `FORCE RLS` + `current_setting('app.current_workspace')`
+  - `rls.sql`: políticas para `PermissionAuditLog`, `Behavior*`, `RecoveryContact`, `User` (`USING workspaceId = current_workspace()`)
+  - `.env.example`: `DATABASE_URL` Postgres + `DIRECT_URL`
+- **Critério:** `docker compose up -d` sobe Postgres; `prisma generate` verde; `rls.sql` versionado; `bunx tsc --noEmit:0`
+- **Testes:** `prisma/rls.sql` sintaxe válida (`psql -f` dry-run)
+- **Ref:** `Closes #19`
 
-#### T2 — Auditoria de Performance (MÉDIO)
-- **Arquivos:** `docs/audit/PERFORMANCE-AUDIT.md` (novo), `src/lib/wallet-*`, `src/components/wallet/*`, `next.config.ts`
+#### T2 — next-auth Prod (ALTO)
+- **Arquivos:** `src/app/api/auth/[...nextauth]/route.ts` (novo), `src/lib/auth/nextauth.ts` (novo), `src/lib/auth/rbac.ts` (atualizar `getSessionContext` → `getServerSession`), `.env.example`, `next.config.ts`
 - **Ações:**
-  - Gates: LCP <2.5s, CLS <0.1, Lighthouse CI no PR de UI
-  - Procurar: queries repetidas, renders extras, operações bloqueantes, imagens gigantes, JS desnecessário, fontes pesadas, falta de cache (ver `AGENTS.md:6`)
-  - Medir `bun run bench` e `reports/` já existentes
-- **Critério:** `PERFORMANCE-AUDIT.md` com achados + plano por risco; `tsc` verde
-- **Ref:** `Closes #16`
+  - `nextauth.ts`: `CredentialsProvider` (email + senha) + `PrismaAdapter` (ou JWT sem adapter para SQLite), `NEXTAUTH_SECRET` + `NEXTAUTH_URL`, callbacks `jwt`/`session` com `workspaceId`+`role`
+  - `route.ts`: `export { GET, POST } from next-auth/next`
+  - `rbac.ts`: `getSessionContext` passa a usar `getServerSession(authOptions)` quando `NEXTAUTH_SECRET` presente, fallback para headers em test
+- **Critério:** `GET /api/auth/session` retorna `workspaceId`+`role` quando autenticado; sem sessão → `401` em rota protegida; `bun test rbac` verde
+- **Testes:** `src/lib/auth/__tests__/rbac.test.ts` cobre `requirePermission` com `next-auth` mock
+- **Ref:** `Closes #20`
 
-#### T3 — Auditoria de Banco (MÉDIO)
-- **Arquivos:** `docs/audit/DB-AUDIT.md` (novo), `prisma/schema.prisma`, `docs/RLS.md`, `docs/disaster-recovery.md`
+#### T3 — Integração RBAC + RLS em rota exemplo (MÉDIO)
+- **Arquivos:** `src/app/api/threats/seed/route.ts` (novo ou atualizar), `src/lib/db/rls.ts`
 - **Ações:**
-  - Verificar: toda tabela com `workspaceId` tem `@@index([workspaceId])`, queries com `LIMIT`, sem `cascade` perigosa, dados sensíveis cifrados/mascarados
-  - Pergunta: "Se precisar restaurar tudo amanhã, existe backup?" — validar `db/custom.db` backup + `disaster-recovery.md` teste no sprint
-  - `prisma generate` + `db push` verde
-- **Critério:** `DB-AUDIT.md` com checklist + resposta backup; `prisma/schema.prisma` sem tabela sem índice de tenant
-- **Ref:** `Closes #17`
-
-#### T4 — SEO/GEO + QA hostil + Limpeza (MÉDIO)
-- **Arquivos:** `docs/audit/SEO-AUDIT.md`, `docs/audit/QA-REPORT.md`, `docs/CLEANUP-PLAN.md` (atualizar), `e2e/*.spec.ts`, `src/app/layout.tsx`, `src/app/robots.ts`, `src/app/sitemap.ts`
-- **Ações:**
-  - SEO: `title`, `description`, `canonical`, `robots.txt`, `sitemap.xml`, Open Graph, JSON-LD, `view-source` indexável (ver `AGENTS.md:8`)
-  - QA hostil: campo vazio, texto gigante, duplo clique, sessão expirada, duas abas, falha API, idempotência, XSS/SQLi stub, upload errado
-  - Responsivo 375/390/768 sem overflow; `error.tsx` fallback com `Sentry` + `traceId`
-  - Limpeza: `knip`/`depcheck` para órfãos, `console.log` em `src/`, `TODO` sem issue
-- **Critério:** `SEO-AUDIT.md` e `QA-REPORT.md` com evidências; `e2e` cobre 375/390/768 + error fallback; sem `console.log` em `src/`
-- **Ref:** `Closes #18`
+  - Proteger `POST /api/threats/seed` com `requirePermission(ctx, post_threats_seed)` → `401/403` + `withWorkspaceFilter` para `workspaceId`
+  - E2E `e2e/security.spec.ts` verifica `403` para `viewer`
+- **Critério:** `viewer → 403`, `security → 200` (quando autenticado); `e2e` cobre
+- **Ref:** `Closes #8` (parte 2)
 
 ### Fora de escopo neste sprint
 
-- Novas features (WalletConnect, MPC, Lightning) — próximo ciclo
-- Migração Postgres `FORCE RLS` — SPRINT-6
-- Rotação de histórico git com `filter-repo` para PGP — sprint dedicado
+- WalletConnect v2 — Sprint 7
+- Threat Intel real — Sprint 8
+- Migração de dados SQLite→Postgres — script separado (não neste PR)
 
 ### Definição de pronto (DoD)
 
-- [ ] `docs/audit/*.md` 4 relatórios com impacto/severidade/correção e evidências `file:line`
-- [ ] `bun test` 32+ pass (rbac, rls, bot, rate, flags) + `bunx tsc --noEmit:0` + `eslint:0` + `next build --webpack: compiled`
-- [ ] `git ls-files:.env:0`, `gitleaks` verde, HSTS + CSP + rate `429` + bot `403` comprovados em `e2e`
-- [ ] Backup `db/custom.db` verificável (`disaster-recovery.md`)
-- [ ] Sem `console.log` em `src/`, sem `TODO` sem issue, sem `any` não justificado
-- [ ] Deploy gate verde: ESLint, `tsc`, `bun test`, Playwright, Semgrep, CodeQL, Gitleaks, Trivy, SBOM
+- [ ] `docker-compose.yml` + `prisma/rls.sql` versionados
+- [ ] `prisma/schema.prisma` com `Workspace`/`User` + `workspaceId` + `@@index` (já em Sprint 3, agora com `rls.sql`)
+- [ ] `src/app/api/auth/[...nextauth]/route.ts` + `src/lib/auth/nextauth.ts` + `rbac.ts` integrado
+- [ ] `bun test rbac+rls` verde; `bunx tsc --noEmit:0`; `next build --webpack: compiled`
+- [ ] `POST /api/threats/seed` com `401/403` comprovado
+- [ ] Deploy gate verde
