@@ -13,7 +13,10 @@
     "verify": "bun run scripts/verify/index.ts",
     "bench": "bun run scripts/bench/index.ts",
     "golden": "bun run scripts/golden-vectors/transaction-flow.ts",
+    "test": "bun test src",
     "test:coverage": "bun test src --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
@@ -105,6 +108,7 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.0",
     "@tailwindcss/postcss": "^4",
     "@types/react": "^19",
     "@types/react-dom": "^19",

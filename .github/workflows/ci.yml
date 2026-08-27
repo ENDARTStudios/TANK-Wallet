@@ -33,6 +33,9 @@ jobs:
       - run: bunx tsc --noEmit
       - run: bun test src
         continue-on-error: true
+      - run: bun run test:coverage
+        continue-on-error: true
+      - run: bun test src/lib/security/__tests__/rate-limit.test.ts
       - run: bun test src/lib/wallet-core/__tests__/vectors.test.ts
       - run: bun test src/lib/wallet-plugins/conformance.ts
         continue-on-error: true
@@ -44,12 +47,20 @@ jobs:
       - run: bun run golden
       - run: bun run scripts/verify/check-signatures.ts
       - run: bun run verify
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: reports-${{ github.sha }}
           path: |
             reports/
+            coverage/
             .ai/state/metrics.snapshot.json
           retention-days: 30
       - name: Commit metrics (main only)
@@ -137,3 +148,22 @@ jobs:
         with:
           name: sbom
           path: reports/sbom.cyclonedx.json
+
+  e2e:
+    name: E2E Playwright
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps
+      - run: bunx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
