@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { getAuthContextFromRequest, requirePermission } from '@/lib/auth/rbac'
 
 // Seed data — known malicious tokens, sites, addresses, and exploits
 // In production this would be synced from ChainPatrol, ScamSniffer, GoPlus, HashDit, PhishFort
@@ -89,7 +90,10 @@ const SEED_EXPLOITS = [
   },
 ]
 
-export async function POST() {
+export async function POST(req: Request) {
+  const ctx = await getAuthContextFromRequest(req);
+  const perm = requirePermission(ctx, "post_threats_seed");
+  if (!perm.ok) return NextResponse.json({ error: perm.message }, { status: perm.status });
   try {
     let tokensAdded = 0
     let sitesAdded = 0

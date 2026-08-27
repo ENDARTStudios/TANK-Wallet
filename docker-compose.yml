@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tank-wallet-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tank_wallet
+      POSTGRES_USER: tank
+      POSTGRES_PASSWORD: tank_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./prisma/rls.sql:/docker-entrypoint-initdb.d/10-rls.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tank -d tank_wallet"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_data:
