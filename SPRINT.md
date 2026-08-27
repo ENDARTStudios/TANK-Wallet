@@ -2,54 +2,51 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 6 — Postgres FORCE RLS + next-auth Prod (Etapa 1/3)
+## Sprint 7 — WalletConnect v2 + EIP-6963 + src/features Migração (Etapa 2/3)
 
-**Objetivo:** fundar multi-tenant real com Postgres e autenticação prod, sem quebrar SQLite dev. É a base para RBAC/RLS `FORCE` e sessão.
+**Objetivo:** fundar DApp browser real com WalletConnect e descoberta de providers, e iniciar migração incremental para `src/features/` alvo.
 
-**Issues mãe:** `docs/ISSUES-BACKLOG.md` #8, #9 (e novas #19, #20)
+**Issues mãe:** `docs/ISSUES-BACKLOG.md` #10 (parte 2), novas #21, #22
 
 ### Tarefas
 
-#### T1 — Postgres + Docker + Prisma RLS (ALTO)
-- **Arquivos:** `docker-compose.yml` (novo), `prisma/schema.prisma`, `prisma/migrations/` (gerado), `prisma/rls.sql` (novo), `.env.example`, `docs/RLS.md`, `docs/disaster-recovery.md`
+#### T1 — WalletConnect v2 Stub (MÉDIO)
+- **Arquivos:** `src/lib/wallet-connect/index.ts` (novo), `src/lib/wallet-connect/__tests__/wallet-connect.test.ts` (novo), `src/components/wallet/dapps-view.tsx` (atualizar), `.env.example`
 - **Ações:**
-  - `docker-compose.yml`: `postgres:16` + `pgadmin` (opcional) com `POSTGRES_DB=tank_wallet`, `DATABASE_URL=postgresql://...`
-  - `schema.prisma`: manter `sqlite` para dev, documentar `postgresql` para prod via `// provider = postgresql` comentado + `rls.sql` com `CREATE POLICY` + `FORCE RLS` + `current_setting('app.current_workspace')`
-  - `rls.sql`: políticas para `PermissionAuditLog`, `Behavior*`, `RecoveryContact`, `User` (`USING workspaceId = current_workspace()`)
-  - `.env.example`: `DATABASE_URL` Postgres + `DIRECT_URL`
-- **Critério:** `docker compose up -d` sobe Postgres; `prisma generate` verde; `rls.sql` versionado; `bunx tsc --noEmit:0`
-- **Testes:** `prisma/rls.sql` sintaxe válida (`psql -f` dry-run)
-- **Ref:** `Closes #19`
+  - `wallet-connect/index.ts`: `createWalletConnectClient`, `pair`, `disconnect`, `onSessionProposal` stubs com `WalletConnect v2` tipos (sem SDK real, preparado para `sign-client`)
+  - Env `WALLETCONNECT_PROJECT_ID` em `.env.example`
+  - `dapps-view.tsx`: botão "Connect via WalletConnect" com `pair(uri)` stub
+- **Critério:** `bun test wallet-connect` 3 pass; `WALLETCONNECT_PROJECT_ID` em `.env.example`
+- **Testes:** `src/lib/wallet-connect/__tests__/wallet-connect.test.ts`
+- **Ref:** `Closes #21`
 
-#### T2 — next-auth Prod (ALTO)
-- **Arquivos:** `src/app/api/auth/[...nextauth]/route.ts` (novo), `src/lib/auth/nextauth.ts` (novo), `src/lib/auth/rbac.ts` (atualizar `getSessionContext` → `getServerSession`), `.env.example`, `next.config.ts`
+#### T2 — EIP-6963 Provider Discovery (MÉDIO)
+- **Arquivos:** `src/lib/eip6963/index.ts` (novo), `src/lib/eip6963/__tests__/eip6963.test.ts` (novo), `src/components/wallet/wallet-context.tsx` (atualizar para `announceProvider`)
 - **Ações:**
-  - `nextauth.ts`: `CredentialsProvider` (email + senha) + `PrismaAdapter` (ou JWT sem adapter para SQLite), `NEXTAUTH_SECRET` + `NEXTAUTH_URL`, callbacks `jwt`/`session` com `workspaceId`+`role`
-  - `route.ts`: `export { GET, POST } from next-auth/next`
-  - `rbac.ts`: `getSessionContext` passa a usar `getServerSession(authOptions)` quando `NEXTAUTH_SECRET` presente, fallback para headers em test
-- **Critério:** `GET /api/auth/session` retorna `workspaceId`+`role` quando autenticado; sem sessão → `401` em rota protegida; `bun test rbac` verde
-- **Testes:** `src/lib/auth/__tests__/rbac.test.ts` cobre `requirePermission` com `next-auth` mock
-- **Ref:** `Closes #20`
+  - `eip6963/index.ts`: `announceProvider` + `requestProviders` (`EIP6963AnnounceProvider`, `EIP6963RequestProvider` events), `injectedProvider` com `window.ethereum` fallback
+  - `wallet-context.tsx`: escuta `eip6963:announceProvider` e registra providers
+- **Critério:** `bun test eip6963` 4 pass; `window.dispatchEvent` simula provider e é capturado
+- **Testes:** `src/lib/eip6963/__tests__/eip6963.test.ts`
+- **Ref:** `Closes #22`
 
-#### T3 — Integração RBAC + RLS em rota exemplo (MÉDIO)
-- **Arquivos:** `src/app/api/threats/seed/route.ts` (novo ou atualizar), `src/lib/db/rls.ts`
+#### T3 — src/features Migração Incremental (MÉDIO)
+- **Arquivos:** `src/features/threat-intel/` (novo), `src/features/README.md` (atualizar), `docs/ARCHITECTURE-MODULES.md` (atualizar status)
 - **Ações:**
-  - Proteger `POST /api/threats/seed` com `requirePermission(ctx, post_threats_seed)` → `401/403` + `withWorkspaceFilter` para `workspaceId`
-  - E2E `e2e/security.spec.ts` verifica `403` para `viewer`
-- **Critério:** `viewer → 403`, `security → 200` (quando autenticado); `e2e` cobre
-- **Ref:** `Closes #8` (parte 2)
+  - Criar `src/features/threat-intel/index.ts` que re-exporta `src/lib/wallet-threat-intel` (ou `wallet-engines`) como primeiro exemplo migrado
+  - Atualizar `features/README.md` com progresso 1/8
+  - `ARCHITECTURE-MODULES.md`: marcar `threat-intel` como `Migrado (exemplo)` + `wallet-connect` e `eip6963` como `Novo`
+- **Critério:** `src/features/threat-intel/index.ts` existe e é importável; `bunx tsc --noEmit:0`
+- **Ref:** `Closes #10` (parte 2)
 
 ### Fora de escopo neste sprint
 
-- WalletConnect v2 — Sprint 7
-- Threat Intel real — Sprint 8
-- Migração de dados SQLite→Postgres — script separado (não neste PR)
+- WalletConnect `sign-client` real + relay — Sprint 8
+- `iframe` sandbox CSP estrita + per-DApp permission scoping — Sprint 8
+- Threat Intel backend real — Sprint 8
 
 ### Definição de pronto (DoD)
 
-- [ ] `docker-compose.yml` + `prisma/rls.sql` versionados
-- [ ] `prisma/schema.prisma` com `Workspace`/`User` + `workspaceId` + `@@index` (já em Sprint 3, agora com `rls.sql`)
-- [ ] `src/app/api/auth/[...nextauth]/route.ts` + `src/lib/auth/nextauth.ts` + `rbac.ts` integrado
-- [ ] `bun test rbac+rls` verde; `bunx tsc --noEmit:0`; `next build --webpack: compiled`
-- [ ] `POST /api/threats/seed` com `401/403` comprovado
+- [ ] `src/lib/wallet-connect` + `src/lib/eip6963` com testes verdes (7 pass total)
+- [ ] `src/features/threat-intel` re-exporta lib existente
+- [ ] `bunx tsc --noEmit:0` `eslint:0`
 - [ ] Deploy gate verde
