@@ -2,44 +2,42 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 8 — Threat Intel Backend Real (Etapa 3/3)
+## Sprint 10 — Signing Completo + Vault Evolution
 
-**Objetivo:** agregar múltiplas fontes (GoPlus + ChainPatrol + ScamSniffer + HashDit + PhishFort + DB local) em um Risk Service unificado, com cache e fallback, fechando o ciclo de proteção ativa.
+**Objetivo:** fechar assinatura multi-chain (Bitcoin PSBT, Solana Versioned, EIP-712) e evolução do cofre (multisig, timelock, spending limits, passphrase).
 
-**Issues mãe:** `docs/ISSUES-BACKLOG.md` novas #23, #24
+**Issues mãe:** novas #27, #28
 
 ### Tarefas
 
-#### T1 — Risk Service Aggregator (ALTO)
-- **Arquivos:** `src/lib/threat-intel/aggregator.ts` (novo), `src/lib/threat-intel/__tests__/aggregator.test.ts` (novo), `src/lib/threat-intel/sources/` (novo)
+#### T1 — Signing Completo (ALTO)
+- **Arquivos:** `src/lib/signing/psbt.ts` (novo), `src/lib/signing/solana.ts` (novo), `src/lib/signing/eip712.ts` (novo), `src/lib/signing/__tests__/*.test.ts` (novo)
 - **Ações:**
-  - `aggregator.ts`: `aggregateThreatIntel({ chain, address, url }) → { score, sources[], risks[], recommendation }` — consulta `db.threatToken/Site/Address` (local), `GoPlus` (via `src/lib/wallet-security-real`), `ChainPatrol` stub, `ScamSniffer` stub, com `Promise.allSettled` + timeout 2s + cache Map 5min
-  - `sources/`: `goplus.ts`, `chainpatrol.ts`, `scamsniffer.ts`, `hashdit.ts`, `phishfort.ts` (stubs com `fetch` + fallback)
-  - Score: `max(severity)` + `count` + `source weight` → 0-100; `recommendation: allow|limit|block` por threshold
-- **Critério:** `bun test aggregator` 5 pass (local DB hit, GoPlus fallback, cache, timeout, block recommendation)
-- **Testes:** `src/lib/threat-intel/__tests__/aggregator.test.ts`
-- **Ref:** `Closes #23`
+  - `psbt.ts`: `createPsbt` (BIP-174) com `bitcoinjs-lib` `Psbt` + Taproot `p2tr` + Native SegWit `p2wpkh`, `signPsbt`, `finalizePsbt`
+  - `solana.ts`: `createVersionedTx` via `@solana/web3.js` stub (`VersionedTransaction`, `TransactionMessage`), `signVersionedTx`
+  - `eip712.ts`: `signTypedData` (EIP-712) + `signMessage` (EIP-191) via `viem` `privateKeyToAccount`
+- **Critério:** `bun test signing` 6 pass (PSBT, Solana, EIP-712)
+- **Testes:** `src/lib/signing/__tests__/{psbt,solana,eip712}.test.ts`
+- **Ref:** `Closes #27`
 
-#### T2 — API Risk Service (MÉDIO)
-- **Arquivos:** `src/app/api/risk/route.ts` (novo), `src/app/api/risk/__tests__/route.test.ts` (novo, opcional), `docs/ARCHITECTURE-MODULES.md`
+#### T2 — Vault Evolution (MÉDIO)
+- **Arquivos:** `src/lib/vault/evolution.ts` (novo), `src/lib/vault/__tests__/evolution.test.ts` (novo), `docs/ARCHITECTURE-MODULES.md`
 - **Ações:**
-  - `POST /api/risk` com `zod` (`chain`, `address`, `url`) → `aggregateThreatIntel` → `withWorkspaceFilter` + `requirePermission(ctx, get_threats)` (viewer+)
-  - Rate-limit + bot já em `src/proxy.ts:1`
-  - `ARCHITECTURE-MODULES.md`: marcar `Risk Service` como `Ativo`
-- **Critério:** `POST /api/risk` com `chain:ethereum address:0x...` retorna `score` + `sources`; `viewer` passa, sem sessão → `401` (se protegido)
-- **Testes:** `bun test` para `aggregator` + manual `curl`
-- **Ref:** `Closes #24`
+  - `evolution.ts`: `MultisigConfig` (k-of-n), `TimelockConfig` (delay), `SpendingLimit` (diário/semanal), `BIP39Passphrase` (25ª palavra), `SocialRecovery` stub
+  - Integrar com `src/lib/wallet-core/storage.ts` (AES-GCM vault)
+  - `ARCHITECTURE-MODULES.md`: marcar `Vault Evolution` como `Ativo`
+- **Critério:** `bun test vault` 4 pass (multisig, timelock, spending, passphrase)
+- **Testes:** `src/lib/vault/__tests__/evolution.test.ts`
+- **Ref:** `Closes #28`
 
 ### Fora de escopo neste sprint
 
-- Helius/Blockstream indexers — próximo ciclo
-- Push notifications + sync — próximo ciclo
-- `filter-repo` PGP history — sprint dedicado
+- LND/Lightning BOLT-11 — próximo ciclo
+- ERC-4337 Account Abstraction — próximo ciclo
+- Social recovery k-of-n completo — stub apenas
 
 ### Definição de pronto (DoD)
 
-- [ ] `src/lib/threat-intel/aggregator.ts` + `sources/` + testes verdes (5 pass)
-- [ ] `src/app/api/risk/route.ts` com `zod` + `withWorkspaceFilter` + `requirePermission` (quando aplicável)
-- [ ] `bunx tsc --noEmit:0` `eslint:0` `bun test: 5 pass`
+- [ ] `src/lib/signing` + `src/lib/vault` com testes verdes (10 pass total)
+- [ ] `bunx tsc --noEmit:0` `eslint:0`
 - [ ] Deploy gate verde
-- [ ] `docs/audit/SECURITY-AUDIT.md` atualizado com Risk Service (se necessário)
