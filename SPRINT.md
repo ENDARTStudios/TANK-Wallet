@@ -2,42 +2,42 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 9 — Broadcast Engine + Indexer (Alchemy/Infura, Helius, Blockstream)
+## Sprint 10 — Signing Completo + Vault Evolution
 
-**Objetivo:** fechar o ciclo de transação real (broadcast) e descoberta automática de ativos via indexers, sem depender de RPC público com Rate limit.
+**Objetivo:** fechar assinatura multi-chain (Bitcoin PSBT, Solana Versioned, EIP-712) e evolução do cofre (multisig, timelock, spending limits, passphrase).
 
-**Issues mãe:** novas #25, #26
+**Issues mãe:** novas #27, #28
 
 ### Tarefas
 
-#### T1 — Broadcast Engine (ALTO)
-- **Arquivos:** `src/lib/broadcast/index.ts` (novo), `src/lib/broadcast/__tests__/broadcast.test.ts` (novo), `src/app/api/broadcast/route.ts` (novo), `.env.example`
+#### T1 — Signing Completo (ALTO)
+- **Arquivos:** `src/lib/signing/psbt.ts` (novo), `src/lib/signing/solana.ts` (novo), `src/lib/signing/eip712.ts` (novo), `src/lib/signing/__tests__/*.test.ts` (novo)
 - **Ações:**
-  - `broadcast/index.ts`: `broadcastTx({ chain, signedTx }) → { hash, success }` com `eth_sendRawTransaction` via `viem` + failover (Alchemy → Infura → publicnode), `ALCHEMY_API_KEY`/`INFURA_API_KEY` em `.env.example`
-  - `route.ts`: `POST /api/broadcast` `zod` + `requirePermission(sign_transaction)` + `withWorkspaceFilter`
-- **Critério:** `bun test broadcast` 3 pass (failover, success, error); `POST /api/broadcast` com stub retorna `hash`
-- **Testes:** `src/lib/broadcast/__tests__/broadcast.test.ts`
-- **Ref:** `Closes #25`
+  - `psbt.ts`: `createPsbt` (BIP-174) com `bitcoinjs-lib` `Psbt` + Taproot `p2tr` + Native SegWit `p2wpkh`, `signPsbt`, `finalizePsbt`
+  - `solana.ts`: `createVersionedTx` via `@solana/web3.js` stub (`VersionedTransaction`, `TransactionMessage`), `signVersionedTx`
+  - `eip712.ts`: `signTypedData` (EIP-712) + `signMessage` (EIP-191) via `viem` `privateKeyToAccount`
+- **Critério:** `bun test signing` 6 pass (PSBT, Solana, EIP-712)
+- **Testes:** `src/lib/signing/__tests__/{psbt,solana,eip712}.test.ts`
+- **Ref:** `Closes #27`
 
-#### T2 — Indexer (MÉDIO)
-- **Arquivos:** `src/lib/indexer/index.ts` (novo), `src/lib/indexer/__tests__/indexer.test.ts` (novo), `src/lib/indexer/providers/{alchemy,helius,blockstream}.ts` (novo)
+#### T2 — Vault Evolution (MÉDIO)
+- **Arquivos:** `src/lib/vault/evolution.ts` (novo), `src/lib/vault/__tests__/evolution.test.ts` (novo), `docs/ARCHITECTURE-MODULES.md`
 - **Ações:**
-  - `indexer/index.ts`: `discoverAssets({ chain, address }) → { erc20[], erc721[], erc1155[] }` via `eth_getLogs` `Transfer` (EVM), `helius` (Solana SPL), `blockstream` (BTC `address/txs`)
-  - Providers com `fetch` + cache 30s + fallback
-  - Integrar com `src/features/threat-intel` para filtrar `honeypot` já no indexer
-- **Critério:** `bun test indexer` 4 pass (EVM, Solana, BTC, cache)
-- **Testes:** `src/lib/indexer/__tests__/indexer.test.ts`
-- **Ref:** `Closes #26`
+  - `evolution.ts`: `MultisigConfig` (k-of-n), `TimelockConfig` (delay), `SpendingLimit` (diário/semanal), `BIP39Passphrase` (25ª palavra), `SocialRecovery` stub
+  - Integrar com `src/lib/wallet-core/storage.ts` (AES-GCM vault)
+  - `ARCHITECTURE-MODULES.md`: marcar `Vault Evolution` como `Ativo`
+- **Critério:** `bun test vault` 4 pass (multisig, timelock, spending, passphrase)
+- **Testes:** `src/lib/vault/__tests__/evolution.test.ts`
+- **Ref:** `Closes #28`
 
 ### Fora de escopo neste sprint
 
-- PSBT/BIP-174 + Taproot — Sprint 10
-- Solana Versioned Transactions — Sprint 10
-- Multisig/Gnosis — Sprint 10
+- LND/Lightning BOLT-11 — próximo ciclo
+- ERC-4337 Account Abstraction — próximo ciclo
+- Social recovery k-of-n completo — stub apenas
 
 ### Definição de pronto (DoD)
 
-- [ ] `src/lib/broadcast` + `src/lib/indexer` com testes verdes (7 pass total)
-- [ ] `src/app/api/broadcast/route.ts` com `401/403` + `429` (via `proxy`)
+- [ ] `src/lib/signing` + `src/lib/vault` com testes verdes (10 pass total)
 - [ ] `bunx tsc --noEmit:0` `eslint:0`
 - [ ] Deploy gate verde
