@@ -2,42 +2,46 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 10 — Signing Completo + Vault Evolution
+## Sprint 12 — Social Recovery + Behavioral AI + Final Hardening
 
-**Objetivo:** fechar assinatura multi-chain (Bitcoin PSBT, Solana Versioned, EIP-712) e evolução do cofre (multisig, timelock, spending limits, passphrase).
+**Objetivo:** fechar soberania do usuário (recuperação social) e proteção comportamental, com hardening final docs/testes.
 
-**Issues mãe:** novas #27, #28
+**Issues mãe:** novas #31, #32
 
 ### Tarefas
 
-#### T1 — Signing Completo (ALTO)
-- **Arquivos:** `src/lib/signing/psbt.ts` (novo), `src/lib/signing/solana.ts` (novo), `src/lib/signing/eip712.ts` (novo), `src/lib/signing/__tests__/*.test.ts` (novo)
+#### T1 — Social Recovery k-of-n (MÉDIO)
+- **Arquivos:** `src/lib/social-recovery/index.ts` (novo), `src/lib/social-recovery/__tests__/social.test.ts` (novo), `prisma/schema.prisma` (RecoveryContact já existe)
 - **Ações:**
-  - `psbt.ts`: `createPsbt` (BIP-174) com `bitcoinjs-lib` `Psbt` + Taproot `p2tr` + Native SegWit `p2wpkh`, `signPsbt`, `finalizePsbt`
-  - `solana.ts`: `createVersionedTx` via `@solana/web3.js` stub (`VersionedTransaction`, `TransactionMessage`), `signVersionedTx`
-  - `eip712.ts`: `signTypedData` (EIP-712) + `signMessage` (EIP-191) via `viem` `privateKeyToAccount`
-- **Critério:** `bun test signing` 6 pass (PSBT, Solana, EIP-712)
-- **Testes:** `src/lib/signing/__tests__/{psbt,solana,eip712}.test.ts`
-- **Ref:** `Closes #27`
+  - `social-recovery/index.ts`: `createRecoverySet({ threshold, contacts })`, `recoverWallet({ shares })`, `verifyRecoveryContact`
+  - Usar `RecoveryContact` + `shamir` stub (2-of-3)
+- **Critério:** `bun test social` 3 pass
+- **Ref:** `Closes #31`
 
-#### T2 — Vault Evolution (MÉDIO)
-- **Arquivos:** `src/lib/vault/evolution.ts` (novo), `src/lib/vault/__tests__/evolution.test.ts` (novo), `docs/ARCHITECTURE-MODULES.md`
+#### T2 — Behavioral AI (MÉDIO)
+- **Arquivos:** `src/lib/behavior-ai/index.ts` (novo), `src/lib/behavior-ai/__tests__/behavior.test.ts` (novo)
 - **Ações:**
-  - `evolution.ts`: `MultisigConfig` (k-of-n), `TimelockConfig` (delay), `SpendingLimit` (diário/semanal), `BIP39Passphrase` (25ª palavra), `SocialRecovery` stub
-  - Integrar com `src/lib/wallet-core/storage.ts` (AES-GCM vault)
-  - `ARCHITECTURE-MODULES.md`: marcar `Vault Evolution` como `Ativo`
-- **Critério:** `bun test vault` 4 pass (multisig, timelock, spending, passphrase)
-- **Testes:** `src/lib/vault/__tests__/evolution.test.ts`
-- **Ref:** `Closes #28`
+  - `behavior-ai/index.ts`: `learnProfile(walletAddress, action)`, `detectAnomaly(action)` com heurística (horário, chain, valor, device) — usa `BehaviorProfile`/`Anomaly` models
+  - Auto-ativar `paranoid`/`lockdown` quando `score > 80`
+- **Critério:** `bun test behavior` 3 pass
+- **Ref:** `Closes #32` (parte 1)
+
+#### T3 — Final Hardening (MÉDIO)
+- **Arquivos:** `docs/ARCHITECTURE-MODULES.md`, `SPRINT.md` (marcar concluído), `README.md` (atualizar status)
+- **Ações:**
+  - Atualizar `ARCHITECTURE-MODULES.md` com todos módulos `Ativo`
+  - `README.md`: status `AUDIT_READY` + sprints 1-12 concluídos
+  - `bunx tsc --noEmit:0` final
+- **Critério:** docs vivos atualizados, `tsc` verde
+- **Ref:** `Closes #32` (parte 2)
 
 ### Fora de escopo neste sprint
 
-- LND/Lightning BOLT-11 — próximo ciclo
-- ERC-4337 Account Abstraction — próximo ciclo
-- Social recovery k-of-n completo — stub apenas
+- Auditoria externa Trail of Bits — já em `docs/security/trail-of-bits-integration.md`
 
 ### Definição de pronto (DoD)
 
-- [ ] `src/lib/signing` + `src/lib/vault` com testes verdes (10 pass total)
+- [ ] `src/lib/social-recovery` + `src/lib/behavior-ai` com testes verdes (6 pass total)
 - [ ] `bunx tsc --noEmit:0` `eslint:0`
 - [ ] Deploy gate verde
+- [ ] `main` pronto para `release.yml` (cosign + SBOM)
