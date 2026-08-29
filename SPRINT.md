@@ -2,44 +2,46 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 11 — Lightning + Account Abstraction + MPC (Etapa 1/2)
+## Sprint 12 — Social Recovery + Behavioral AI + Final Hardening
 
-**Objetivo:** fundar Lightning Network e ERC-4337, preparando MPC/Passkeys para substituir seed.
+**Objetivo:** fechar soberania do usuário (recuperação social) e proteção comportamental, com hardening final docs/testes.
 
-**Issues mãe:** novas #29, #30
+**Issues mãe:** novas #31, #32
 
 ### Tarefas
 
-#### T1 — Lightning (MÉDIO)
-- **Arquivos:** `src/lib/lightning/index.ts` (novo), `src/lib/lightning/__tests__/lightning.test.ts` (novo)
+#### T1 — Social Recovery k-of-n (MÉDIO)
+- **Arquivos:** `src/lib/social-recovery/index.ts` (novo), `src/lib/social-recovery/__tests__/social.test.ts` (novo), `prisma/schema.prisma` (RecoveryContact já existe)
 - **Ações:**
-  - `lightning/index.ts`: `createInvoice({ amount, memo }) → { bolt11, paymentHash }` (BOLT-11 stub), `payInvoice(bolt11)`, `submarineSwap({ from, to, amount })` (on-chain ↔ Lightning)
-  - LND stub (sem node real, preparado para `lnd-grpc`)
-- **Critério:** `bun test lightning` 3 pass
-- **Ref:** `Closes #29`
+  - `social-recovery/index.ts`: `createRecoverySet({ threshold, contacts })`, `recoverWallet({ shares })`, `verifyRecoveryContact`
+  - Usar `RecoveryContact` + `shamir` stub (2-of-3)
+- **Critério:** `bun test social` 3 pass
+- **Ref:** `Closes #31`
 
-#### T2 — ERC-4337 Account Abstraction (MÉDIO)
-- **Arquivos:** `src/lib/account-abstraction/index.ts` (novo), `src/lib/account-abstraction/__tests__/aa.test.ts` (novo)
+#### T2 — Behavioral AI (MÉDIO)
+- **Arquivos:** `src/lib/behavior-ai/index.ts` (novo), `src/lib/behavior-ai/__tests__/behavior.test.ts` (novo)
 - **Ações:**
-  - `aa/index.ts`: `createSmartAccount({ owner, salt }) → { address, factory }`, `createUserOperation({ sender, callData }) → UserOperation`, `sponsorUserOp` stub (paymaster)
-- **Critério:** `bun test aa` 3 pass
-- **Ref:** `Closes #30` (parte 1)
+  - `behavior-ai/index.ts`: `learnProfile(walletAddress, action)`, `detectAnomaly(action)` com heurística (horário, chain, valor, device) — usa `BehaviorProfile`/`Anomaly` models
+  - Auto-ativar `paranoid`/`lockdown` quando `score > 80`
+- **Critério:** `bun test behavior` 3 pass
+- **Ref:** `Closes #32` (parte 1)
 
-#### T3 — MPC/Passkeys (MÉDIO)
-- **Arquivos:** `src/lib/mpc/index.ts` (novo), `src/lib/mpc/__tests__/mpc.test.ts` (novo)
+#### T3 — Final Hardening (MÉDIO)
+- **Arquivos:** `docs/ARCHITECTURE-MODULES.md`, `SPRINT.md` (marcar concluído), `README.md` (atualizar status)
 - **Ações:**
-  - `mpc/index.ts`: `generateMpcShare` (2-of-2 stub), `combineShares`, `createPasskey` (WebAuthn stub)
-- **Critério:** `bun test mpc` 2 pass
-- **Ref:** `Closes #30` (parte 2)
+  - Atualizar `ARCHITECTURE-MODULES.md` com todos módulos `Ativo`
+  - `README.md`: status `AUDIT_READY` + sprints 1-12 concluídos
+  - `bunx tsc --noEmit:0` final
+- **Critério:** docs vivos atualizados, `tsc` verde
+- **Ref:** `Closes #32` (parte 2)
 
 ### Fora de escopo neste sprint
 
-- LND node real + channel management — próximo ciclo
-- Bundler/paymaster real — próximo ciclo
-- Social Recovery — Sprint 12
+- Auditoria externa Trail of Bits — já em `docs/security/trail-of-bits-integration.md`
 
 ### Definição de pronto (DoD)
 
-- [ ] `src/lib/lightning` + `account-abstraction` + `mpc` com testes verdes (8 pass total)
-- [ ] `bunx tsc --noEmit:0`
+- [ ] `src/lib/social-recovery` + `src/lib/behavior-ai` com testes verdes (6 pass total)
+- [ ] `bunx tsc --noEmit:0` `eslint:0`
 - [ ] Deploy gate verde
+- [ ] `main` pronto para `release.yml` (cosign + SBOM)
