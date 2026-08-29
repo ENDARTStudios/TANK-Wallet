@@ -2,44 +2,42 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 8 — Threat Intel Backend Real (Etapa 3/3)
+## Sprint 9 — Broadcast Engine + Indexer (Alchemy/Infura, Helius, Blockstream)
 
-**Objetivo:** agregar múltiplas fontes (GoPlus + ChainPatrol + ScamSniffer + HashDit + PhishFort + DB local) em um Risk Service unificado, com cache e fallback, fechando o ciclo de proteção ativa.
+**Objetivo:** fechar o ciclo de transação real (broadcast) e descoberta automática de ativos via indexers, sem depender de RPC público com Rate limit.
 
-**Issues mãe:** `docs/ISSUES-BACKLOG.md` novas #23, #24
+**Issues mãe:** novas #25, #26
 
 ### Tarefas
 
-#### T1 — Risk Service Aggregator (ALTO)
-- **Arquivos:** `src/lib/threat-intel/aggregator.ts` (novo), `src/lib/threat-intel/__tests__/aggregator.test.ts` (novo), `src/lib/threat-intel/sources/` (novo)
+#### T1 — Broadcast Engine (ALTO)
+- **Arquivos:** `src/lib/broadcast/index.ts` (novo), `src/lib/broadcast/__tests__/broadcast.test.ts` (novo), `src/app/api/broadcast/route.ts` (novo), `.env.example`
 - **Ações:**
-  - `aggregator.ts`: `aggregateThreatIntel({ chain, address, url }) → { score, sources[], risks[], recommendation }` — consulta `db.threatToken/Site/Address` (local), `GoPlus` (via `src/lib/wallet-security-real`), `ChainPatrol` stub, `ScamSniffer` stub, com `Promise.allSettled` + timeout 2s + cache Map 5min
-  - `sources/`: `goplus.ts`, `chainpatrol.ts`, `scamsniffer.ts`, `hashdit.ts`, `phishfort.ts` (stubs com `fetch` + fallback)
-  - Score: `max(severity)` + `count` + `source weight` → 0-100; `recommendation: allow|limit|block` por threshold
-- **Critério:** `bun test aggregator` 5 pass (local DB hit, GoPlus fallback, cache, timeout, block recommendation)
-- **Testes:** `src/lib/threat-intel/__tests__/aggregator.test.ts`
-- **Ref:** `Closes #23`
+  - `broadcast/index.ts`: `broadcastTx({ chain, signedTx }) → { hash, success }` com `eth_sendRawTransaction` via `viem` + failover (Alchemy → Infura → publicnode), `ALCHEMY_API_KEY`/`INFURA_API_KEY` em `.env.example`
+  - `route.ts`: `POST /api/broadcast` `zod` + `requirePermission(sign_transaction)` + `withWorkspaceFilter`
+- **Critério:** `bun test broadcast` 3 pass (failover, success, error); `POST /api/broadcast` com stub retorna `hash`
+- **Testes:** `src/lib/broadcast/__tests__/broadcast.test.ts`
+- **Ref:** `Closes #25`
 
-#### T2 — API Risk Service (MÉDIO)
-- **Arquivos:** `src/app/api/risk/route.ts` (novo), `src/app/api/risk/__tests__/route.test.ts` (novo, opcional), `docs/ARCHITECTURE-MODULES.md`
+#### T2 — Indexer (MÉDIO)
+- **Arquivos:** `src/lib/indexer/index.ts` (novo), `src/lib/indexer/__tests__/indexer.test.ts` (novo), `src/lib/indexer/providers/{alchemy,helius,blockstream}.ts` (novo)
 - **Ações:**
-  - `POST /api/risk` com `zod` (`chain`, `address`, `url`) → `aggregateThreatIntel` → `withWorkspaceFilter` + `requirePermission(ctx, get_threats)` (viewer+)
-  - Rate-limit + bot já em `src/proxy.ts:1`
-  - `ARCHITECTURE-MODULES.md`: marcar `Risk Service` como `Ativo`
-- **Critério:** `POST /api/risk` com `chain:ethereum address:0x...` retorna `score` + `sources`; `viewer` passa, sem sessão → `401` (se protegido)
-- **Testes:** `bun test` para `aggregator` + manual `curl`
-- **Ref:** `Closes #24`
+  - `indexer/index.ts`: `discoverAssets({ chain, address }) → { erc20[], erc721[], erc1155[] }` via `eth_getLogs` `Transfer` (EVM), `helius` (Solana SPL), `blockstream` (BTC `address/txs`)
+  - Providers com `fetch` + cache 30s + fallback
+  - Integrar com `src/features/threat-intel` para filtrar `honeypot` já no indexer
+- **Critério:** `bun test indexer` 4 pass (EVM, Solana, BTC, cache)
+- **Testes:** `src/lib/indexer/__tests__/indexer.test.ts`
+- **Ref:** `Closes #26`
 
 ### Fora de escopo neste sprint
 
-- Helius/Blockstream indexers — próximo ciclo
-- Push notifications + sync — próximo ciclo
-- `filter-repo` PGP history — sprint dedicado
+- PSBT/BIP-174 + Taproot — Sprint 10
+- Solana Versioned Transactions — Sprint 10
+- Multisig/Gnosis — Sprint 10
 
 ### Definição de pronto (DoD)
 
-- [ ] `src/lib/threat-intel/aggregator.ts` + `sources/` + testes verdes (5 pass)
-- [ ] `src/app/api/risk/route.ts` com `zod` + `withWorkspaceFilter` + `requirePermission` (quando aplicável)
-- [ ] `bunx tsc --noEmit:0` `eslint:0` `bun test: 5 pass`
+- [ ] `src/lib/broadcast` + `src/lib/indexer` com testes verdes (7 pass total)
+- [ ] `src/app/api/broadcast/route.ts` com `401/403` + `429` (via `proxy`)
+- [ ] `bunx tsc --noEmit:0` `eslint:0`
 - [ ] Deploy gate verde
-- [ ] `docs/audit/SECURITY-AUDIT.md` atualizado com Risk Service (se necessário)
