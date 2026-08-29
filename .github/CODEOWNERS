@@ -1,0 +1,5 @@
+# CODEOWNERS — TANK Wallet
+* @ENDARTStudios
+/src/lib/security/ @ENDARTStudios
+/prisma/ @ENDARTStudios
+/.github/workflows/ @ENDARTStudios
