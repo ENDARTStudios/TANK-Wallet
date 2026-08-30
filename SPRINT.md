@@ -2,29 +2,38 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 23 — Release v1.1.0 + Audit Closure
+## Sprint 24 — Knip cleanup + og.png + PII AES + HSTS preload prep
 
-**Objetivo:** congelar v1.1.0 com tag, CHANGELOG final, audit closure report.
+**Objetivo:** fechar os 4 achados abertos da audit closure (Sprint 5 → Sprint 23).
 
-**Issues mãe:** novas #53, #54
+**Issues mãe:** novas #55, #56
 
 ### Tarefas
 
-#### T1 — Release v1.1.0 tag (ALTO)
-- **Arquivos:** `package.json` (confirmar 1.1.0), `CHANGELOG.md` (atualizar), `git tag v1.1.0`
+#### T1 — Knip cleanup config (MÉDIO)
+- **Arquivos:** `knip.json` (novo)
 - **Ações:**
-  - Confirmar `package.json:1.1.0`
-  - CHANGELOG 1.1.0 com Sprints 1-22
-  - Criar tag `v1.1.0` lightweight
-- **Critério:** tag existe localmente
-
-#### T2 — Audit closure report (ALTO)
-- **Arquivos:** `docs/audit/AUDIT-CLOSURE.md` (novo)
-- **Ações:**
-  - Relatório de fechamento: findings abertos (Sprint 5) + status atual
-  - Assinatura PGP + data
+  - Configurar knip para detectar dead code/files
 - **Critério:** arquivo versionado
 
+#### T2 — og.png placeholder (BAIXO)
+- **Arquivos:** `public/og.png` (novo, 1x1 PNG mínimo)
+- **Ações:**
+  - Criar placeholder mínimo 1200x630 (1x1 funcional)
+- **Critério:** `public/og.png` existe
+
+#### T3 — PII AES helper (MÉDIO)
+- **Arquivos:** `src/lib/crypto/pii.ts` (novo), `src/lib/crypto/__tests__/pii.test.ts` (novo)
+- **Ações:**
+  - `pii.ts`: `encryptPII`, `decryptPII` com AES-256-GCM keystream (reuso crypted.ts)
+- **Critério:** `bun test pii` 3 pass
+
+#### T4 — HSTS preload prep (BAIXO)
+- **Arquivos:** `docs/HSTS-PRELOAD.md` (novo)
+- **Ações:**
+  - Checklist para submissão ao HSTS preload list (após 6 meses)
+- **Critério:** doc versionado
+
 ### Definição de pronto (DoD)
-- [ ] tag `v1.1.0` + CHANGELOG + audit-closure
+- [ ] 4 arquivos + 3 pass pii
 - [ ] `tsc:0`

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["src/app/{layout,page,error,global-error}.tsx", "src/app/api/**/route.ts", "src/instrumentation.ts", "src/proxy.ts", "scripts/**/*.ts"],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignore": [
+    "src/lib/wallet-engines/__tests__/**",
+    "src/lib/wallet-kernel/__tests__/**",
+    "src/lib/wallet-core/__tests__/**",
+    "src/lib/wallet-plugins/**",
+    "src/lib/wallet-translations/**",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/__tests__/**",
+    "gsap-public/**",
+    "public/**",
+    "examples/**",
+    "docs/**",
+    "scripts/__tests__/**"
+  ],
+  "ignoreDependencies": [
+    "@playwright/test",
+    "@types/*",
+    "bun-types",
+    "eslint*",
+    "tailwindcss*",
+    "@tailwindcss/postcss",
+    "tw-animate-css",
+    "typescript"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "rules": {
+    "files": "warn",
+    "dependencies": "warn",
+    "devDependencies": "warn",
+    "exports": "warn",
+    "types": "warn",
+    "unlisted": "warn"
+  }
+}
