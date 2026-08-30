@@ -1,0 +1,38 @@
+name: Restore E2E
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"  # weekly Monday 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  restore-e2e:
+    name: Backup → Restore E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run db:push
+        env:
+          DATABASE_URL: file:./db/test.db
+      - name: Insert test data
+        run: bun --eval "import { PrismaClient } from '@prisma/client'; const db = new PrismaClient(); await db.threatSite.create({ data: { url: 'test-restore-' + Date.now() + '.com', reason: 'e2e', category: 'test', source: 'ci', severity: 1 } }); await db.\$disconnect();"
+        env:
+          DATABASE_URL: file:./db/test.db
+      - name: Backup
+        run: bun run scripts/backup-restore.ts
+        env:
+          DATABASE_URL: file:./db/test.db
+        continue-on-error: true
+      - name: Restore + verify
+        run: bun test scripts/__tests__/backup-restore.test.ts
