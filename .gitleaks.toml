@@ -1,0 +1,30 @@
+title = "TANK Wallet gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+paths = [
+  "node_modules/",
+  "public/og.png",
+  "coverage/",
+  "reports/",
+  "prisma/db/",
+  "playwright-report/",
+  "test-results/",
+  ".next/",
+  "db/custom.db",
+  "db/_*.db",
+  "src/lib/webauthn/__tests__/.test-keys/",
+]
+
+regexes = [
+  "github_pat_[A-Za-z0-9_]+",
+  "xox[baprs]-[A-Za-z0-9-]+",
+]
+
+[[rules]]
+id = "tank-private-key"
+description = "Private key block"
+regex = "-----BEGIN [A-Z ]*PRIVATE KEY-----[\\s\\S]+?-----END [A-Z ]*PRIVATE KEY-----"
+tags = ["private-key", "secret"]

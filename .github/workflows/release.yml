@@ -76,6 +76,7 @@ jobs:
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.RELEASE_SIGNING_KEY }}
           COSIGN_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
+          RELEASE_SIGNING_KEY: ${{ secrets.RELEASE_SIGNING_KEY }}
         run: |
           # Generate SBOM
           bunx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON
@@ -94,8 +95,6 @@ jobs:
             --key /tmp/cosign.pub \
             --signature reports/sbom.cyclonedx.json.sig \
             reports/sbom.cyclonedx.json || echo "Verify skipped (no public key)"
-        env:
-          RELEASE_SIGNING_KEY: ${{ secrets.RELEASE_SIGNING_KEY }}
 
       - name: Generate SBOM (keyless fallback)
         if: env.RELEASE_SIGNING_KEY == ''

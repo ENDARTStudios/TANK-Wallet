@@ -2,26 +2,27 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 40 — Handoff + governance + tag v1.2.0
+## Sprint 41 — CI YAML fixes + .gitleaks.toml
 
-**Objetivo:** entrega final v1.2.0 com handoff, governance e tag.
+**Objetivo:** corrigir workflows com YAML inválido e configurar gitleaks.
 
-**Issues mãe:** novas #87, #88
+**Issues mãe:** novas #89, #90
 
 ### Tarefas
 
-#### T1 — Handoff doc (ALTO)
-- **Arquivos:** `docs/HANDOFF.md` (novo)
+#### T1 — release.yml fix (ALTO)
+- **Arquivos:** `.github/workflows/release.yml` (atualizar)
 - **Ações:**
-  - Doc: arquitetura, onboarding, runbooks, contatos, links
-- **Critério:** doc completo
+  - Remover `Map keys must be unique` em line 97
+- **Critério:** `bunx knip` não retorna erro YAML
 
-#### T2 — v1.2.0 tag + bump (MÉDIO)
-- **Arquivos:** `package.json`, `CHANGELOG.md`
+#### T2 — restore-e2e.yml fix + gitleaks (MÉDIO)
+- **Arquivos:** `.github/workflows/restore-e2e.yml` (atualizar), `.gitleaks.toml` (novo)
 - **Ações:**
-  - `1.1.1 → 1.2.0`; tag `v1.2.0`
-- **Critério:** tag + versão
+  - Remover `Nested mappings are not allowed` em line 29
+  - `.gitleaks.toml` config base
+- **Critério:** `bunx knip` limpo; gitleaks detecta
 
 ### Definição de pronto (DoD)
-- [ ] 3 docs + tag v1.2.0
+- [ ] 3 arquivos
 - [ ] `tsc:0`
