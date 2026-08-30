@@ -2,26 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 30 — Sentry real + traceId correlation
+## Sprint 31 — WalletConnect relay real
 
-**Objetivo:** wire Sentry SDK com traceId e propagação de contexto.
+**Objetivo:** provider WalletConnect v2 com project ID e namespace.
 
-**Issues mãe:** novas #67, #68
+**Issues mãe:** novas #69, #70
 
 ### Tarefas
 
-#### T1 — Sentry wire real (ALTO)
-- **Arquivos:** `src/lib/observability/sentry-real.ts` (novo), `src/lib/observability/__tests__/sentry-real.test.ts` (novo)
+#### T1 — WCProvider real (ALTO)
+- **Arquivos:** `src/lib/wallet-connect/provider.ts` (novo), `src/lib/wallet-connect/__tests__/provider.test.ts` (novo)
 - **Ações:**
-  - `sentry-real.ts`: `initSentry(dsn, env, release)` lazy import + `captureException`/`setTraceId`
-- **Critério:** `bun test sentry-real` 3 pass
+  - `WCProvider`: init, connect, signClient stub, namespace
+- **Critério:** `bun test provider` 4 pass
 
-#### T2 — traceId propagation (MÉDIO)
-- **Arquivos:** `src/lib/observability/traceid.ts` (novo), `src/lib/observability/__tests__/traceid.test.ts` (novo)
+#### T2 — Session persistence (MÉDIO)
+- **Arquivos:** `src/lib/wallet-connect/session-store.ts` (novo), `src/lib/wallet-connect/__tests__/session-store.test.ts` (novo)
 - **Ações:**
-  - `traceid.ts`: `newTraceId`, `withTraceId(ctx, fn)` async-local-storage
-- **Critério:** `bun test traceid` 3 pass
+  - `session-store.ts`: save/load/clear session em memória cifrada
+- **Critério:** `bun test session-store` 3 pass
 
 ### Definição de pronto (DoD)
-- [ ] 4 arquivos + 6 pass
+- [ ] 4 arquivos + 7 pass
 - [ ] `tsc:0`
