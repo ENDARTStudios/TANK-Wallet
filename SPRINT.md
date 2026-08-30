@@ -2,26 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 36 — i18n pt-BR/en-US/es
+## Sprint 37 — PWA + offline
 
-**Objetivo:** internacionalização com 3 locales via `next-intl`.
+**Objetivo:** manifest PWA + service worker com offline fallback.
 
-**Issues mãe:** novas #79, #80
+**Issues mãe:** novas #81, #82
 
 ### Tarefas
 
-#### T1 — i18n config (ALTO)
-- **Arquivos:** `src/i18n/config.ts` (novo), `src/i18n/__tests__/config.test.ts` (novo)
+#### T1 — Manifest PWA (ALTO)
+- **Arquivos:** `public/manifest.json` (novo)
 - **Ações:**
-  - `config.ts`: locales list, default, getMessage
-- **Critério:** `bun test config` 3 pass
+  - Web App Manifest com name, icons, theme, start_url
+- **Critério:** manifest válido
 
-#### T2 — Traduções (MÉDIO)
-- **Arquivos:** `src/i18n/messages/pt-BR.json` (novo), `src/i18n/messages/en-US.json` (novo), `src/i18n/messages/es-ES.json` (novo)
+#### T2 — Service worker (MÉDIO)
+- **Arquivos:** `public/sw.js` (novo), `e2e/pwa.spec.ts` (novo)
 - **Ações:**
-  - JSON com chaves: nav.dashboard, nav.settings, common.app_name, common.loading
-- **Critério:** 3 arquivos válidos
+  - `sw.js`: cache-first + network fallback
+- **Critério:** 1 test smoke
 
 ### Definição de pronto (DoD)
-- [ ] 5 arquivos + 3 pass
+- [ ] 3 arquivos
 - [ ] `tsc:0`
