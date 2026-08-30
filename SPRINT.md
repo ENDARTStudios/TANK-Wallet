@@ -2,46 +2,42 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 12 — Social Recovery + Behavioral AI + Final Hardening
+## Sprint 13 — Indexer Prod + Push Notifications + Sync
 
-**Objetivo:** fechar soberania do usuário (recuperação social) e proteção comportamental, com hardening final docs/testes.
+**Objetivo:** tornar a descoberta de ativos e notificações em tempo real, com sync entre dispositivos.
 
-**Issues mãe:** novas #31, #32
+**Issues mãe:** novas #33, #34
 
 ### Tarefas
 
-#### T1 — Social Recovery k-of-n (MÉDIO)
-- **Arquivos:** `src/lib/social-recovery/index.ts` (novo), `src/lib/social-recovery/__tests__/social.test.ts` (novo), `prisma/schema.prisma` (RecoveryContact já existe)
+#### T1 — Indexer Prod (MÉDIO)
+- **Arquivos:** `src/lib/indexer/providers/alchemy.ts` (atualizar), `src/lib/indexer/providers/helius.ts` (atualizar), `src/lib/indexer/providers/blockstream.ts` (atualizar)
 - **Ações:**
-  - `social-recovery/index.ts`: `createRecoverySet({ threshold, contacts })`, `recoverWallet({ shares })`, `verifyRecoveryContact`
-  - Usar `RecoveryContact` + `shamir` stub (2-of-3)
-- **Critério:** `bun test social` 3 pass
-- **Ref:** `Closes #31`
+  - Alchemy: `eth_getLogs` real com `ALCHEMY_API_KEY`
+  - Helius: `getBalances` real com `HELIUS_API_KEY`
+  - Blockstream: `address/txs` com paginação
+- **Critério:** `bun test indexer` com mock ainda passa; `e2e` verifica `discoverAssets` com cache
 
-#### T2 — Behavioral AI (MÉDIO)
-- **Arquivos:** `src/lib/behavior-ai/index.ts` (novo), `src/lib/behavior-ai/__tests__/behavior.test.ts` (novo)
+#### T2 — Push Notifications (MÉDIO)
+- **Arquivos:** `src/lib/notifications/index.ts` (novo), `src/lib/notifications/__tests__/notifications.test.ts` (novo), `src/app/api/notifications/route.ts` (novo)
 - **Ações:**
-  - `behavior-ai/index.ts`: `learnProfile(walletAddress, action)`, `detectAnomaly(action)` com heurística (horário, chain, valor, device) — usa `BehaviorProfile`/`Anomaly` models
-  - Auto-ativar `paranoid`/`lockdown` quando `score > 80`
-- **Critério:** `bun test behavior` 3 pass
-- **Ref:** `Closes #32` (parte 1)
+  - `notifications/index.ts`: `subscribePush`, `sendPush` (web-push stub), `onThreat` → push
+  - `route.ts`: `POST /api/notifications/subscribe` + `GET /api/notifications`
+- **Critério:** `bun test notifications` 3 pass
 
-#### T3 — Final Hardening (MÉDIO)
-- **Arquivos:** `docs/ARCHITECTURE-MODULES.md`, `SPRINT.md` (marcar concluído), `README.md` (atualizar status)
+#### T3 — Sync (MÉDIO)
+- **Arquivos:** `src/lib/sync/index.ts` (novo), `src/lib/sync/__tests__/sync.test.ts` (novo)
 - **Ações:**
-  - Atualizar `ARCHITECTURE-MODULES.md` com todos módulos `Ativo`
-  - `README.md`: status `AUDIT_READY` + sprints 1-12 concluídos
-  - `bunx tsc --noEmit:0` final
-- **Critério:** docs vivos atualizados, `tsc` verde
-- **Ref:** `Closes #32` (parte 2)
+  - `sync/index.ts`: `syncPortfolio` (encrypted sync via `workspaceId`), `getSyncStatus`
+- **Critério:** `bun test sync` 2 pass
 
 ### Fora de escopo neste sprint
 
-- Auditoria externa Trail of Bits — já em `docs/security/trail-of-bits-integration.md`
+- Helius API key real — stub com `HELIUS_API_KEY` env
+- Web Push VAPID real — stub
 
 ### Definição de pronto (DoD)
 
-- [ ] `src/lib/social-recovery` + `src/lib/behavior-ai` com testes verdes (6 pass total)
-- [ ] `bunx tsc --noEmit:0` `eslint:0`
+- [ ] `src/lib/indexer` atualizado + `notifications` + `sync` com testes verdes (8 pass total)
+- [ ] `bunx tsc --noEmit:0`
 - [ ] Deploy gate verde
-- [ ] `main` pronto para `release.yml` (cosign + SBOM)
