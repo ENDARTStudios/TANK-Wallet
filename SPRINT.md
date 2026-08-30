@@ -2,26 +2,34 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 21 — OAuth (Google/Apple) + 2FA TOTP
+## Sprint 22 — Migration Postgres + Backups restore test + DR drill
 
-**Objetivo:** autenticação social e segundo fator (TOTP RFC 6238).
+**Objetivo:** preparar migração Postgres e validar backup restore em CI.
 
-**Issues mãe:** novas #49, #50
+**Issues mãe:** novas #51, #52
 
 ### Tarefas
 
-#### T1 — OAuth providers (MÉDIO)
-- **Arquivos:** `src/lib/auth/oauth.ts` (novo), `src/lib/auth/__tests__/oauth.test.ts` (novo), `.env.example`
+#### T1 — Migration Postgres (ALTO)
+- **Arquivos:** `prisma/schema.postgres.prisma` (novo), `scripts/migrate-sqlite-to-postgres.ts` (novo), `prisma/schema.prisma` (atualizar)
 - **Ações:**
-  - `oauth.ts`: `GoogleProvider`, `AppleProvider` stubs (sem SDK real)
-- **Critério:** `bun test oauth` 3 pass
+  - `schema.postgres.prisma`: `provider = postgresql`
+  - `migrate-sqlite-to-postgres.ts`: export SQLite → import Postgres
+  - `schema.prisma`: switch env-based
+- **Critério:** `tsc:0`; `migrate-sqlite-to-postgres.ts` compila
 
-#### T2 — 2FA TOTP (ALTO)
-- **Arquivos:** `src/lib/auth/totp.ts` (novo), `src/lib/auth/__tests__/totp.test.ts` (novo)
+#### T2 — Backup restore test (ALTO)
+- **Arquivos:** `scripts/backup-restore-test.ts` (novo), `scripts/__tests__/backup-restore.test.ts` (novo)
 - **Ações:**
-  - `totp.ts`: `generateSecret`, `getTOTP(secret, time)`, `verifyTOTP(secret, code)` RFC 6238
-- **Critério:** `bun test totp` 4 pass (generate, getTOTP, verify, expiry)
+  - `backup-restore-test.ts`: cria db de teste, faz backup, restore, valida
+- **Critério:** `bun test backup-restore` 2 pass
+
+#### T3 — DR drill (MÉDIO)
+- **Arquivos:** `docs/disaster-recovery.md` (atualizar)
+- **Ações:**
+  - Documentar drill RTO/RPO + checklist
+- **Critério:** doc atualizado
 
 ### Definição de pronto (DoD)
-- [ ] `oauth` + `totp` com 7 pass
-- [ ] `tsc:0`
+- [ ] `tsc:0` + 2 pass backup-restore
+- [ ] `docs/disaster-recovery.md` atualizado
