@@ -15,7 +15,10 @@
     "public/**",
     "examples/**",
     "docs/**",
-    "scripts/__tests__/**"
+    "scripts/__tests__/**",
+    "src/lib/observability/sentry.ts",
+    "src/lib/observability/metrics.ts",
+    "src/lib/observability/tracing.ts"
   ],
   "ignoreDependencies": [
     "@playwright/test",
@@ -25,7 +28,23 @@
     "tailwindcss*",
     "@tailwindcss/postcss",
     "tw-animate-css",
-    "typescript"
+    "typescript",
+    "next",
+    "next-intl",
+    "next-themes",
+    "next-auth",
+    "react",
+    "react-dom",
+    "viem",
+    "bitcoinjs-lib",
+    "ed25519-hd-key",
+    "@sentry/nextjs",
+    "@prisma/client",
+    "@scure/bip32",
+    "@scure/bip39",
+    "@tanstack/react-query",
+    "@tanstack/react-table",
+    "zod"
   ],
   "ignoreExportsUsedInFile": true,
   "rules": {
