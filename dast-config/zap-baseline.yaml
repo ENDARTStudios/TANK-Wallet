@@ -1,0 +1,64 @@
+# OWASP ZAP Baseline Scan — v1.1.0
+# Aplicado em CI via dast.yml (ZAP baseline weekly)
+# Documentação: https://www.zaproxy.org/docs/docker/baseline-scan/
+
+env:
+  contexts:
+    - name: tank-wallet
+      urls:
+        - https://tankwallet.dev
+        - https://tankwallet.dev/onboarding
+        - https://tankwallet.dev/api/health
+        - https://tankwallet.dev/sitemap.xml
+        - https://tankwallet.dev/robots.txt
+
+jobs:
+  - type: passiveScan
+    name: passive
+    parameters:
+      maxAlertsPerRule: 10
+      scanOnlyInScope: true
+
+  - type: activeScan
+    name: active
+    parameters:
+      maxAlertsPerRule: 10
+      scanOnlyInScope: true
+      # Evitar denial-of-service no alvo
+      delayInMs: 100
+      threadCount: 2
+    policyDefinition:
+      defaultStrength: low
+      defaultThreshold: medium
+
+  - type: spider
+    name: spider
+    parameters:
+      maxDepth: 5
+      maxDuration: 10
+
+  - type: report
+    parameters:
+      template: traditional-html
+      reportDir: /tmp/zap-out
+      reportFile: zap-report.html
+      reportFormat: html
+
+  - type: report
+    parameters:
+      template: traditional-json
+      reportDir: /tmp/zap-out
+      reportFile: zap-report.json
+      reportFormat: json
+
+# Thresholds (bloqueantes em CI):
+# - High: 0
+# - Medium: < 5
+# - Low: < 20
+# - Informational: ignore
+
+thresholds:
+  high: 0
+  medium: 5
+  low: 20
+  informational: 999
