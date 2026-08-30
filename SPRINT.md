@@ -2,26 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 34 — COSIGN image signing + SBOM CycloneDX
+## Sprint 35 — Audit externa (Trail of Bits)
 
-**Objetivo:** release.yml com cosign keyless + SBOM assinado.
+**Objetivo:** engagement Trail of Bits com checklist + tracking.
 
-**Issues mãe:** novas #75, #76
+**Issues mãe:** novas #77, #78
 
 ### Tarefas
 
-#### T1 — COSIGN workflow (ALTO)
-- **Arquivos:** `.github/workflows/cosign.yml` (novo)
+#### T1 — Engagement doc (ALTO)
+- **Arquivos:** `audit-config/trail-of-bits-engagement.md` (novo)
 - **Ações:**
-  - Workflow: build image, cosign keyless sign, attach SBOM
-- **Critério:** workflow versionado
+  - Doc: scope, deliverables, kickoff, comms channel
+- **Critério:** doc versionado
 
-#### T2 — SBOM CycloneDX step (MÉDIO)
-- **Arquivos:** `.github/workflows/sbom-cyclonedx.yml` (novo)
+#### T2 — Findings tracker (MÉDIO)
+- **Arquivos:** `audit-config/findings-tracker.md` (novo)
 - **Ações:**
-  - Workflow: gerar SBOM CycloneDX, attach ao GHCR release
-- **Critério:** workflow versionado
+  - Tabela de findings com severidade/status/SLA
+- **Critério:** doc versionado
 
 ### Definição de pronto (DoD)
-- [ ] 2 workflows
+- [ ] 2 docs
 - [ ] `tsc:0`
