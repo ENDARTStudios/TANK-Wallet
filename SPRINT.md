@@ -2,34 +2,29 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 22 — Migration Postgres + Backups restore test + DR drill
+## Sprint 23 — Release v1.1.0 + Audit Closure
 
-**Objetivo:** preparar migração Postgres e validar backup restore em CI.
+**Objetivo:** congelar v1.1.0 com tag, CHANGELOG final, audit closure report.
 
-**Issues mãe:** novas #51, #52
+**Issues mãe:** novas #53, #54
 
 ### Tarefas
 
-#### T1 — Migration Postgres (ALTO)
-- **Arquivos:** `prisma/schema.postgres.prisma` (novo), `scripts/migrate-sqlite-to-postgres.ts` (novo), `prisma/schema.prisma` (atualizar)
+#### T1 — Release v1.1.0 tag (ALTO)
+- **Arquivos:** `package.json` (confirmar 1.1.0), `CHANGELOG.md` (atualizar), `git tag v1.1.0`
 - **Ações:**
-  - `schema.postgres.prisma`: `provider = postgresql`
-  - `migrate-sqlite-to-postgres.ts`: export SQLite → import Postgres
-  - `schema.prisma`: switch env-based
-- **Critério:** `tsc:0`; `migrate-sqlite-to-postgres.ts` compila
+  - Confirmar `package.json:1.1.0`
+  - CHANGELOG 1.1.0 com Sprints 1-22
+  - Criar tag `v1.1.0` lightweight
+- **Critério:** tag existe localmente
 
-#### T2 — Backup restore test (ALTO)
-- **Arquivos:** `scripts/backup-restore-test.ts` (novo), `scripts/__tests__/backup-restore.test.ts` (novo)
+#### T2 — Audit closure report (ALTO)
+- **Arquivos:** `docs/audit/AUDIT-CLOSURE.md` (novo)
 - **Ações:**
-  - `backup-restore-test.ts`: cria db de teste, faz backup, restore, valida
-- **Critério:** `bun test backup-restore` 2 pass
-
-#### T3 — DR drill (MÉDIO)
-- **Arquivos:** `docs/disaster-recovery.md` (atualizar)
-- **Ações:**
-  - Documentar drill RTO/RPO + checklist
-- **Critério:** doc atualizado
+  - Relatório de fechamento: findings abertos (Sprint 5) + status atual
+  - Assinatura PGP + data
+- **Critério:** arquivo versionado
 
 ### Definição de pronto (DoD)
-- [ ] `tsc:0` + 2 pass backup-restore
-- [ ] `docs/disaster-recovery.md` atualizado
+- [ ] tag `v1.1.0` + CHANGELOG + audit-closure
+- [ ] `tsc:0`
