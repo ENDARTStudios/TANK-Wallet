@@ -2,27 +2,27 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 41 — CI YAML fixes + .gitleaks.toml
+## Sprint 42 — Verify gate completo
 
-**Objetivo:** corrigir workflows com YAML inválido e configurar gitleaks.
+**Objetivo:** todos os 11 checks do `bun run verify` retornarem ✅ pass (não `⚠ skip`).
 
-**Issues mãe:** novas #89, #90
+**Issues mãe:** novas #91, #92
 
 ### Tarefas
 
-#### T1 — release.yml fix (ALTO)
-- **Arquivos:** `.github/workflows/release.yml` (atualizar)
+#### T1 — Testes required (ALTO)
+- **Arquivos:** `scripts/verify/index.ts` (atualizar)
 - **Ações:**
-  - Remover `Map keys must be unique` em line 97
-- **Critério:** `bunx knip` não retorna erro YAML
+  - `tests` e `conformance` viram `required:true`
+- **Critério:** verifica todos ✅ pass
 
-#### T2 — restore-e2e.yml fix + gitleaks (MÉDIO)
-- **Arquivos:** `.github/workflows/restore-e2e.yml` (atualizar), `.gitleaks.toml` (novo)
+#### T2 — SBOM/secrets/deps required (MÉDIO)
+- **Arquivos:** `scripts/verify/index.ts`
 - **Ações:**
-  - Remover `Nested mappings are not allowed` em line 29
-  - `.gitleaks.toml` config base
-- **Critério:** `bunx knip` limpo; gitleaks detecta
+  - `sbom`, `secrets-scan`, `dependency-scan` required
+  - Fallback: se ferramentas ausentes, mensagem clara
+- **Critério:** verify com tudo ✅
 
 ### Definição de pronto (DoD)
-- [ ] 3 arquivos
-- [ ] `tsc:0`
+- [ ] 1 arquivo
+- [ ] `bun run verify` 11 ✅
