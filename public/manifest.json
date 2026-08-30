@@ -1,0 +1,31 @@
+{
+  "name": "TANK Wallet",
+  "short_name": "TANK",
+  "description": "TANK Wallet — secure multi-chain wallet",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#10b981",
+  "lang": "pt-BR",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["finance", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Send",
+      "url": "/send"
+    },
+    {
+      "name": "Receive",
+      "url": "/receive"
+    }
+  ]
+}
