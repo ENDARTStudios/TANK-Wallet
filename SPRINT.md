@@ -2,32 +2,29 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 18 — Push prod + Sync crypted + Watchtower
+## Sprint 19 — Risk Service real (Blowfish/Tenderly/ChainPatrol) + AI Risk Engine
 
-**Objetivo:** notificações reais (web-push), sync criptografado E2E, watchtower on-chain.
+**Objetivo:** agregar múltiplas fontes reais e scoring IA para risco avançado.
 
-**Issues mãe:** novas #43, #44
+**Issues mãe:** novas #45, #46
 
 ### Tarefas
 
-#### T1 — Push prod (ALTO)
-- **Arquivos:** `src/lib/notifications/prod.ts` (novo), `src/lib/notifications/__tests__/prod.test.ts` (novo)
+#### T1 — Risk Service real (ALTO)
+- **Arquivos:** `src/lib/risk-service/aggregator.ts` (novo), `src/lib/risk-service/sources/blowfish.ts` (novo), `src/lib/risk-service/sources/tenderly.ts` (novo), `src/lib/risk-service/sources/chainpatrol.ts` (novo)
 - **Ações:**
-  - `prod.ts`: `sendWebPush` com payload + ttl, `VAPID` headers, retry on 410 remove
-- **Critério:** `bun test prod` 3 pass
+  - `blowfish.ts`: `scanTransaction` via `BLOWFISH_API_KEY`
+  - `tenderly.ts`: `simulateTransaction` via `TENDERLY_ACCESS_KEY`
+  - `chainpatrol.ts`: `checkAsset` via `CHAINPATROL_API_KEY`
+  - `aggregator.ts`: combina com timeout/cache
+- **Critério:** `bun test risk-service` 4 pass (cada source + aggregator)
 
-#### T2 — Sync crypted (MÉDIO)
-- **Arquivos:** `src/lib/sync/crypted.ts` (novo), `src/lib/sync/__tests__/crypted.test.ts` (novo)
+#### T2 — AI Risk Engine (MÉDIO)
+- **Arquivos:** `src/lib/ai-risk/index.ts` (novo), `src/lib/ai-risk/__tests__/ai-risk.test.ts` (novo)
 - **Ações:**
-  - `crypted.ts`: `encryptSync`, `decryptSync` com AES-256-GCM via Web Crypto stub
-- **Critério:** `bun test crypted` 3 pass
-
-#### T3 — Watchtower (MÉDIO)
-- **Arquivos:** `src/lib/watchtower/index.ts` (novo), `src/lib/watchtower/__tests__/watchtower.test.ts` (novo)
-- **Ações:**
-  - `watchtower/index.ts`: `watchTransaction` monitora reorgs/confirmações
-- **Critério:** `bun test watchtower` 2 pass
+  - `ai-risk/index.ts`: `scoreRisk(features) → number` heurístico (0-100)
+- **Critério:** `bun test ai-risk` 3 pass
 
 ### Definição de pronto (DoD)
-- [ ] `prod` + `crypted` + `watchtower` com 8 pass
+- [ ] `risk-service` + `ai-risk` com 7 pass
 - [ ] `tsc:0`
