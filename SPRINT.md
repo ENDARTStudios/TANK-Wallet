@@ -2,27 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 39 — Metrics dashboard (Grafana-ready)
+## Sprint 40 — Handoff + governance + tag v1.2.0
 
-**Objetivo:** `/api/dashboard` com métricas agregadas Grafana-ready.
+**Objetivo:** entrega final v1.2.0 com handoff, governance e tag.
 
-**Issues mãe:** novas #85, #86
+**Issues mãe:** novas #87, #88
 
 ### Tarefas
 
-#### T1 — Dashboard route (ALTO)
-- **Arquivos:** `src/app/api/dashboard/route.ts` (novo), `src/lib/metrics/dashboard.ts` (novo), `src/lib/metrics/__tests__/dashboard.test.ts` (novo)
+#### T1 — Handoff doc (ALTO)
+- **Arquivos:** `docs/HANDOFF.md` (novo)
 - **Ações:**
-  - `dashboard.ts`: `getDashboardMetrics()` retorna { rps, errorRate, p95, activeUsers }
-  - `route.ts`: `GET /api/dashboard`
-- **Critério:** `bun test dashboard` 4 pass
+  - Doc: arquitetura, onboarding, runbooks, contatos, links
+- **Critério:** doc completo
 
-#### T2 — Prometheus format (MÉDIO)
-- **Arquivos:** `src/app/api/metrics/prometheus/route.ts` (novo)
+#### T2 — v1.2.0 tag + bump (MÉDIO)
+- **Arquivos:** `package.json`, `CHANGELOG.md`
 - **Ações:**
-  - `GET /api/metrics/prometheus` formato Prometheus exposition
-- **Critério:** `tsc:0`
+  - `1.1.1 → 1.2.0`; tag `v1.2.0`
+- **Critério:** tag + versão
 
 ### Definição de pronto (DoD)
-- [ ] 4 arquivos + 4 pass
+- [ ] 3 docs + tag v1.2.0
 - [ ] `tsc:0`
