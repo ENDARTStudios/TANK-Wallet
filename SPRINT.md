@@ -2,27 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 42 — Verify gate completo
+## Sprint 43 — Sentry/OTel wire completo
 
-**Objetivo:** todos os 11 checks do `bun run verify` retornarem ✅ pass (não `⚠ skip`).
+**Objetivo:** `initObservability` real carrega Sentry SDK + traceId + OTel trace propagation.
 
-**Issues mãe:** novas #91, #92
+**Issues mãe:** novas #93, #94
 
 ### Tarefas
 
-#### T1 — Testes required (ALTO)
-- **Arquivos:** `scripts/verify/index.ts` (atualizar)
+#### T1 — initObservability completo (ALTO)
+- **Arquivos:** `src/lib/observability/init.ts` (novo), `src/lib/observability/__tests__/init.test.ts` (novo)
 - **Ações:**
-  - `tests` e `conformance` viram `required:true`
-- **Critério:** verifica todos ✅ pass
+  - `init.ts`: `initObservability({ dsn, env, release, sampleRate })` lazy + trace correlation
+- **Critério:** `bun test init` 3 pass
 
-#### T2 — SBOM/secrets/deps required (MÉDIO)
-- **Arquivos:** `scripts/verify/index.ts`
+#### T2 — Wire em instrumentation.ts (MÉDIO)
+- **Arquivos:** `src/instrumentation.ts` (atualizar)
 - **Ações:**
-  - `sbom`, `secrets-scan`, `dependency-scan` required
-  - Fallback: se ferramentas ausentes, mensagem clara
-- **Critério:** verify com tudo ✅
+  - `register()` chama `initObservability()` com DSN do env
+- **Critério:** `tsc:0`
 
 ### Definição de pronto (DoD)
-- [ ] 1 arquivo
-- [ ] `bun run verify` 11 ✅
+- [ ] 3 arquivos + 3 pass
+- [ ] `tsc:0`
