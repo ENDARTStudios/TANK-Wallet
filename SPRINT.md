@@ -2,32 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 20 — Audit externa + Lighthouse CI + Code Owners + Reviewers
+## Sprint 21 — OAuth (Google/Apple) + 2FA TOTP
 
-**Objetivo:** endurecer auditoria e gate com checks automatizados e CODEOWNERS.
+**Objetivo:** autenticação social e segundo fator (TOTP RFC 6238).
 
-**Issues mãe:** novas #47, #48
+**Issues mãe:** novas #49, #50
 
 ### Tarefas
 
-#### T1 — Audit externa config (MÉDIO)
-- **Arquivos:** `audit-config/audit-external.json` (novo)
+#### T1 — OAuth providers (MÉDIO)
+- **Arquivos:** `src/lib/auth/oauth.ts` (novo), `src/lib/auth/__tests__/oauth.test.ts` (novo), `.env.example`
 - **Ações:**
-  - Configurar `audit-config/` com escopo, listas de verificação e contatos
-- **Critério:** arquivo versionado, pronto para auditor externo
+  - `oauth.ts`: `GoogleProvider`, `AppleProvider` stubs (sem SDK real)
+- **Critério:** `bun test oauth` 3 pass
 
-#### T2 — Lighthouse CI (MÉDIO)
-- **Arquivos:** `.lighthouserc.json` (novo)
+#### T2 — 2FA TOTP (ALTO)
+- **Arquivos:** `src/lib/auth/totp.ts` (novo), `src/lib/auth/__tests__/totp.test.ts` (novo)
 - **Ações:**
-  - Configurar budgets: LCP <2.5s, CLS <0.1, TBT <200ms
-- **Critério:** arquivo existe
-
-#### T3 — CODEOWNERS + Reviewers (BAIXO)
-- **Arquivos:** `.github/CODEOWNERS` (atualizar)
-- **Ações:**
-  - CODEOWNERS: paths de risco (security, prisma, workflows, src/lib/*) → @ENDARTStudios
-- **Critério:** CODEOWNERS com paths críticos
+  - `totp.ts`: `generateSecret`, `getTOTP(secret, time)`, `verifyTOTP(secret, code)` RFC 6238
+- **Critério:** `bun test totp` 4 pass (generate, getTOTP, verify, expiry)
 
 ### Definição de pronto (DoD)
-- [ ] 3 arquivos versionados
+- [ ] `oauth` + `totp` com 7 pass
 - [ ] `tsc:0`
