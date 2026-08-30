@@ -2,26 +2,32 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 17 — MPC HSM abstraction + Account Abstraction real
+## Sprint 18 — Push prod + Sync crypted + Watchtower
 
-**Objetivo:** abstração de HSM/MPC e Account Abstraction real (ERC-4337 v0.7).
+**Objetivo:** notificações reais (web-push), sync criptografado E2E, watchtower on-chain.
 
-**Issues mãe:** novas #41, #42
+**Issues mãe:** novas #43, #44
 
 ### Tarefas
 
-#### T1 — MPC HSM abstraction (ALTO)
-- **Arquivos:** `src/lib/mpc/hsm.ts` (novo), `src/lib/mpc/__tests__/hsm.test.ts` (novo)
+#### T1 — Push prod (ALTO)
+- **Arquivos:** `src/lib/notifications/prod.ts` (novo), `src/lib/notifications/__tests__/prod.test.ts` (novo)
 - **Ações:**
-  - `hsm.ts`: `HsmProvider` interface, `LocalHsm`, `RemoteHsm` stubs com `sign({ payload, keyId }) → signature`
-- **Critério:** `bun test hsm` 3 pass
+  - `prod.ts`: `sendWebPush` com payload + ttl, `VAPID` headers, retry on 410 remove
+- **Critério:** `bun test prod` 3 pass
 
-#### T2 — Account Abstraction real (MÉDIO)
-- **Arquivos:** `src/lib/account-abstraction/v0.7.ts` (novo), `src/lib/account-abstraction/__tests__/v0.7.test.ts` (novo)
+#### T2 — Sync crypted (MÉDIO)
+- **Arquivos:** `src/lib/sync/crypted.ts` (novo), `src/lib/sync/__tests__/crypted.test.ts` (novo)
 - **Ações:**
-  - `v0.7.ts`: `EntryPoint v0.7` `getUserOpHash`, `packUserOp`, `unpackUserOp` (sem viem dep)
-- **Critério:** `bun test v0.7` 3 pass
+  - `crypted.ts`: `encryptSync`, `decryptSync` com AES-256-GCM via Web Crypto stub
+- **Critério:** `bun test crypted` 3 pass
+
+#### T3 — Watchtower (MÉDIO)
+- **Arquivos:** `src/lib/watchtower/index.ts` (novo), `src/lib/watchtower/__tests__/watchtower.test.ts` (novo)
+- **Ações:**
+  - `watchtower/index.ts`: `watchTransaction` monitora reorgs/confirmações
+- **Critério:** `bun test watchtower` 2 pass
 
 ### Definição de pronto (DoD)
-- [ ] `hsm` + `v0.7` com 6 pass
+- [ ] `prod` + `crypted` + `watchtower` com 8 pass
 - [ ] `tsc:0`
