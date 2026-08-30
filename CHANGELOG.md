@@ -1,4 +1,20 @@
 # Changelog
+## [1.2.0] — 2026-08-30 — Sprints 28-40
+### Added
+- **Sprint 28**: `scripts/apply-rls.ts` applyRls/countRlsStatements (3 tests), `scripts/migrate-deploy.ts` migrateDeploy Postgres
+- **Sprint 29**: `.github/workflows/lighthouse.yml` treosh/lighthouse-ci-action + `e2e/lighthouse-budget.spec.ts` (2 tests)
+- **Sprint 30**: `src/lib/observability/sentry-real.ts` initSentry/captureException (4 tests), `traceid.ts` withTraceId/withTraceIdAsync (4 tests)
+- **Sprint 31**: `src/lib/wallet-connect/provider.ts` createWCProvider/buildConnectionUri (4 tests), `session-store.ts` save/load/clear (4 tests)
+- **Sprint 32**: `src/lib/webauthn/register.ts` generateChallenge/buildAttestationOptions/verifyAttestation (4 tests), `login.ts` buildAssertionOptions/verifyAssertion (3 tests)
+- **Sprint 33**: `scripts/backup-cron.sh` SQLite/Postgres + openssl AES-256 + S3 stub + retention 30d; `.github/workflows/restore-e2e.yml` weekly Monday 06:00 UTC
+- **Sprint 34**: `.github/workflows/cosign.yml` build GHCR + cosign keyless sign + verify; `sbom-cyclonedx.yml` CycloneDX 1.5 + artifact 90d
+- **Sprint 35**: `audit-config/trail-of-bits-engagement.md` scope + deliverables + cronograma 4 weeks + SLA; `findings-tracker.md` status/SLA/PR
+- **Sprint 36**: `src/i18n/config.ts` LOCALES + DEFAULT_LOCALE + loadMessages/getMessage (5 tests); `messages/{pt-BR,en-US,es-ES}.json` 14 chaves cada
+- **Sprint 37**: `public/manifest.json` standalone + theme #10b981 + shortcuts; `public/sw.js` cache-first + offline fallback; `e2e/pwa.spec.ts` (2 tests)
+- **Sprint 38**: `src/lib/billing/stripe.ts` createCheckoutSession/verifyWebhookSignature (4 tests); `src/app/api/billing/webhook/route.ts` POST
+- **Sprint 39**: `src/lib/metrics/dashboard.ts` rps/errorRate/p95/activeUsers (4 tests); `src/app/api/dashboard/route.ts` GET; `src/app/api/metrics/prometheus/route.ts` Prometheus exposition
+- **Sprint 40**: `docs/HANDOFF.md` arquitetura + onboarding + runbooks + contatos + links
+
 ## [1.1.1] — 2026-08-30 — Hotfix
 ### Added
 - `src/lib/observability/redact.ts`: `redactSecrets`/`redactObject` para mascarar tokens/emails/private keys em logs

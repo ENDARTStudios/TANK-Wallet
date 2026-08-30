@@ -15,11 +15,8 @@ describe("stripe", () => {
     const ts = Math.floor(Date.now() / 1000);
     const sig = `t=${ts},v1=abc123`;
     const secret = "whsec_test";
-    const recomputed = require("../stripe") as { verifyWebhookSignature: (p: string, s: string, sec: string) => boolean };
-    // Manually compute
-    const stripe = recomputed;
-    expect(typeof stripe.verifyWebhookSignature).toBe("function");
     const expected = `t=${ts},v1=00000000`;
+    expect(typeof verifyWebhookSignature).toBe("function");
     expect(verifyWebhookSignature(payload, expected, secret)).toBe(false);
     expect(verifyWebhookSignature(payload, sig, secret)).toBe(false);
   });
