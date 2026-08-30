@@ -2,26 +2,27 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 26 — Deploy + Smoke Test Prod
+## Sprint 27 — v1.1.1 hotfix + Observability tuning
 
-**Objetivo:** garantir que v1.1.0 deploya e responde corretamente em produção simulada.
+**Objetivo:** corrigir findings menores e ajustar Sentry/OTel.
 
-**Issues mãe:** novas #59, #60
+**Issues mãe:** novas #61, #62
 
 ### Tarefas
 
-#### T1 — Smoke tests (MÉDIO)
-- **Arquivos:** `e2e/smoke.spec.ts` (novo)
+#### T1 — v1.1.1 version bump (BAIXO)
+- **Arquivos:** `package.json`, `CHANGELOG.md`
 - **Ações:**
-  - Verificar `/` renderiza, `/api/health` retorna 200, `/sitemap.xml` válido
-- **Critério:** `bunx playwright test e2e/smoke.spec.ts` verde
+  - `1.1.0 → 1.1.1` patch
+  - CHANGELOG entrada
+- **Critério:** versão 1.1.1
 
-#### T2 — Deploy script (BAIXO)
-- **Arquivos:** `scripts/deploy-preflight.sh` (novo)
+#### T2 — Logger mask util (MÉDIO)
+- **Arquivos:** `src/lib/observability/redact.ts` (novo), `src/lib/observability/__tests__/redact.test.ts` (novo)
 - **Ações:**
-  - Script bash: `bunx tsc`, `bun run lint`, `bun test`, `git status`, `git tag -l`
-- **Critério:** script executa verde
+  - `redact.ts`: `redactSecrets` para mascarar em logs
+- **Critério:** `bun test redact` 3 pass
 
 ### Definição de pronto (DoD)
-- [ ] 2 arquivos + smoke test verde
+- [ ] patch + 3 pass redact
 - [ ] `tsc:0`
