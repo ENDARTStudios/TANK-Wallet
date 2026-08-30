@@ -2,33 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 25 — Release Validation + DAST + Final Hardening
+## Sprint 26 — Deploy + Smoke Test Prod
 
-**Objetivo:** validar v1.1.0 pré-produção, rodar DAST e endurecer últimos detalhes.
+**Objetivo:** garantir que v1.1.0 deploya e responde corretamente em produção simulada.
 
-**Issues mãe:** novas #57, #58
+**Issues mãe:** novas #59, #60
 
 ### Tarefas
 
-#### T1 — DAST config (MÉDIO)
-- **Arquivos:** `dast-config/zap-baseline.yaml` (novo)
+#### T1 — Smoke tests (MÉDIO)
+- **Arquivos:** `e2e/smoke.spec.ts` (novo)
 - **Ações:**
-  - Configurar OWASP ZAP baseline scan
-- **Critério:** arquivo versionado
+  - Verificar `/` renderiza, `/api/health` retorna 200, `/sitemap.xml` válido
+- **Critério:** `bunx playwright test e2e/smoke.spec.ts` verde
 
-#### T2 — Release checklist (MÉDIO)
-- **Arquivos:** `docs/RELEASE-CHECKLIST.md` (novo)
+#### T2 — Deploy script (BAIXO)
+- **Arquivos:** `scripts/deploy-preflight.sh` (novo)
 - **Ações:**
-  - Checklist final pré-produção (RTO, backups, observability, feature flags)
-- **Critério:** doc versionado
-
-#### T3 — Hardening (MÉDIO)
-- **Arquivos:** `src/proxy.ts` (verificar), `src/lib/security/rate-limit.ts` (verificar)
-- **Ações:**
-  - Garantir coverage de path /health, /api/*, /_next/*, /favicon*
-  - Adicionar comentário defensivo
-- **Critério:** `tsc:0`
+  - Script bash: `bunx tsc`, `bun run lint`, `bun test`, `git status`, `git tag -l`
+- **Critério:** script executa verde
 
 ### Definição de pronto (DoD)
-- [ ] 3 arquivos + proxy + rate-limit
+- [ ] 2 arquivos + smoke test verde
 - [ ] `tsc:0`
