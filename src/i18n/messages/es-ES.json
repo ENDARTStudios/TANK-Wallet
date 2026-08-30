@@ -1,0 +1,16 @@
+{
+  "common.app_name": "TANK Wallet",
+  "common.loading": "Cargando...",
+  "common.error": "Error",
+  "common.cancel": "Cancelar",
+  "common.confirm": "Confirmar",
+  "nav.dashboard": "Panel",
+  "nav.assets": "Activos",
+  "nav.activity": "Actividad",
+  "nav.send": "Enviar",
+  "nav.receive": "Recibir",
+  "nav.settings": "Ajustes",
+  "risk.score_low": "Riesgo bajo",
+  "risk.score_medium": "Riesgo medio",
+  "risk.score_high": "Riesgo alto"
+}

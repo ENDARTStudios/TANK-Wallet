@@ -2,26 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 35 — Audit externa (Trail of Bits)
+## Sprint 36 — i18n pt-BR/en-US/es
 
-**Objetivo:** engagement Trail of Bits com checklist + tracking.
+**Objetivo:** internacionalização com 3 locales via `next-intl`.
 
-**Issues mãe:** novas #77, #78
+**Issues mãe:** novas #79, #80
 
 ### Tarefas
 
-#### T1 — Engagement doc (ALTO)
-- **Arquivos:** `audit-config/trail-of-bits-engagement.md` (novo)
+#### T1 — i18n config (ALTO)
+- **Arquivos:** `src/i18n/config.ts` (novo), `src/i18n/__tests__/config.test.ts` (novo)
 - **Ações:**
-  - Doc: scope, deliverables, kickoff, comms channel
-- **Critério:** doc versionado
+  - `config.ts`: locales list, default, getMessage
+- **Critério:** `bun test config` 3 pass
 
-#### T2 — Findings tracker (MÉDIO)
-- **Arquivos:** `audit-config/findings-tracker.md` (novo)
+#### T2 — Traduções (MÉDIO)
+- **Arquivos:** `src/i18n/messages/pt-BR.json` (novo), `src/i18n/messages/en-US.json` (novo), `src/i18n/messages/es-ES.json` (novo)
 - **Ações:**
-  - Tabela de findings com severidade/status/SLA
-- **Critério:** doc versionado
+  - JSON com chaves: nav.dashboard, nav.settings, common.app_name, common.loading
+- **Critério:** 3 arquivos válidos
 
 ### Definição de pronto (DoD)
-- [ ] 2 docs
+- [ ] 5 arquivos + 3 pass
 - [ ] `tsc:0`
