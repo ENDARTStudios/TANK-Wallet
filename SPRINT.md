@@ -2,27 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 28 — RLS Postgres real (RUNTIME)
+## Sprint 29 — Lighthouse CI real
 
-**Objetivo:** validar e aplicar `rls.sql` em runtime Postgres + migrate deploy.
+**Objetivo:** workflow Lighthouse CI rodando em PR com budget gate.
 
-**Issues mãe:** novas #63, #64
+**Issues mãe:** novas #65, #66
 
 ### Tarefas
 
-#### T1 — RLS runtime apply (ALTO)
-- **Arquivos:** `scripts/apply-rls.ts` (novo), `scripts/__tests__/rls-apply.test.ts` (novo)
+#### T1 — Lighthouse workflow (ALTO)
+- **Arquivos:** `.github/workflows/lighthouse.yml` (novo)
 - **Ações:**
-  - `apply-rls.ts`: conectar Postgres via `pg`, executar `rls.sql`
-  - Teste: dry-run com SQLite mock ou skip se DATABASE_URL=sqlite
-- **Critério:** `bun test rls-apply` 2 pass
+  - Workflow com `treosh/lighthouse-ci-action` + budgets
+- **Critério:** arquivo versionado
 
-#### T2 — migrate deploy (MÉDIO)
-- **Arquivos:** `scripts/migrate-deploy.ts` (novo)
+#### T2 — Budget assert test (MÉDIO)
+- **Arquivos:** `e2e/lighthouse-budget.spec.ts` (novo)
 - **Ações:**
-  - `migrate-deploy.ts`: `prisma migrate deploy` + `apply-rls`
-- **Critério:** `tsc:0` + `migrate-deploy.ts` compila
+  - Verificar `.lighthouserc.json` existe e tem budgets
+- **Critério:** `bun test e2e` verde
 
 ### Definição de pronto (DoD)
-- [ ] 3 arquivos + 2 pass
+- [ ] 2 arquivos
 - [ ] `tsc:0`
