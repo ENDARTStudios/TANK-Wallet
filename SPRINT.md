@@ -2,25 +2,25 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 31 — WalletConnect relay real
+## Sprint 32 — WebAuthn real (passkey challenge/verify)
 
-**Objetivo:** provider WalletConnect v2 com project ID e namespace.
+**Objetivo:** passkey completo com challenge e verificação.
 
-**Issues mãe:** novas #69, #70
+**Issues mãe:** novas #71, #72
 
 ### Tarefas
 
-#### T1 — WCProvider real (ALTO)
-- **Arquivos:** `src/lib/wallet-connect/provider.ts` (novo), `src/lib/wallet-connect/__tests__/provider.test.ts` (novo)
+#### T1 — WebAuthn register (ALTO)
+- **Arquivos:** `src/lib/webauthn/register.ts` (novo), `src/lib/webauthn/__tests__/register.test.ts` (novo)
 - **Ações:**
-  - `WCProvider`: init, connect, signClient stub, namespace
-- **Critério:** `bun test provider` 4 pass
+  - `register.ts`: `generateChallenge`, `buildAttestationOptions`, `verifyAttestation`
+- **Critério:** `bun test register` 4 pass
 
-#### T2 — Session persistence (MÉDIO)
-- **Arquivos:** `src/lib/wallet-connect/session-store.ts` (novo), `src/lib/wallet-connect/__tests__/session-store.test.ts` (novo)
+#### T2 — WebAuthn login (MÉDIO)
+- **Arquivos:** `src/lib/webauthn/login.ts` (novo), `src/lib/webauthn/__tests__/login.test.ts` (novo)
 - **Ações:**
-  - `session-store.ts`: save/load/clear session em memória cifrada
-- **Critério:** `bun test session-store` 3 pass
+  - `login.ts`: `buildAssertionOptions`, `verifyAssertion`
+- **Critério:** `bun test login` 3 pass
 
 ### Definição de pronto (DoD)
 - [ ] 4 arquivos + 7 pass
