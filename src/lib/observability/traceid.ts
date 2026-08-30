@@ -28,3 +28,7 @@ export function getCurrentTraceId(): string | undefined {
 export function getCurrentContext(): TraceContext | undefined {
   return storage.getStore();
 }
+
+export function getTraceId(): string | undefined {
+  return storage.getStore()?.traceId;
+}
