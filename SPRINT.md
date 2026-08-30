@@ -2,42 +2,43 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 13 — Indexer Prod + Push Notifications + Sync
+## Sprint 14 — Helius Prod + Web Push VAPID + Final Release Prep
 
-**Objetivo:** tornar a descoberta de ativos e notificações em tempo real, com sync entre dispositivos.
+**Objetivo:** fechar integrações prod restantes com env real e preparar release.
 
-**Issues mãe:** novas #33, #34
+**Issues mãe:** novas #35, #36
 
 ### Tarefas
 
-#### T1 — Indexer Prod (MÉDIO)
-- **Arquivos:** `src/lib/indexer/providers/alchemy.ts` (atualizar), `src/lib/indexer/providers/helius.ts` (atualizar), `src/lib/indexer/providers/blockstream.ts` (atualizar)
+#### T1 — Helius Prod (MÉDIO)
+- **Arquivos:** `src/lib/indexer/providers/helius.ts`, `.env.example`, `src/lib/indexer/__tests__/indexer.test.ts`
 - **Ações:**
-  - Alchemy: `eth_getLogs` real com `ALCHEMY_API_KEY`
-  - Helius: `getBalances` real com `HELIUS_API_KEY`
-  - Blockstream: `address/txs` com paginação
-- **Critério:** `bun test indexer` com mock ainda passa; `e2e` verifica `discoverAssets` com cache
+  - `helius.ts`: `fetchHeliusSpl` com `HELIUS_API_KEY` `https://api.helius.xyz/v0/addresses/{address}/balances?api-key={key}` + fallback mock
+- **Critério:** `helius.ts` usa `HELIUS_API_KEY` quando presente; teste ainda passa com mock
 
-#### T2 — Push Notifications (MÉDIO)
-- **Arquivos:** `src/lib/notifications/index.ts` (novo), `src/lib/notifications/__tests__/notifications.test.ts` (novo), `src/app/api/notifications/route.ts` (novo)
+#### T2 — Web Push VAPID (MÉDIO)
+- **Arquivos:** `src/lib/notifications/vapid.ts` (novo), `src/lib/notifications/__tests__/vapid.test.ts` (novo), `.env.example`
 - **Ações:**
-  - `notifications/index.ts`: `subscribePush`, `sendPush` (web-push stub), `onThreat` → push
-  - `route.ts`: `POST /api/notifications/subscribe` + `GET /api/notifications`
-- **Critério:** `bun test notifications` 3 pass
+  - `vapid.ts`: `generateVapidKeys`, `getVapidPublicKey` stub, `sendPushVapid` com `web-push` stub
+  - `.env.example`: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `HELIUS_API_KEY`
+- **Critério:** `bun test vapid` 2 pass
 
-#### T3 — Sync (MÉDIO)
-- **Arquivos:** `src/lib/sync/index.ts` (novo), `src/lib/sync/__tests__/sync.test.ts` (novo)
+#### T3 — Release Prep (BAIXO)
+- **Arquivos:** `CHANGELOG.md`, `package.json` (version bump), `docs/reproducible-build.md`
 - **Ações:**
-  - `sync/index.ts`: `syncPortfolio` (encrypted sync via `workspaceId`), `getSyncStatus`
-- **Critério:** `bun test sync` 2 pass
+  - `CHANGELOG.md`: `v1.1.0` com Sprints 1-14
+  - `package.json: version 1.1.0`
+  - `git tag v1.1.0-rc1` (não pushado, preparado)
+- **Critério:** `CHANGELOG.md` + `package.json` atualizados; `bunx tsc --noEmit:0`
 
 ### Fora de escopo neste sprint
 
-- Helius API key real — stub com `HELIUS_API_KEY` env
-- Web Push VAPID real — stub
+- LND channel real — próximo ciclo
+- Bundler paymaster real — próximo ciclo
 
 ### Definição de pronto (DoD)
 
-- [ ] `src/lib/indexer` atualizado + `notifications` + `sync` com testes verdes (8 pass total)
-- [ ] `bunx tsc --noEmit:0`
-- [ ] Deploy gate verde
+- [ ] `helius.ts` + `vapid.ts` com testes verdes (7 pass total)
+- [ ] `.env.example` com `HELIUS_API_KEY` + `VAPID_*`
+- [ ] `CHANGELOG.md` `v1.1.0` + `package.json:1.1.0`
+- [ ] `bunx tsc --noEmit:0` `eslint:0` `verify:✅ APPROVED`
