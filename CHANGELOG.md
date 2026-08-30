@@ -1,26 +1,34 @@
 # Changelog
-## [1.1.0] — 2026-08-30 — Sprints 1-14
+## [1.1.0] — 2026-08-30 — Sprints 1-22
 ### Added
-- PRD, UML, RBAC, RLS, SECRETS, ARCHITECTURE-MODULES, OBSERVABILITY, TESTING, SECURITY-GATE
-- AGENTS.md (Issue→PR→gate + Motion + skills)
-- Sprints 1-4: hygiene (HSTS/proxy/observability), E2E Playwright + Codecov + rate-limit + strict
-- Sprint 3: WAF/Bot (BOT_MODE), RBAC (Workspace/User + requirePermission), RLS (workspaceId), feature flags
-- Sprint 4: SEO (robots/sitemap/canonical/OG/JSON-LD), modular src/features, cleanup plan
-- Sprint 5: auditoria completa (security/performance/db/SEO/QA) docs/audit/*.md
-- Sprints 6-8: Postgres RLS (docker-compose + rls.sql), next-auth, WalletConnect v2 + EIP-6963 + Risk Service
-- Sprints 9-10: Broadcast (eth_sendRawTransaction) + Indexer (Alchemy/Helius/Blockstream) + Signing (PSBT/Solana/EIP-712) + Vault (k-of-n)
-- Sprints 11-12: Lightning (BOLT-11) + AA (UserOperation) + MPC (2-of-2) + Social Recovery + Behavioral AI
-- Sprints 13-14: Notifications/Push + Sync + Helius prod + VAPID
-- 68+ tests (rate-limit, bot-guard, rbac, rls, feature-flags, wallet-connect, eip6963, threat-intel, broadcast, indexer, signing, vault, lightning, aa, mpc, social, behavior, notifications, sync, vapid)
-- HSTS, CSP, rate 429, bot 403, proxy, instrumentation, error.tsx
+- **Sprint 1-2 (hygiene + E2E)**: `.env` fora do git, PGP privada removida, HSTS, `error.tsx`+`global-error.tsx`, `instrumentation.ts` Sentry/OTel, Playwright E2E (chromium/mobile-375/tablet-768), Codecov gate, rate-limit 120/30, strict TypeScript
+- **Sprint 3-4 (WAF/RBAC/RLS/SEO)**: WAF/Bot `BOT_MODE`, RBAC `Workspace`/`User`+`requirePermission` 401/403, RLS `workspaceId`+`filterByWorkspace`, feature flags tier, SEO robots/sitemap/canonical/OG/JSON-LD
+- **Sprint 5 (auditoria)**: `docs/audit/{SECURITY,PERFORMANCE,DB,SEO}-AUDIT.md` + `QA-REPORT.md`
+- **Sprints 6-8 (Postgres/AA/MPC)**: `docker-compose.yml` Postgres 16, `prisma/rls.sql` 6 policies FORCE RLS, `next-auth` CredentialsProvider+JWT, WalletConnect v2, EIP-6963 announce/request, Risk Service aggregator (GoPlus/ChainPatrol/ScamSniffer)
+- **Sprints 9-10 (Broadcast/Signing)**: `eth_sendRawTransaction` failover Alchemy→Infura, Indexer (Alchemy/Helius/Blockstream), PSBT/Solana VersionedTx/EIP-712, Vault Evolution k-of-n/Timelock/SpendingLimit
+- **Sprints 11-12 (Lightning/AA/MPC/Social)**: Lightning BOLT-11+submarineSwap, ERC-4337 `UserOperation`+paymaster, MPC 2-of-2+passkey, Social Recovery k-of-n, Behavioral AI lockdown
+- **Sprints 13-14 (Notifications/Helius/VAPID)**: `subscribePush`/`sendPush`/`getSyncStatus`, Helius API real, VAPID keys, Notifications route
+- **Sprints 15 (LND+Bundler)**: LND `openChannel/closeChannel/listChannels`, Bundler `sendUserOperation`/`estimateUserOpGas`/`sponsorWithPaymaster`
+- **Sprints 16-17 (Crypto/MPC HSM)**: Shamir SSS GF(256) Lagrange `splitSecret`/`combineShares`, Threshold SSA, HsmProvider Local/Remote, ERC-4337 v0.7 `packUserOp`/`unpackUserOp`/`getUserOpHash`
+- **Sprints 18-19 (Push/Sync/Risk/AI)**: Web Push prod, Sync crypted keystream, Watchtower `watchTransaction`, Blowfish/Tenderly/ChainPatrol risk, AI Risk scoring
+- **Sprints 20-22 (Audit/Auth/DR)**: `audit-config/audit-external.json`, `.lighthouserc.json` budgets, `.github/CODEOWNERS` paths críticos, Google/Apple OAuth, TOTP RFC 6238, Postgres migration script, backup-restore + DR drill checklist
+- 160+ tests, 11 docs vivos, 22 sprints
 ### Changed
-- next.config.ts: HSTS, typescript.ignoreBuildErrors:false, reactStrictMode:true
-- eslint.config.mjs: ignore gsap-public/public/prisma/db
-- package.json: tank-wallet 1.1.0, @playwright/test
-- .env.example: 12 vars (DATABASE_URL, NEXTAUTH_SECRET, SENTRY, OTel, WALLETCONNECT, ALCHEMY/INFURA/HELIUS/VAPID)
-- Caddyfile: :443 tls + HSTS + :80→443 + :81 compat
+- `next.config.ts:18` HSTS, `ignoreBuildErrors:false`, `reactStrictMode:true`
+- `eslint.config.mjs` ignora `gsap-public/**`, `public/**`, `prisma/db/**`
+- `package.json:1.1.0` `tank-wallet` + `@playwright/test ^1.48`
+- `.env.example` 18 vars (DB, auth, observability, security, WalletConnect, RPCs, VAPID, OAuth, Risk)
+- `Caddyfile` `:443 tls` + HSTS + `:80→443` + `:81` compat dev
+- `branch protection main` 7 checks (Quality Gates, Semgrep, CodeQL, Gitleaks, Trivy, SBOM, E2E) + 1 review
+- `gh 2.65.0` instalado + `gho_***` token + labels (18) + PR/issue templates
 ### Security
-- .env fora do git, PGP privada removida, branch protection main (7 checks, 1 review)
+- `.env` fora do git (`git rm --cached` + `!.env.example`)
+- PGP privada removida
+- HSTS `max-age=63072000; includeSubDomains; preload`
+- CSP `default-src 'self'`, X-Frame DENY, nosniff, Referrer, Permissions-Policy
+- Rate-limit `429` + Bot-guard `403` em `/api/*` via `src/proxy.ts`
+- E2E Playwright + Codecov + Gitleaks + CodeQL + Semgrep + Trivy
+- `.github/CODEOWNERS` review paths segurança
 
 ## [Unreleased] — Sprint 4+2 (2026-07-16)
 ### Added
