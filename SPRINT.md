@@ -2,26 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 32 — WebAuthn real (passkey challenge/verify)
+## Sprint 33 — Backup agendado + restore E2E
 
-**Objetivo:** passkey completo com challenge e verificação.
+**Objetivo:** agendamento cron + restore test em CI.
 
-**Issues mãe:** novas #71, #72
+**Issues mãe:** novas #73, #74
 
 ### Tarefas
 
-#### T1 — WebAuthn register (ALTO)
-- **Arquivos:** `src/lib/webauthn/register.ts` (novo), `src/lib/webauthn/__tests__/register.test.ts` (novo)
+#### T1 — Backup cron (ALTO)
+- **Arquivos:** `scripts/backup-cron.sh` (novo)
 - **Ações:**
-  - `register.ts`: `generateChallenge`, `buildAttestationOptions`, `verifyAttestation`
-- **Critério:** `bun test register` 4 pass
+  - Cron script: backup SQLite/Postgres hourly, upload S3 stub
+- **Critério:** script executa verde
 
-#### T2 — WebAuthn login (MÉDIO)
-- **Arquivos:** `src/lib/webauthn/login.ts` (novo), `src/lib/webauthn/__tests__/login.test.ts` (novo)
+#### T2 — Restore E2E workflow (MÉDIO)
+- **Arquivos:** `.github/workflows/restore-e2e.yml` (novo)
 - **Ações:**
-  - `login.ts`: `buildAssertionOptions`, `verifyAssertion`
-- **Critério:** `bun test login` 3 pass
+  - Workflow CI: cria backup, restaura, valida
+- **Critério:** workflow versionado
 
 ### Definição de pronto (DoD)
-- [ ] 4 arquivos + 7 pass
+- [ ] 2 arquivos
 - [ ] `tsc:0`
