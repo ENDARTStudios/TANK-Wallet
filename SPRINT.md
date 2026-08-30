@@ -2,26 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 33 — Backup agendado + restore E2E
+## Sprint 34 — COSIGN image signing + SBOM CycloneDX
 
-**Objetivo:** agendamento cron + restore test em CI.
+**Objetivo:** release.yml com cosign keyless + SBOM assinado.
 
-**Issues mãe:** novas #73, #74
+**Issues mãe:** novas #75, #76
 
 ### Tarefas
 
-#### T1 — Backup cron (ALTO)
-- **Arquivos:** `scripts/backup-cron.sh` (novo)
+#### T1 — COSIGN workflow (ALTO)
+- **Arquivos:** `.github/workflows/cosign.yml` (novo)
 - **Ações:**
-  - Cron script: backup SQLite/Postgres hourly, upload S3 stub
-- **Critério:** script executa verde
+  - Workflow: build image, cosign keyless sign, attach SBOM
+- **Critério:** workflow versionado
 
-#### T2 — Restore E2E workflow (MÉDIO)
-- **Arquivos:** `.github/workflows/restore-e2e.yml` (novo)
+#### T2 — SBOM CycloneDX step (MÉDIO)
+- **Arquivos:** `.github/workflows/sbom-cyclonedx.yml` (novo)
 - **Ações:**
-  - Workflow CI: cria backup, restaura, valida
+  - Workflow: gerar SBOM CycloneDX, attach ao GHCR release
 - **Critério:** workflow versionado
 
 ### Definição de pronto (DoD)
-- [ ] 2 arquivos
+- [ ] 2 workflows
 - [ ] `tsc:0`
