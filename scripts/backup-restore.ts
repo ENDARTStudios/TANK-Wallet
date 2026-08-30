@@ -34,8 +34,5 @@ export function pgDump(dbUrl: string, dest: string): BackupResult {
 
 export function pgRestore(dbUrl: string, backup: string): RestoreResult {
   execSync(`psql "${dbUrl}" < "${backup}"`, { stdio: "ignore" });
-  writeFileSync;
   return { ok: true, rows: 0 };
 }
-
-void join;

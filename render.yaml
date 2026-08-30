@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: tank-wallet
+    runtime: docker
+    plan: starter
+    branch: main
+    healthCheckPath: /api/health
+    autoDeploy: true
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SENTRY_DSN
+        sync: false
+      - key: SENTRY_AUTH_TOKEN
+        sync: false
+      - key: OTEL_EXPORTER_OTLP_ENDPOINT
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: NEXTAUTH_URL
+        value: https://tankwallet.dev
+      - key: BOT_MODE
+        value: block
+      - key: API_RATE_LIMIT_PER_MIN
+        value: 120
+      - key: WALLETCONNECT_PROJECT_ID
+        sync: false
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+    domains:
+      - tankwallet.dev
