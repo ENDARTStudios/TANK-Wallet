@@ -26,7 +26,12 @@ jobs:
         env:
           DATABASE_URL: file:./db/test.db
       - name: Insert test data
-        run: bun --eval "import { PrismaClient } from '@prisma/client'; const db = new PrismaClient(); await db.threatSite.create({ data: { url: 'test-restore-' + Date.now() + '.com', reason: 'e2e', category: 'test', source: 'ci', severity: 1 } }); await db.\$disconnect();"
+        run: >-
+          bun --eval
+          "import { PrismaClient } from '@prisma/client';
+          const db = new PrismaClient();
+          await db.threatSite.create({ data: { url: 'test-restore-' + Date.now() + '.com', reason: 'e2e', category: 'test', source: 'ci', severity: 1 } });
+          await db.$disconnect();"
         env:
           DATABASE_URL: file:./db/test.db
       - name: Backup
