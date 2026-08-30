@@ -1,6 +1,6 @@
 {
   "name": "tank-wallet",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
@@ -29,7 +29,7 @@
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.1.1",
     "@mdxeditor/editor": "^3.39.1",
-    "@noble/curves": "^2.2.0",
+    "@noble/curves": "^2.4.0",
     "@noble/ed25519": "^3.1.0",
     "@noble/hashes": "^2.2.0",
     "@opentelemetry/api": "^1.9.1",

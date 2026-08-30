@@ -1,4 +1,15 @@
 # Changelog
+## [1.2.1] — 2026-08-30 — Hotfix
+### Added
+- **Sprint 41**: `.github/workflows/release.yml` remove duplicate env; `.github/workflows/restore-e2e.yml` folded scalar; `.gitleaks.toml` config + allowlist + private key rule
+- **Sprint 42**: `scripts/verify/index.ts` 11/11 ✅ APPROVED (lint/typecheck/tests/conformance/metrics/audit:code/sbom/secrets-scan/dep-scan/enforce/signature-verify); `hasTool()` helper; `scripts/sbom.{sh,ps1}` fallback npx
+- **Sprint 43**: `src/lib/observability/init.ts` initObservability real (dsn, env, release, sampleRate, otlpEndpoint) lazy + idempotente; `src/instrumentation.ts` wire; `traceid.getTraceId()` helper
+- **Sprint 44**: `render.yaml` (Docker + healthcheck /api/health + 12 env + tankwallet.dev); 4 lint warnings em `observability/{sentry,tracing,metrics}.ts` + `scripts/backup-restore.ts` corrigidos
+### Fixed
+- 4 lint warnings → 0 (lint:0 errors 0 warnings)
+- verify gate 11/11 ✅
+- viem + @noble/curves compat (`@noble/curves@2.4.0`)
+
 ## [1.2.0] — 2026-08-30 — Sprints 28-40
 ### Added
 - **Sprint 28**: `scripts/apply-rls.ts` applyRls/countRlsStatements (3 tests), `scripts/migrate-deploy.ts` migrateDeploy Postgres
