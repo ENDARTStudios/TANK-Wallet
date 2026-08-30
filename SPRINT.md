@@ -2,30 +2,34 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 46 — knip cleanup + deps reduction
+## Sprint 47 — Tag v1.2.1 push + knip 31→0 + cleanup de branches
 
-**Objetivo:** remover dependências realmente não usadas (75 → 0) e manter em package.json as que ainda são importadas via dynamic/indirect.
+**Objetivo:** garantir tag `v1.2.1` em origin, reduzir knip 31→0 (dynamic imports), limpar branches locais obsoletas.
 
-**Issues mãe:** novas #99, #100
+**Issues mãe:** novas #101, #102
 
 ### Tarefas
 
-#### T1 — Remover deps não usadas (ALTO)
-- **Arquivos:** `package.json`
+#### T1 — Tag v1.2.1 push (ALTO)
+- **Arquivos:** `git push origin v1.2.1`
 - **Ações:**
-  - Manter deps usadas via dynamic import: `@prisma/client`, `@sentry/nextjs`, `@opentelemetry/*`, `@noble/curves`, `@noble/hashes`, `@noble/ed25519`, `@scure/*`, `@tanstack/*`
-  - Remover deps não usadas: dnd-kit, gsap/react, hookform/resolvers, mdxeditor/editor, radix-ui/* (não importados), reactuses/core
-  - Verificar via `bun test` + `bunx tsc --noEmit`
-- **Critério:** `bunx knip` 0 unused deps
+  - Verificar se tag já existe em origin
+- **Critério:** tag em origin
 
-#### T2 — knip.json entry fix (MÉDIO)
+#### T2 — knip dynamic import detection (MÉDIO)
 - **Arquivos:** `knip.json`
 - **Ações:**
-  - Adicionar `entry` patterns para dynamic imports
-- **Critério:** `bunx knip` 0 errors
+  - Adicionar entry para arquivos com dynamic imports de deps
+- **Critério:** knip 31→0 (ou justificativa documentada)
+
+#### T3 — Cleanup de branches (BAIXO)
+- **Arquivos:** `scripts/cleanup-branches.sh`
+- **Ações:**
+  - Script bash para listar branches mergeadas em main
+- **Critério:** script executa verde
 
 ### Definição de pronto (DoD)
-- [ ] 2 arquivos
-- [ ] `bunx knip` 0 errors
-- [ ] `bun test` 227 pass
-- [ ] `verify:11/11 ✅`
+- [ ] 1-2 arquivos
+- [ ] tag v1.2.1 em origin
+- [ ] `bunx knip` justificável
+- [ ] `verify` 11/11 ✅
