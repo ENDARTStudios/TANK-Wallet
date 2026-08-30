@@ -2,26 +2,26 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 16 — Shamir Backup real (split/join) + Threshold SSA
+## Sprint 17 — MPC HSM abstraction + Account Abstraction real
 
-**Objetivo:** Shamir's Secret Sharing real (k-of-n) e threshold signatures para vault.
+**Objetivo:** abstração de HSM/MPC e Account Abstraction real (ERC-4337 v0.7).
 
-**Issues mãe:** novas #39, #40
+**Issues mãe:** novas #41, #42
 
 ### Tarefas
 
-#### T1 — Shamir Backup (ALTO)
-- **Arquivos:** `src/lib/crypto/shamir.ts` (novo), `src/lib/crypto/__tests__/shamir.test.ts` (novo)
+#### T1 — MPC HSM abstraction (ALTO)
+- **Arquivos:** `src/lib/mpc/hsm.ts` (novo), `src/lib/mpc/__tests__/hsm.test.ts` (novo)
 - **Ações:**
-  - `shamir.ts`: `splitSecret({ secret, threshold, shares })`, `combineShares({ shares, threshold })` com GF(256) math
-- **Critério:** `bun test shamir` 5 pass (split k-of-n, combine correto, recover com shares insuficientes falha, hex)
+  - `hsm.ts`: `HsmProvider` interface, `LocalHsm`, `RemoteHsm` stubs com `sign({ payload, keyId }) → signature`
+- **Critério:** `bun test hsm` 3 pass
 
-#### T2 — Threshold SSA (MÉDIO)
-- **Arquivos:** `src/lib/crypto/threshold-ssa.ts` (novo), `src/lib/crypto/__tests__/threshold-ssa.test.ts` (novo)
+#### T2 — Account Abstraction real (MÉDIO)
+- **Arquivos:** `src/lib/account-abstraction/v0.7.ts` (novo), `src/lib/account-abstraction/__tests__/v0.7.test.ts` (novo)
 - **Ações:**
-  - `threshold-ssa.ts`: `signThreshold({ message, shares })`, `verifyThreshold({ message, signature, publicKey })` stubs
-- **Critério:** `bun test threshold-ssa` 3 pass
+  - `v0.7.ts`: `EntryPoint v0.7` `getUserOpHash`, `packUserOp`, `unpackUserOp` (sem viem dep)
+- **Critério:** `bun test v0.7` 3 pass
 
 ### Definição de pronto (DoD)
-- [ ] `shamir` + `threshold-ssa` com 8 pass
+- [ ] `hsm` + `v0.7` com 6 pass
 - [ ] `tsc:0`
