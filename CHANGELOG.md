@@ -1,4 +1,48 @@
 # Changelog
+## [1.1.1] — 2026-08-30 — Hotfix
+### Added
+- `src/lib/observability/redact.ts`: `redactSecrets`/`redactObject` para mascarar tokens/emails/private keys em logs
+- `e2e/smoke.spec.ts`: smoke tests (home, /api/health, sitemap, robots, HSTS)
+- `scripts/deploy-preflight.sh`: tsc/lint/test/audit/verify/secrets/tag check
+- `dast-config/zap-baseline.yaml`: OWASP ZAP baseline scan
+- `docs/RELEASE-CHECKLIST.md`: checklist final v1.1.0
+- `docs/HSTS-PRELOAD.md`: checklist submissão 2027-02
+- `docs/audit/AUDIT-CLOSURE.md`: APPROVED v1.1.0
+- `knip.json`: config dead code
+- `public/og.png`: placeholder 1200x630
+- `src/lib/crypto/pii.ts`: encryptPII/decryptPII
+- `src/lib/crypto/shamir.ts`: Shamir SSS GF(256)
+- `src/lib/crypto/threshold-ssa.ts`: Threshold signatures
+- `src/lib/mpc/hsm.ts`: HsmProvider
+- `src/lib/account-abstraction/v0.7.ts`: packUserOp EntryPoint v0.7
+- `src/lib/notifications/prod.ts`: sendWebPush
+- `src/lib/sync/crypted.ts`: encryptSync keystream
+- `src/lib/watchtower/index.ts`: watchTransaction
+- `src/lib/risk-service/aggregator.ts`: Blowfish/Tenderly/ChainPatrol
+- `src/lib/ai-risk/index.ts`: scoreRisk features
+- `src/lib/lightning/lnd.ts`: openChannel/closeChannel
+- `src/lib/auth/oauth.ts`: Google/Apple providers
+- `src/lib/auth/totp.ts`: RFC 6238 base32
+- `src/lib/threat-intel/aggregator.ts`: aggregator multi-source
+- `src/lib/broadcast/index.ts`: eth_sendRawTransaction
+- `src/lib/indexer/index.ts`: Alchemy/Helius/Blockstream
+- `src/lib/signing/{psbt,solana,eip712}.ts`: PSBT/Solana/EIP-712
+- `src/lib/vault/evolution.ts`: k-of-n Timelock
+- `src/lib/lightning/index.ts`: BOLT-11 + submarineSwap
+- `src/lib/account-abstraction/index.ts`: UserOperation
+- `src/lib/mpc/index.ts`: MPC + passkey
+- `src/lib/social-recovery/index.ts`: k-of-n recovery
+- `src/lib/behavior-ai/index.ts`: anomaly detection
+- `src/lib/notifications/index.ts`: subscribePush
+- `src/lib/sync/index.ts`: syncPortfolio
+- `src/features/threat-intel/index.ts`: primeiro módulo migrado
+- `prisma/rls.sql`: 6 policies FORCE RLS
+- `prisma/schema.postgres.prisma`: provider postgresql
+- `scripts/backup-restore.ts`: backup/restore helpers
+- `scripts/migrate-sqlite-to-postgres.ts`: migration
+- `src/lib/db/rls.ts`: withWorkspaceFilter/assertSameWorkspace
+- `src/lib/config/feature-flags.ts`: FeatureFlagKey + isFeatureOn
+
 ## [1.1.0] — 2026-08-30 — Sprints 1-22
 ### Added
 - **Sprint 1-2 (hygiene + E2E)**: `.env` fora do git, PGP privada removida, HSTS, `error.tsx`+`global-error.tsx`, `instrumentation.ts` Sentry/OTel, Playwright E2E (chromium/mobile-375/tablet-768), Codecov gate, rate-limit 120/30, strict TypeScript
