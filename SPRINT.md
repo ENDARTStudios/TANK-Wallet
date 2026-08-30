@@ -2,29 +2,32 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 19 — Risk Service real (Blowfish/Tenderly/ChainPatrol) + AI Risk Engine
+## Sprint 20 — Audit externa + Lighthouse CI + Code Owners + Reviewers
 
-**Objetivo:** agregar múltiplas fontes reais e scoring IA para risco avançado.
+**Objetivo:** endurecer auditoria e gate com checks automatizados e CODEOWNERS.
 
-**Issues mãe:** novas #45, #46
+**Issues mãe:** novas #47, #48
 
 ### Tarefas
 
-#### T1 — Risk Service real (ALTO)
-- **Arquivos:** `src/lib/risk-service/aggregator.ts` (novo), `src/lib/risk-service/sources/blowfish.ts` (novo), `src/lib/risk-service/sources/tenderly.ts` (novo), `src/lib/risk-service/sources/chainpatrol.ts` (novo)
+#### T1 — Audit externa config (MÉDIO)
+- **Arquivos:** `audit-config/audit-external.json` (novo)
 - **Ações:**
-  - `blowfish.ts`: `scanTransaction` via `BLOWFISH_API_KEY`
-  - `tenderly.ts`: `simulateTransaction` via `TENDERLY_ACCESS_KEY`
-  - `chainpatrol.ts`: `checkAsset` via `CHAINPATROL_API_KEY`
-  - `aggregator.ts`: combina com timeout/cache
-- **Critério:** `bun test risk-service` 4 pass (cada source + aggregator)
+  - Configurar `audit-config/` com escopo, listas de verificação e contatos
+- **Critério:** arquivo versionado, pronto para auditor externo
 
-#### T2 — AI Risk Engine (MÉDIO)
-- **Arquivos:** `src/lib/ai-risk/index.ts` (novo), `src/lib/ai-risk/__tests__/ai-risk.test.ts` (novo)
+#### T2 — Lighthouse CI (MÉDIO)
+- **Arquivos:** `.lighthouserc.json` (novo)
 - **Ações:**
-  - `ai-risk/index.ts`: `scoreRisk(features) → number` heurístico (0-100)
-- **Critério:** `bun test ai-risk` 3 pass
+  - Configurar budgets: LCP <2.5s, CLS <0.1, TBT <200ms
+- **Critério:** arquivo existe
+
+#### T3 — CODEOWNERS + Reviewers (BAIXO)
+- **Arquivos:** `.github/CODEOWNERS` (atualizar)
+- **Ações:**
+  - CODEOWNERS: paths de risco (security, prisma, workflows, src/lib/*) → @ENDARTStudios
+- **Critério:** CODEOWNERS com paths críticos
 
 ### Definição de pronto (DoD)
-- [ ] `risk-service` + `ai-risk` com 7 pass
+- [ ] 3 arquivos versionados
 - [ ] `tsc:0`
