@@ -24,4 +24,5 @@ export function initTracing(): void {
   sdk.start();
 }
 export async function shutdownTracing(): Promise<void> { if (sdk) { await sdk.shutdown(); sdk = null; } }
-export default { initTracing, shutdownTracing };
+const tracingModule = { initTracing, shutdownTracing };
+export default tracingModule;

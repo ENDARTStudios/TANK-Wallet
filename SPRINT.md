@@ -2,26 +2,27 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 43 — Sentry/OTel wire completo
+## Sprint 44 — Deploy target + LICENSE + lint clean
 
-**Objetivo:** `initObservability` real carrega Sentry SDK + traceId + OTel trace propagation.
+**Objetivo:** `render.yaml`, LICENSE explícita, lint 0 warnings.
 
-**Issues mãe:** novas #93, #94
+**Issues mãe:** novas #95, #96
 
 ### Tarefas
 
-#### T1 — initObservability completo (ALTO)
-- **Arquivos:** `src/lib/observability/init.ts` (novo), `src/lib/observability/__tests__/init.test.ts` (novo)
+#### T1 — render.yaml (ALTO)
+- **Arquivos:** `render.yaml` (novo)
 - **Ações:**
-  - `init.ts`: `initObservability({ dsn, env, release, sampleRate })` lazy + trace correlation
-- **Critério:** `bun test init` 3 pass
+  - Render deploy config (Docker, env, healthcheck, branch)
+- **Critério:** arquivo versionado
 
-#### T2 — Wire em instrumentation.ts (MÉDIO)
-- **Arquivos:** `src/instrumentation.ts` (atualizar)
+#### T2 — LICENSE explícita + lint clean (MÉDIO)
+- **Arquivos:** `LICENSE` (verificar)
 - **Ações:**
-  - `register()` chama `initObservability()` com DSN do env
-- **Critério:** `tsc:0`
+  - LICENSE MIT
+  - Fix 4 lint warnings em `observability/{metrics,sentry,tracing,backup-restore}.ts`
+- **Critério:** `bun run lint:0 warnings`; LICENSE MIT OK
 
 ### Definição de pronto (DoD)
-- [ ] 3 arquivos + 3 pass
-- [ ] `tsc:0`
+- [ ] 2+ arquivos + lint clean
+- [ ] `bun run verify` 11/11 ✅

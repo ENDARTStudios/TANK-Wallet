@@ -6,4 +6,5 @@ export function initObservability(): void {
   if (!dsn) return;
   import("@sentry/nextjs").then(S => S.init({ dsn, environment: process.env.NODE_ENV, release: "tank-wallet@1.0.0", tracesSampleRate: 0.1 })).catch(() => {});
 }
-export default { initObservability };
+const sentryModule = { initObservability };
+export default sentryModule;
