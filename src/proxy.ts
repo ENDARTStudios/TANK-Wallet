@@ -6,6 +6,7 @@ export default function proxy(request: NextRequest): NextResponse | Response {
   const pathname = request.nextUrl.pathname;
 
   if (pathname.startsWith("/api/")) {
+    // /api/health is exempt from rate-limit and bot checks (monitoring only)
     if (pathname !== "/api/health") {
       const botSignal = analyzeBotSignal({ headers: request.headers });
       const botMode = getBotMode();
@@ -22,6 +23,7 @@ export default function proxy(request: NextRequest): NextResponse | Response {
     }
 
     const isWrite = ["POST", "PUT", "PATCH", "DELETE"].includes(request.method);
+    // 30 req/min for writes (POST/PUT/PATCH/DELETE), 120 req/min for reads (GET/HEAD/OPTIONS)
     const limit = isWrite ? 30 : 120;
     const result = consumeRateLimit(
       {
@@ -51,6 +53,7 @@ export default function proxy(request: NextRequest): NextResponse | Response {
     return res;
   }
 
+  // Pages and assets are not rate-limited
   return NextResponse.next();
 }
 
