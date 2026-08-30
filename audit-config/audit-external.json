@@ -1,0 +1,32 @@
+{
+  "scope": {
+    "name": "TANK Wallet v1.1.0",
+    "description": "Pre-launch external security audit",
+    "repository": "ENDARTStudios/TANK-Wallet",
+    "commit": "main"
+  },
+  "checklist": {
+    "authentication": ["OAuth flows", "next-auth config", "MFA/TOTP"],
+    "authorization": ["RBAC matrix", "workspaceId enforcement", "deny-by-default"],
+    "cryptography": ["Shamir SSS", "AES-256-GCM", "ECDSA/secp256k1", "Ed25519"],
+    "data_security": ["RLS policies", "PII handling", "secrets management"],
+    "smart_contracts": ["ERC-4337 v0.7", "EntryPoint integration", "signature replay"],
+    "infrastructure": ["HSTS/CSP", "Caddy config", "rate limiting", "bot defense"],
+    "dependency_security": ["npm audit", "Trivy", "CodeQL", "Semgrep"],
+    "operational_security": ["monitoring", "incident response", "disaster recovery", "backup restore"]
+  },
+  "contacts": {
+    "primary": "endart.studios@gmail.com",
+    "pgp_key": "docs/security/pgp-key.asc",
+    "bounty_program": "https://immunefi.com"
+  },
+  "deliverables": [
+    "Executive summary",
+    "Technical findings (CRITICAL/HIGH/MEDIUM/LOW)",
+    "Reproduction steps per finding",
+    "Remediation recommendations",
+    "Re-test attestation"
+  ],
+  "timeline_weeks": 4,
+  "fixed_budget_usd": 25000
+}

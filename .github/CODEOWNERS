@@ -1,5 +1,35 @@
 # CODEOWNERS — TANK Wallet
+# Default owner for everything
 * @ENDARTStudios
+
+# Security-sensitive paths require security review
 /src/lib/security/ @ENDARTStudios
-/prisma/ @ENDARTStudios
+/src/lib/auth/ @ENDARTStudios
+/src/lib/crypto/ @ENDARTStudios
+/src/lib/risk-service/ @ENDARTStudios
+/src/lib/ai-risk/ @ENDARTStudios
+/src/proxy.ts @ENDARTStudios
+/src/middleware.ts @ENDARTStudios
+/src/app/error.tsx @ENDARTStudios
+/src/app/global-error.tsx @ENDARTStudios
+/src/instrumentation.ts @ENDARTStudios
+
+# Database
+/prisma/schema.prisma @ENDARTStudios
+/prisma/rls.sql @ENDARTStudios
+/prisma/migrations/ @ENDARTStudios
+
+# CI/CD and security tooling
 /.github/workflows/ @ENDARTStudios
+/.github/CODEOWNERS @ENDARTStudios
+/.github/ISSUE_TEMPLATE/ @ENDARTStudios
+/audit-config/ @ENDARTStudios
+/.lighthouserc.json @ENDARTStudios
+
+# Environment templates
+/.env.example @ENDARTStudios
+
+# Infrastructure
+/Caddyfile @ENDARTStudios
+/Dockerfile @ENDARTStudios
+/docker-compose.yml @ENDARTStudios
