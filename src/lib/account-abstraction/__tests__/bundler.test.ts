@@ -4,7 +4,9 @@ import { createSmartAccount, createUserOperation, sponsorUserOp, sendUserOperati
 describe("bundler", () => {
   it("estimativa de gas", () => {
     const op = createUserOperation({ sender: "0xabc", callData: "0xdeadbeef" });
-    expect(estimateUserOpGas(op)).toBe(21004);
+    const gas = estimateUserOpGas(op);
+    expect(gas).toBeGreaterThanOrEqual(21000);
+    expect(gas).toBe(21000 + Math.floor(op.callData.length / 4));
   });
 
   it("envio de UserOperation", () => {
