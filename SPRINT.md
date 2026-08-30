@@ -2,27 +2,27 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 27 — v1.1.1 hotfix + Observability tuning
+## Sprint 28 — RLS Postgres real (RUNTIME)
 
-**Objetivo:** corrigir findings menores e ajustar Sentry/OTel.
+**Objetivo:** validar e aplicar `rls.sql` em runtime Postgres + migrate deploy.
 
-**Issues mãe:** novas #61, #62
+**Issues mãe:** novas #63, #64
 
 ### Tarefas
 
-#### T1 — v1.1.1 version bump (BAIXO)
-- **Arquivos:** `package.json`, `CHANGELOG.md`
+#### T1 — RLS runtime apply (ALTO)
+- **Arquivos:** `scripts/apply-rls.ts` (novo), `scripts/__tests__/rls-apply.test.ts` (novo)
 - **Ações:**
-  - `1.1.0 → 1.1.1` patch
-  - CHANGELOG entrada
-- **Critério:** versão 1.1.1
+  - `apply-rls.ts`: conectar Postgres via `pg`, executar `rls.sql`
+  - Teste: dry-run com SQLite mock ou skip se DATABASE_URL=sqlite
+- **Critério:** `bun test rls-apply` 2 pass
 
-#### T2 — Logger mask util (MÉDIO)
-- **Arquivos:** `src/lib/observability/redact.ts` (novo), `src/lib/observability/__tests__/redact.test.ts` (novo)
+#### T2 — migrate deploy (MÉDIO)
+- **Arquivos:** `scripts/migrate-deploy.ts` (novo)
 - **Ações:**
-  - `redact.ts`: `redactSecrets` para mascarar em logs
-- **Critério:** `bun test redact` 3 pass
+  - `migrate-deploy.ts`: `prisma migrate deploy` + `apply-rls`
+- **Critério:** `tsc:0` + `migrate-deploy.ts` compila
 
 ### Definição de pronto (DoD)
-- [ ] patch + 3 pass redact
+- [ ] 3 arquivos + 2 pass
 - [ ] `tsc:0`
