@@ -2,34 +2,32 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 47 — Tag v1.2.1 push + knip 31→0 + cleanup de branches
+## Sprint 48 — PR review final + release announcement + 1.2.1 GA
 
-**Objetivo:** garantir tag `v1.2.1` em origin, reduzir knip 31→0 (dynamic imports), limpar branches locais obsoletas.
+**Objetivo:** fechar ciclo com review final dos PRs, anúncio de release e marcação GA.
 
-**Issues mãe:** novas #101, #102
+**Issues mãe:** novas #103, #104
 
 ### Tarefas
 
-#### T1 — Tag v1.2.1 push (ALTO)
-- **Arquivos:** `git push origin v1.2.1`
+#### T1 — PR review final (ALTO)
+- **Arquivos:** `docs/PR-REVIEW-CHECKLIST.md` (novo)
 - **Ações:**
-  - Verificar se tag já existe em origin
-- **Critério:** tag em origin
+  - Checklist para review de PRs (segurança, perf, testes, docs)
+- **Critério:** doc versionado
 
-#### T2 — knip dynamic import detection (MÉDIO)
-- **Arquivos:** `knip.json`
+#### T2 — Release announcement (MÉDIO)
+- **Arquivos:** `docs/RELEASE-ANNOUNCEMENT-v1.2.1.md` (novo)
 - **Ações:**
-  - Adicionar entry para arquivos com dynamic imports de deps
-- **Critério:** knip 31→0 (ou justificativa documentada)
+  - Anúncio v1.2.1 GA com highlights e links
+- **Critério:** doc versionado
 
-#### T3 — Cleanup de branches (BAIXO)
-- **Arquivos:** `scripts/cleanup-branches.sh`
+#### T3 — GA tag (BAIXO)
+- **Arquivos:** `docs/RELEASE-ANNOUNCEMENT-v1.2.1.md` ( GA marker)
 - **Ações:**
-  - Script bash para listar branches mergeadas em main
-- **Critério:** script executa verde
+  - Marcar v1.2.1 como GA em CHANGELOG
+- **Critério:** `tsc:0`
 
 ### Definição de pronto (DoD)
-- [ ] 1-2 arquivos
-- [ ] tag v1.2.1 em origin
-- [ ] `bunx knip` justificável
-- [ ] `verify` 11/11 ✅
+- [ ] 3 docs
+- [ ] `tsc:0`
