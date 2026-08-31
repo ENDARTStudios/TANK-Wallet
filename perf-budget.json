@@ -1,0 +1,29 @@
+{
+  "name": "tank-wallet",
+  "version": "1.2.1",
+  "budgets": {
+    "web-vitals": {
+      "largest-contentful-paint": 2500,
+      "first-contentful-paint": 1800,
+      "cumulative-layout-shift": 0.1,
+      "total-blocking-time": 200,
+      "interaction-to-next-paint": 200,
+      "speed-index": 3000,
+      "time-to-first-byte": 600
+    },
+    "resource-sizes": {
+      "javascript": 200000,
+      "css": 50000,
+      "image": 100000,
+      "font": 50000,
+      "third-party": 0
+    },
+    "requests": {
+      "total": 50,
+      "third-party": 0
+    }
+  },
+  "applies-to": ["/", "/dashboard", "/send", "/receive", "/settings"],
+  "enforcement": "warn",
+  "updated": "2026-08-30"
+}
