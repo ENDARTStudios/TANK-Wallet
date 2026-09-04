@@ -2,27 +2,28 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 53 — Security Validation + Chaos Testing
+## Sprint 54 — Production Readiness + Release Signing
 
-**Objetivo:** validar robustez sob adversidade com testes de caos e propriedades.
+**Objetivo:** pipeline de release seguro e reproduzível com SBOM e assinatura.
 
-**Issues mãe:** novas #112, #113
+**Issues mãe:** novas #114, #115
 
 ### Tarefas
 
-#### T1 — Chaos Testing (ALTO)
-- **Arquivos:** `src/lib/chaos/index.ts` (novo), `src/lib/chaos/__tests__/chaos.test.ts` (novo)
+#### T1 — Release Signing (ALTO)
+- **Arquivos:** `.github/workflows/release.yml`, `Dockerfile`
 - **Ações:**
-  - `chaos/index.ts`: `injectChaos` (latência, falha RPC, reorg)
-- **Critério:** `bun test chaos` 3 pass
+  - Validar `release.yml` cosign keyless + Ed25519 + SBOM assinado
+- **Critério:** `release.yml` verde em `main`
 
-#### T2 — Property-based Testing (MÉDIO)
-- **Arquivos:** `src/lib/property/index.ts` (novo), `src/lib/property/__tests__/property.test.ts` (novo)
+#### T2 — SBOM Verification (MÉDIO)
+- **Arquivos:** `reports/sbom.cyclonedx.json`, `scripts/verify/check-signatures.ts`
 - **Ações:**
-  - `property/index.ts`: `forAll` com fast-check stub
-- **Critério:** `bun test property` 3 pass
+  - Verificar SBOM assinado em `reports/`
+- **Critério:** `bun run verify` 11/11 ✅
 
 ### Definição de pronto (DoD)
 
-- [ ] `chaos` + `property` 6 pass
-- [ ] `tsc:0` `verify` 11/11
+- [ ] `release.yml` validado
+- [ ] `verify` 11/11
+- [ ] `tsc:0`
