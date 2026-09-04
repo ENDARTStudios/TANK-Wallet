@@ -2,28 +2,27 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 54 — Production Readiness + Release Signing
+## Sprint 55 — Auditoria + Bug Bounty
 
-**Objetivo:** pipeline de release seguro e reproduzível com SBOM e assinatura.
+**Objetivo:** validação externa independente com auditoria e bug bounty.
 
-**Issues mãe:** novas #114, #115
+**Issues mãe:** novas #116, #117
 
 ### Tarefas
 
-#### T1 — Release Signing (ALTO)
-- **Arquivos:** `.github/workflows/release.yml`, `Dockerfile`
+#### T1 — Auditoria Externa (ALTO)
+- **Arquivos:** `audit-config/audit-external.json`, `docs/SECURITY-GATE.md`
 - **Ações:**
-  - Validar `release.yml` cosign keyless + Ed25519 + SBOM assinado
-- **Critério:** `release.yml` verde em `main`
+  - Validar `audit-config/trail-of-bits-engagement.md` + `findings-tracker.md`
+- **Critério:** `audit-config` validado
 
-#### T2 — SBOM Verification (MÉDIO)
-- **Arquivos:** `reports/sbom.cyclonedx.json`, `scripts/verify/check-signatures.ts`
+#### T2 — Bug Bounty (MÉDIO)
+- **Arquivos:** `docs/bug-bounty.md`, `BUG-BOUNTY.md`
 - **Ações:**
-  - Verificar SBOM assinado em `reports/`
-- **Critério:** `bun run verify` 11/11 ✅
+  - Validar `BUG-BOUNTY.md` programa Immunefi
+- **Critério:** `BUG-BOUNTY.md` validado
 
 ### Definição de pronto (DoD)
 
-- [ ] `release.yml` validado
-- [ ] `verify` 11/11
-- [ ] `tsc:0`
+- [ ] `audit-config` + `BUG-BOUNTY.md` validados
+- [ ] `tsc:0` `verify` 11/11
