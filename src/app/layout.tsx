@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { WalletFooter } from "@/components/wallet/wallet-footer";
+import { I18nProvider } from "@/i18n/provider";
+import { LanguageSelector } from "@/components/ui/language-selector";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,12 +68,17 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        <div className="flex min-h-screen flex-col">
-          <div className="flex flex-1 flex-col">
-            {children}
+        <I18nProvider>
+          <div className="fixed right-3 top-3 z-50">
+            <LanguageSelector compact />
           </div>
-          <WalletFooter />
-        </div>
+          <div className="flex min-h-screen flex-col">
+            <div className="flex flex-1 flex-col">
+              {children}
+            </div>
+            <WalletFooter />
+          </div>
+        </I18nProvider>
         <Toaster />
       </body>
     </html>

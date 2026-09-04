@@ -7,6 +7,22 @@
 
 Nunca commit um segredo. Nunca versionar `.env`, chaves, DSN ou tokens. Descubra um → rode agora (ver `docs/SECRETS.md`).
 
+## 0.5. GRAFT-FIRST — navegação com grafo (obrigatório)
+
+> **Grafo local/regenerável:** `graft` em `D:\PROJETOS\TANK Wallet\TANK Wallet\graft` (6396 nós, 14933 edges, 448 files). É `git-ignored` — cada dev roda `graft build` para gerar o seu. Use `graft check` para manter frescura e `graft build` para regenerar.
+
+**Claude Code → automático:** hooks/statusline/MCP já consomem o grafo — não precisa chamar manualmente.
+
+**OpenCode / qualquer agente sem MCP → manual (GRAFT-FIRST):** em *qualquer* tarefa de navegação (explorar código, achar arquivos, entender arquitetura, planejar refator), **rode `graft ask` / `graft grep` / `graft callers` e leia os nós do grafo *antes* de `grep`/ler fonte**. Menos tokens, menos acerto às cegas, mais acerto na primeira tentativa.
+
+```bash
+npx @nanonets/graft ask "onde fica a lógica de RBAC?"
+npx @nanonets/graft grep "requirePermission"
+npx @nanonets/graft callers --function "initObservability"
+```
+
+Se em algum momento o agente não usar o grafo, lembre-o: **"siga o AGENTS.md — GRAFT-FIRST"**.
+
 ## 1. Fluxo obrigatório: Issue → PR → Deploy Gate
 
 1. **Todo** trabalho (correção, melhoria, nova função) nasce de **uma Issue** no GitHub.

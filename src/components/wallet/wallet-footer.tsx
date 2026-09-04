@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Crown, ShieldCheck, Activity } from 'lucide-react'
+import { useI18n } from '@/i18n/provider'
 
 /**
  * Footer global da Tank Wallet.
@@ -11,6 +12,7 @@ import { Crown, ShieldCheck, Activity } from 'lucide-react'
  * (que só está disponível dentro do escopo da carteira).
  */
 export function WalletFooter() {
+  const { t, labels } = useI18n();
   const [isProTier, setIsProTier] = useState(() => {
     if (typeof window === 'undefined') return false
     try {
@@ -45,12 +47,17 @@ export function WalletFooter() {
             <span className="font-black uppercase tracking-tight text-foreground">TANK</span>
             <span className="font-medium text-muted-foreground">Wallet</span>
             <span className="text-muted-foreground/60">·</span>
-            <span className="text-muted-foreground/70 font-mono">v1.0.0-beta</span>
+            <span className="text-muted-foreground/70 font-mono">v1.2.1</span>
             <span className="text-muted-foreground/60">·</span>
             <span className="text-muted-foreground/70">Security Engine 2.0</span>
           </div>
 
-          {/* Right: PRO status or copyright */}
+          {/* Center: Copyright - sempre visível */}
+          <p className="text-[11px] text-muted-foreground/80">
+            {t('footer.copyright')}
+          </p>
+
+          {/* Right: PRO status */}
           {isProTier ? (
             <div className="flex items-center gap-3 text-[11px]">
               <div className="flex items-center gap-1.5">
@@ -67,9 +74,15 @@ export function WalletFooter() {
               </div>
             </div>
           ) : (
-            <p className="text-[11px] text-muted-foreground/80">
-              Copyright © 2026 END ART
-            </p>
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60">
+              <a href="/terms" className="hover:text-foreground underline underline-offset-2">{t('footer.terms')}</a>
+              <span>·</span>
+              <a href="/privacy" className="hover:text-foreground underline underline-offset-2">{t('footer.privacy')}</a>
+              <span>·</span>
+              <a href="mailto:endart.studios@gmail.com" className="hover:text-foreground">{t('footer.contact')}</a>
+              <span>·</span>
+              <a href="https://t.me/TANKWallet2026" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">{t('footer.telegram')}</a>
+            </div>
           )}
         </div>
       </div>

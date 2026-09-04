@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 import { useToast } from '@/hooks/use-toast'
 import { Shield, ShieldCheck, KeyRound, Lock, ArrowRight, ArrowLeft, Copy, Check, AlertTriangle, Plus, Download, Eye, EyeOff, Loader2, Sparkles, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -38,6 +39,7 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
   const [loading, setLoading] = useState(false)
   const [revealedWords, setRevealedWords] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -95,6 +97,10 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
 
   const finalize = async () => {
     setError('')
+    if (!acceptedTerms) {
+      setError('Você precisa aceitar os Termos de Uso e a Política de Privacidade para continuar.')
+      return
+    }
     if (password.length < 8) {
       setError('Senha deve ter no mínimo 8 caracteres.')
       return
@@ -110,6 +116,9 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
       const fingerprint = computeFingerprint(mnemonic)
       await storeMnemonic(mnemonic, password, fingerprint)
       markVaultBackedUp()
+      try {
+        localStorage.setItem('tank:termsAccepted', JSON.stringify({ at: new Date().toISOString(), version: '2026-08-30', terms: '/terms', privacy: '/privacy' }))
+      } catch {}
       toast({ title: 'Carteira criada', description: 'Mnemonic armazenado com criptografia AES-256-GCM.' })
       onUnlocked(wallet)
     } catch (e) {
@@ -360,12 +369,23 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
                     onKeyDown={(e) => e.key === 'Enter' && finalize()}
                   />
                 </div>
+                <div className="flex items-start gap-2 rounded-md border border-border/60 bg-muted/30 p-3">
+                  <Checkbox
+                    id="terms"
+                    checked={acceptedTerms}
+                    onCheckedChange={(v) => setAcceptedTerms(v === true)}
+                    className="mt-0.5"
+                  />
+                  <label htmlFor="terms" className="text-[11px] leading-tight text-muted-foreground">
+                    Li e concordo com os <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline text-foreground hover:text-emerald-400">Termos de Uso</a> e <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-foreground hover:text-emerald-400">Política de Privacidade</a> da END ART Studios (CNPJ 45.370.930/0001-75). <span className="text-red-400">*</span>
+                  </label>
+                </div>
                 {error && <p className="text-xs text-red-400">{error}</p>}
                 <div className="flex gap-2">
                   <Button variant="ghost" size="sm" onClick={() => setStep('generate')} className="gap-1.5">
                     <ArrowLeft className="h-3.5 w-3.5" /> Voltar
                   </Button>
-                  <Button onClick={finalize} className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700" disabled={loading || !password || !passwordConfirm}>
+                  <Button onClick={finalize} className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700" disabled={loading || !password || !passwordConfirm || !acceptedTerms}>
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
                     {loading ? 'Criptografando…' : 'Criar carteira'}
                   </Button>
