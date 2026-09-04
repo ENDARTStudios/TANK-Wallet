@@ -2,27 +2,27 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 55 — Auditoria + Bug Bounty
+## Sprint 56 — Bug Bounty Launch + Hall of Fame
 
-**Objetivo:** validação externa independente com auditoria e bug bounty.
+**Objetivo:** lançar programa bug bounty público e hall of fame.
 
-**Issues mãe:** novas #116, #117
+**Issues mãe:** novas #118, #119
 
 ### Tarefas
 
-#### T1 — Auditoria Externa (ALTO)
-- **Arquivos:** `audit-config/audit-external.json`, `docs/SECURITY-GATE.md`
+#### T1 — Bug Bounty Launch (ALTO)
+- **Arquivos:** `docs/bug-bounty-launch-guide.md` (novo)
 - **Ações:**
-  - Validar `audit-config/trail-of-bits-engagement.md` + `findings-tracker.md`
-- **Critério:** `audit-config` validado
+  - Guia de lançamento Immunefi com tiers e SLAs
+- **Critério:** doc versionado
 
-#### T2 — Bug Bounty (MÉDIO)
-- **Arquivos:** `docs/bug-bounty.md`, `BUG-BOUNTY.md`
+#### T2 — Hall of Fame (MÉDIO)
+- **Arquivos:** `docs/hall-of-fame.md` (novo)
 - **Ações:**
-  - Validar `BUG-BOUNTY.md` programa Immunefi
-- **Critério:** `BUG-BOUNTY.md` validado
+  - Hall of fame com pesquisadores e achados
+- **Critério:** doc versionado
 
 ### Definição de pronto (DoD)
 
-- [ ] `audit-config` + `BUG-BOUNTY.md` validados
-- [ ] `tsc:0` `verify` 11/11
+- [ ] 2 docs
+- [ ] `tsc:0`
