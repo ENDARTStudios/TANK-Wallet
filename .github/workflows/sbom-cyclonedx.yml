@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
+      - run: npm install
       - name: Generate CycloneDX SBOM
         run: |
           npx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON --spec-version 1.5
