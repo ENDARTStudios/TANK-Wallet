@@ -139,11 +139,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: latest
-      - run: bun install --frozen-lockfile
-      - run: bunx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON
+          node-version: 20
+      - run: npm ci
+      - run: npx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON
       - uses: actions/upload-artifact@v4
         with:
           name: sbom
