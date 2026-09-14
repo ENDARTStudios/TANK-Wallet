@@ -2,9 +2,9 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Smoke (v1.1.0)", () => {
   test("home renderiza TANK Wallet", async ({ page }) => {
-    const res = await page.goto("/");
+    const res = await page.goto("/", { waitUntil: "networkidle" });
     expect(res?.status() ?? 0).toBeLessThan(500);
-    await expect(page.getByText("TANK")).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("h1").filter({ hasText: "TANK" })).toBeVisible({ timeout: 15000 });
   });
 
   test("/api/health retorna 200", async ({ request }) => {

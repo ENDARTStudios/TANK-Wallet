@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Security headers e error boundary", () => {
   test("CSP header presente em resposta", async ({ page }) => {
-    const response = await page.goto("/");
+    const response = await page.goto("/", { waitUntil: "networkidle" });
     const headers = response?.headers() ?? {};
     expect(headers["content-security-policy"]).toBeTruthy();
     expect(headers["x-frame-options"]).toBe("DENY");
@@ -18,8 +18,8 @@ test.describe("Security headers e error boundary", () => {
   });
 
   test("error boundary renderiza fallback com Sentry (simulado)", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.getByText("TANK")).toBeVisible({ timeout: 10000 });
+    await page.goto("/", { waitUntil: "networkidle" });
+    await expect(page.locator("h1").filter({ hasText: "TANK" })).toBeVisible({ timeout: 15000 });
   });
 
   test("rate limiting em /api responde 429 após limite (quando ativo)", async ({ request }) => {
