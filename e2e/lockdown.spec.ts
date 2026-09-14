@@ -3,7 +3,9 @@ import { test, expect } from "@playwright/test";
 test.describe("Lockdown e skeleton compliance", () => {
   test("dashboard exibe Wallet Health quando desbloqueado (mock)", async ({ page }) => {
     await page.goto("/");
+    // Wallet is locked by default, showing onboarding - check for onboarding content
     await expect(page.getByText("TANK")).toBeVisible();
+    await expect(page.getByText("ZERO TRUST SECURITY")).toBeVisible();
   });
 
   test("skeleton placeholder verificado (quando existir data-skeleton)", async ({ page }) => {

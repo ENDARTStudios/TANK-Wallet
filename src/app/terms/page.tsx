@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { useI18n } from "@/i18n/provider";
+import { getServerTranslations, getAvailableLocales, type Locale } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
   title: "Termos de Uso e Serviços — TANK Wallet",
   description: "Termos de Uso e Serviços da TANK Wallet — END ART Studios",
 };
 
-const CONTENT = {
+const CONTENT: Record<Locale, { sections: { h: string; p: string }[] }> = {
   "pt-BR": {
     sections: [
       { h: "1. Aceitação", p: "Ao criar, importar ou desbloquear uma carteira na TANK Wallet, você declara que leu, compreendeu e concorda com estes Termos e com a Política de Privacidade. O aceite é obrigatório e registrado no momento do cadastro (checkbox + timestamp)." },
@@ -49,18 +49,28 @@ const CONTENT = {
   },
 } as const;
 
-export default function TermsPage() {
-  const { locale, t } = useI18n();
-  const data = CONTENT[locale] ?? CONTENT["pt-BR"];
+export async function generateStaticParams() {
+  return getAvailableLocales().map((locale) => ({ locale }));
+}
+
+interface TermsPageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export default async function TermsPage({ params }: TermsPageProps) {
+  const { locale } = await params;
+  const normalizedLocale = (["pt-BR", "en-US", "es-ES"].includes(locale) ? locale : "pt-BR") as Locale;
+  const translations = getServerTranslations(normalizedLocale);
+  const data = CONTENT[normalizedLocale] ?? CONTENT["pt-BR"];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 md:px-6">
-      <h1 className="text-2xl font-black uppercase tracking-tight">{t("legal.title")}</h1>
+      <h1 className="text-2xl font-black uppercase tracking-tight">{translations["legal.title"]}</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        {t("legal.last_updated")}: 30 de agosto de 2026 · END ART Studios · CNPJ 45.370.930/0001-75 · Osasco/SP — Brasil
+        {translations["legal.last_updated"]}: 30 de agosto de 2026 — END ART Studios — CNPJ 45.370.930/0001-75 — Osasco/SP — Brasil
       </p>
       <p className="mt-1 text-xs text-muted-foreground">
-        {t("legal.contact")}: <a href="mailto:endart.studios@gmail.com" className="underline">endart.studios@gmail.com</a> · Telegram:{" "}
+        {translations["legal.contact"]}: <a href="mailto:endart.studios@gmail.com" className="underline">endart.studios@gmail.com</a> — Telegram:{" "}
         <a href="https://t.me/TANKWallet2026" target="_blank" rel="noopener noreferrer" className="underline">https://t.me/TANKWallet2026</a>
       </p>
 
@@ -73,10 +83,10 @@ export default function TermsPage() {
         ))}
       </div>
 
-      <p className="mt-8 text-xs text-muted-foreground">{t("legal.accept_required")}</p>
+      <p className="mt-8 text-xs text-muted-foreground">{translations["legal.accept_required"]}</p>
       <div className="mt-4 flex gap-3 text-sm">
-        <Link href="/" className="underline">{t("legal.back_to_app")}</Link>
-        <Link href="/privacy" className="underline">{t("legal.privacy")}</Link>
+        <Link href="/" className="underline">{translations["legal.back_to_app"]}</Link>
+        <Link href="/privacy" className="underline">{translations["legal.privacy"]}</Link>
       </div>
     </div>
   );

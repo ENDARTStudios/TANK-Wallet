@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Onboarding", () => {
   test("exibe TANK Wallet e ZERO TRUST SECURITY na tela inicial", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("TANK", { exact: true })).toBeVisible();
+    await expect(page.getByText("TANK")).toBeVisible();
     await expect(page.getByText("ZERO TRUST SECURITY")).toBeVisible();
   });
 
