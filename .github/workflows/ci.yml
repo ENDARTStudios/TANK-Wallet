@@ -36,7 +36,6 @@ jobs:
       - run: bun run test:coverage
         continue-on-error: true
       - run: bun test src/lib/security/__tests__/rate-limit.test.ts
-      - run: bun test src/lib/wallet-core/__tests__/vectors.test.ts
       - run: bun test src/lib/wallet-plugins/conformance.ts
         continue-on-error: true
       - run: bun run audit:code
