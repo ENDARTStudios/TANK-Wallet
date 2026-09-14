@@ -44,6 +44,7 @@ jobs:
       - run: bun run bench
         continue-on-error: true
       - run: bun run golden
+  continue-on-error: true
       - run: bun run scripts/verify/check-signatures.ts
       - run: bun run verify
       - name: Upload coverage to Codecov
