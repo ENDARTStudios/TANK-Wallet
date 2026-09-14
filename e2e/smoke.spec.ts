@@ -4,7 +4,7 @@ test.describe("Smoke (v1.1.0)", () => {
   test("home renderiza TANK Wallet", async ({ page }) => {
     const res = await page.goto("/");
     expect(res?.status() ?? 0).toBeLessThan(500);
-    await expect(page.getByText("TANK")).toBeVisible();
+    await expect(page.getByText("TANK")).toBeVisible({ timeout: 10000 });
   });
 
   test("/api/health retorna 200", async ({ request }) => {

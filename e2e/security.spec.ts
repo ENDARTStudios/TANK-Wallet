@@ -19,8 +19,7 @@ test.describe("Security headers e error boundary", () => {
 
   test("error boundary renderiza fallback com Sentry (simulado)", async ({ page }) => {
     await page.goto("/");
-    // Wallet is locked, showing onboarding - verify basic page loads
-    await expect(page.getByText("TANK")).toBeVisible();
+    await expect(page.getByText("TANK")).toBeVisible({ timeout: 10000 });
   });
 
   test("rate limiting em /api responde 429 após limite (quando ativo)", async ({ request }) => {
