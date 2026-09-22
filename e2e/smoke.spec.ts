@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Smoke (v1.1.0)", () => {
-  test.fixme("T061 — skip aceito: env/test setup Playwright; motivo: h1 TANK invisível (H1+H2)", async ({ page }) => {
+  test.fixme("T061 — skip aceito: env/test setup Playwright; motivo: h1 TANK invisível (H1+H2); ver T062 Sprint 59; issue #49", async ({ page }) => {
     const res = await page.goto("/", { waitUntil: "networkidle" });
     expect(res?.status() ?? 0).toBeLessThan(500);
     await expect(page.locator("h1").filter({ hasText: "TANK" })).toBeVisible({ timeout: 15000 });

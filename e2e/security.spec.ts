@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Security headers e error boundary", () => {
-  test.fixme("T061 — skip aceito: env/test setup Playwright (CSP header); motivo: h1 TANK invisível (H1+H2)", async ({ page }) => {
+  test.fixme("T061 — skip aceito: env/test setup Playwright (CSP header); motivo: h1 TANK invisível (H1+H2); ver T062 Sprint 59; issue #49", async ({ page }) => {
     const response = await page.goto("/", { waitUntil: "networkidle" });
     const headers = response?.headers() ?? {};
     expect(headers["content-security-policy"]).toBeTruthy();

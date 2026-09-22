@@ -27,6 +27,13 @@
 
 ### Definição de pronto (DoD)
 
-- [ ] `mpc/v2` + `hsm-*` com testes verdes (6 pass)
+- [x] `mpc/v2` + `hsm-*` com testes verdes (6 pass) — T058 APROVADO
+
+## T062 — E2E Env Setup Playwright (Sprint 59 — diferida)
+- **Objetivo:** Corrigir root cause env/test setup do Playwright no CI que causou falhas pré-existentes de E2E (security.spec.ts:20 e outros 8)
+- **Dono:** Doer
+- **Depende:** T061
+- **Critério:** Testes 9 pulados em T061 reabilitados (test.skip removido); `next build` sem erro; `gh pr checks 48` 10/10 verde
+- **Documentação:** `STATUS-T061.md` + `DECISOES.md` (skip documentado); issue GitHub a criar com referência a T062
 - [ ] `tsc:0`
 - [ ] `verify` 11/11 ✅
