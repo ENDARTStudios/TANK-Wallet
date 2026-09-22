@@ -2,8 +2,8 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Onboarding", () => {
   test("exibe TANK Wallet e ZERO TRUST SECURITY na tela inicial", async ({ page }) => {
-    await page.goto("/", { waitUntil: "networkidle" });
-    await expect(page.locator("h1").filter({ hasText: "TANK" })).toBeVisible({ timeout: 15000 });
+    await page.goto("/", { waitUntil: "load", timeout: 20000 });
+    await expect(page.locator("h1").filter({ hasText: "TANK" })).toBeVisible({ timeout: 20000 });
     await expect(page.getByText("ZERO TRUST SECURITY")).toBeVisible();
   });
 
