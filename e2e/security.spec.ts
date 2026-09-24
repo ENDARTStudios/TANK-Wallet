@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Security headers e error boundary", () => {
-  test.fixme("T061 - skip aceito: env/test setup Playwright (CSP header); motivo: h1 TANK invisivel (H1+H2); ver T062 Sprint 59; issue #49", async ({ page }) => {
-    const response = await page.goto("/", { waitUntil: "networkidle" });
+  test("T061 - skip aceito: env/test setup Playwright (CSP header); motivo: h1 TANK invisivel (H1+H2); ver T062 Sprint 59; issue #49", async ({ page }) => {
+    const response = await page.goto("/", { waitUntil: "domcontentloaded" });
     const headers = response?.headers() ?? {};
     expect(headers["content-security-policy"]).toBeTruthy();
     expect(headers["x-frame-options"]).toBe("DENY");
@@ -17,9 +17,9 @@ test.describe("Security headers e error boundary", () => {
     expect(hsts).toContain("preload");
   });
 
-  test.fixme("T061 - skip aceito: env/test setup Playwright (error boundary / mock Sentry); motivo: h1 TANK invisivel (H1+H2); ver T062 Sprint 59", async ({ page }) => {
-    await page.goto("/", { waitUntil: "networkidle" });
-    await expect(page.locator("h1").filter({ hasText: "TANK" })).toBeVisible({ timeout: 15000 });
+  test("T061 - skip aceito: env/test setup Playwright (error boundary / mock Sentry); motivo: h1 TANK invisivel (H1+H2); ver T062 Sprint 59", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("h1").filter({ hasText: "TANK" })).toBeVisible({ timeout: 10000 });
   });
 
   test("rate limiting em /api responde 429 apos limite (quando ativo)", async ({ request }) => {

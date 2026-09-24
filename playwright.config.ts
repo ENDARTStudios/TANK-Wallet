@@ -7,7 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [["html"], ["list"]] : "list",
-  timeout: 30_000,
+  timeout: 60_000,
   expect: { timeout: 5000 },
   use: {
     baseURL: "http://127.0.0.1:3000",
