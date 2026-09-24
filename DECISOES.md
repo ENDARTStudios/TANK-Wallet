@@ -187,3 +187,9 @@ Alternativas consideradas: Auditoria paga (descartada ‚Äî sem or√ßamento); lan√ß
  -   U s o   f u t u r o :   R A G / q u a l i d a d e   d e   r e s p o s t a ,   r o t e a m e n t o   d e   i n t e n t      c a m a d a   d e   d e c i s „ o   d e   p r o d u t o ,   n „ o   d e   p r o t e Á „ o   d e   c h a v e s . 
   
  
+## 2026-09-24 ó T068 Saneamento PR #50
+- Golden removido: step bun run golden excluido de ci.yml (nao mascarado). Decisao: script nao existe nesta fase.
+- 27 skips: 9 test.fixme x 3 projetos Playwright = 27 skips confirmados.
+- Vercel: fail Deployment has failed (dpl_A6Fxi...) por projeto nao vinculado ó PENDENCIA_OPERADOR.
+- PR 48 CLOSED superseded by 50.
+
