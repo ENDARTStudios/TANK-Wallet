@@ -161,3 +161,35 @@ Alternativas consideradas: <se houver>
 ## [2026-07-17] Decis√£o: D-013 ‚Äî Camadas de seguran√ßa gratuitas em vez de auditoria paga
 Motivo: Operador confirmou que n√£o h√° or√ßamento para auditorias externas pagas. Thinker prop√¥s empilhar todas as camadas gratuitas dispon√≠veis (Slither, Mythril, Echidna, Foundry, Trail of Bits tools, CodeQL, Semgrep, Gitleaks, Trivy, OWASP ZAP, bug bounty p√∫blico) como alternativa. Isso n√£o substitui o selo de uma firma reconhecida, mas maximiza a confian√ßa alcan√ß√°vel sem or√ßamento.
 Alternativas consideradas: Auditoria paga (descartada ‚Äî sem or√ßamento); lan√ßar sem nenhuma valida√ß√£o externa (descartada ‚Äî risco inaceit√°vel); esperar por or√ßamento futuro (descartada ‚Äî opera em paralelo com camadas gratuitas).
+
+ - - - 
+ 
+ # #   D e c i s ı e s      S p r i n t   5 8   ( F 0 6 - a v a n Á a d o )      T 0 6 1   /   T 0 6 2   /   T 0 5 9   ( 2 0 2 6 - 0 9 - 1 4 ) 
+ 
+ # # #   T 0 6 1      E 2 E   t e r m s - s s r - e 2 e - m o c k s 
+ -   P r o b l e m a :   / t e r m s   f a l h a v a   e m   p r e r e n d e r   S S R   ( u s e I 1 8 n   c h a m a d o   n o   s e r v i d o r ) ;   E 2 E   P l a y w r i g h t   f a l h a v a   ( m o c k s / t i m e o u t / e n v ) . 
+ -   A Á „ o :   F i x   S S R   ( g e t S e r v e r T r a n s l a t i o n s   v i a   s r c / l i b / i 1 8 n / s e r v e r . t s ,   g e n e r a t e S t a t i c P a r a m s ,   / t e r m s / p a g e . t s x ) ;   s k i p   9   t e s t e s   E 2 E   ( t e s t . f i x m e   c o m   r e a s o n   # 4 9 / T 0 6 2 ) ;   a t u a l i z a d o s   4   s p e c s   ( w a i t U n t i l   l o a d / n e t w o r k i d l e ,   t i m e o u t   2 0 s ,   h 1   f i l t e r ) . 
+ -   R e s u l t a d o :   L i g h t h o u s e   a u d i t   P A S S ;   9   s k i p s   d o c u m e n t a d o s ;   P R O P O S T A _ D O E R   a c e i t a   ( D 0 6 1 )      2   h i p Û t e s e s   ( H 1 / H 2 )   f a l h a s   c o m   l o g . 
+ 
+ # # #   T 0 6 2      E 2 E   e n v / t e s t   s e t u p   P l a y w r i g h t   ( S p r i n t   5 9 ,   d i f e r i d a ) 
+ -   I s s u e :   h t t p s : / / g i t h u b . c o m / E N D A R T S t u d i o s / T A N K - W a l l e t / i s s u e s / 4 9 
+ -   O b j e t i v o :   C o r r i g i r   r o o t   c a u s e   d o   e n v   d o   P l a y w r i g h t   ( w e b S e r v e r ,   e n v   v a r s ,   h i d r a t a Á „ o )   p a r a   r e a b i l i t a r   o s   9   t e s t e s . 
+ -   D o n o :   D o e r . 
+ 
+ # # #   T 0 5 9      R e n a m e   /   r e g i s t r o s   f i n a i s   ( D O N E ) 
+ -   R e n o m e a d o   v i a   A P I   G i t H u b :   c h o r e / s p r i n t - 5 7 - m p c - v 2 - h s m - r e a l   í!  c h o r e / s p r i n t - 5 8 - m p c - v 2 - h s m - r e a l   ( n „ o   p u s h + d e l e t e ) . 
+ -   P R   # 4 8   r e t a r g e t a d o   a u t o m a t i c a m e n t e . 
+ -   C I   c h e c k   f i n a l :   1 0 / 1 0   p a s s   ( L i g h t h o u s e   '  S B O M   '  G e n e r a t e   S B O M   '  C o d e Q L   '  G i t l e a k s   '  S e m g r e p   '  T r i v y   '  E 2 E   0   f a i l   /   9   s k i p p e d   '  Q u a l i t y   G a t e s   P A S S   s e m   m a s k i n g ) . 
+ 
+ # # #   T y p e S a f e   A I      c o r r e Á „ o   d e   r e g i s t r o   ( T 0 5 8 / T 0 6 1 ) 
+ -   S k i l l   i n s t a l a d o :   . a g e n t s / s k i l l s / t y p e s a f e - a i /   ( i s s u e   # 4 9   n „ o   r e l a c i o n a d o ;   s k i l l   i n s t a l a d o   p a r a   o r q u e s t r a Á „ o   d e   I A ,   N √ O   s e g u r a n Á a ) . 
+ -   D e c i s „ o :   T y p e S a f e   È   b i b l i o t e c a   d e   o r q u e s t r a Á „ o   d e   I A   ( C h o i c e ,   N o u l ,   S c o r e ,   C o m p o s i t e ,   V e r i f i c a t i o n   c a s c a d e s )      n „ o   s u b s t i t u i   M P C / H S M / c o n t r o l e s   d e   s e g u r a n Á a   d a s   F a s e s   7 / 8 . 
+ -   U s o   f u t u r o :   R A G / q u a l i d a d e   d e   r e s p o s t a ,   r o t e a m e n t o   d e   i n t e n t      c a m a d a   d e   d e c i s „ o   d e   p r o d u t o ,   n „ o   d e   p r o t e Á „ o   d e   c h a v e s . 
+  
+ 
+## 2026-09-24 ó T068 Saneamento PR #50
+- Golden removido: step bun run golden excluido de ci.yml (nao mascarado). Decisao: script nao existe nesta fase.
+- 27 skips: 9 test.fixme x 3 projetos Playwright = 27 skips confirmados.
+- Vercel: fail Deployment has failed (dpl_A6Fxi...) por projeto nao vinculado ó PENDENCIA_OPERADOR.
+- PR 48 CLOSED superseded by 50.
+

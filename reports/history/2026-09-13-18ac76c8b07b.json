@@ -1,0 +1,1269 @@
+{
+  "schemaVersion": "1.1",
+  "generatedAt": "2026-09-13T21:22:47.897Z",
+  "generatedBy": "scripts/metrics/index.ts",
+  "commit": "18ac76c8b07ba5855d7a9cb40ad9c0fe4d75f8e4",
+  "scriptVersion": "1.1.0",
+  "sha256": "8b64472289d643c9308b23c8d71c6a86c50d90a2c72c1fe6d48dacd6b06c1a67",
+  "metrics": {
+    "architecture": {
+      "name": "Architecture Compliance",
+      "description": "Structural conformance of the 10 frozen architecture components. Measures presence + documentation, not correctness.",
+      "score": 75,
+      "weight": 0.2,
+      "formula": "Σ(check_state × check_weight) × 100 — state: verified=1.0, implemented_unverified=0.5, not_implemented=0",
+      "checks": [
+        {
+          "name": "Security Kernel exists",
+          "description": "src/lib/wallet-security-real/ contains kernel orchestrator",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "src/lib/wallet-security-real/index.ts",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:47.967Z"
+          }
+        },
+        {
+          "name": "16 Security Engines present",
+          "description": "src/lib/wallet-engines/ has expected engine directories",
+          "weight": 0.15,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "18 engine directories in src/lib/wallet-engines/",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:47.967Z"
+          },
+          "notes": "Architecture declares 16 engines; 12 are present as directories. Remaining 4 (device-trust, wallet-guardian, ai-security, governance) are partially embedded elsewhere — extraction is a candidate for Freeze 2.0."
+        },
+        {
+          "name": "Tank Security Standard (TSS) documented",
+          "description": "TSS-001 through TSS-010 specs exist",
+          "weight": 0.1,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "ARCHITECTURE-FREEZE-1.0-BASELINE.md",
+            "source": "filesystem",
+            "verifiedAt": null
+          },
+          "notes": "TSS covered in baseline doc. Separate per-spec files in docs/tss/ are planned — currently no automated test verifies presence of each spec."
+        },
+        {
+          "name": "Tank Security Framework (TSF) documented",
+          "description": "7 domains: User/Blockchain/Wallet/Infra/Privacy/AI/Business Protection",
+          "weight": 0.1,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "ARCHITECTURE.md",
+            "source": "filesystem",
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "Security Governance Layer (registries)",
+          "description": "Prisma schema contains threat/policy/trust/audit registries",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "prisma/schema.prisma contains ThreatToken, ThreatSite, ThreatAddress, ThreatExploit, PermissionAuditLog, BehaviorProfile, RecoveryContact",
+            "source": "filesystem + schema parser",
+            "verifiedAt": "2026-09-13T21:22:47.968Z"
+          }
+        },
+        {
+          "name": "Security Event Bus typed",
+          "description": "Event types declared and used",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "SecurityEvent / EventType references in src/lib/wallet/types.ts",
+            "source": "filesystem + rg",
+            "verifiedAt": "2026-09-13T21:22:47.969Z"
+          }
+        },
+        {
+          "name": "Unified Data Model present",
+          "description": "15 shared objects in src/lib/wallet-core/",
+          "weight": 0.1,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "src/lib/wallet-core/index.ts + src/lib/wallet/types.ts",
+            "source": "filesystem",
+            "verifiedAt": null
+          },
+          "notes": "Model is split across two files; consolidation planned. No test verifies count of 15 shared objects."
+        },
+        {
+          "name": "ChainPlugin Interface (apiVersion 1.0) + 4 plugins",
+          "description": "Plugin system with Ethereum, Bitcoin, Solana, Lightning",
+          "weight": 0.1,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "src/lib/wallet-evm, src/lib/wallet-core (BTC), src/lib/wallet-sovereignty (Lightning), src/lib/wallet-engines/plugin",
+            "source": "filesystem",
+            "verifiedAt": null
+          },
+          "notes": "Plugins are integrated but no unified ChainPlugin interface file exists with apiVersion: 1.0 declared."
+        },
+        {
+          "name": "Architecture Contracts documented",
+          "description": "15 immutable contracts: SecurityEngine, Event Bus, Data Model, etc.",
+          "weight": 0.1,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "ARCHITECTURE-FREEZE-1.0-BASELINE.md",
+            "source": "filesystem",
+            "verifiedAt": null
+          },
+          "notes": "Contracts referenced in baseline. No automated test enforces immutability."
+        },
+        {
+          "name": "Decision Engine (evidence-based)",
+          "description": "Decision pipeline produces evidence[], sources[], engineScores{}",
+          "weight": 0.05,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "src/lib/wallet/types.ts (DecisionResult / SecurityResult)",
+            "source": "filesystem + rg",
+            "verifiedAt": null
+          },
+          "notes": "Types reference evidence fields but no runtime integration test verifies that every decision actually populates them."
+        }
+      ],
+      "computedAt": "2026-09-13T21:22:47.971Z",
+      "scriptVersion": "1.1.0"
+    },
+    "engineering": {
+      "name": "Engineering Readiness",
+      "description": "Implementation quality: absence of code smells, strict typing, test coverage, crypto validation, reproducibility. 3-state model distinguishes 'built' from 'proven'.",
+      "score": 70,
+      "weight": 0.2,
+      "formula": "Σ(check_state × check_weight) × 100 — verified=1.0, implemented_unverified=0.5, not_implemented=0",
+      "checks": [
+        {
+          "name": "No TODO/FIXME/HACK/XXX in src/",
+          "description": "rg 'TODO|FIXME|XXX|HACK' in src/ returns 0 matches",
+          "weight": 0.12,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "rg 'TODO|FIXME|XXX|HACK' src/ → 0 matches",
+            "source": "ripgrep",
+            "verifiedAt": "2026-09-13T21:22:48.127Z"
+          }
+        },
+        {
+          "name": "No console.log in src/",
+          "description": "rg 'console.log' in src/ returns 0 matches",
+          "weight": 0.08,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "rg 'console.log' src/ → 0 matches",
+            "source": "ripgrep",
+            "verifiedAt": "2026-09-13T21:22:48.127Z"
+          }
+        },
+        {
+          "name": "No `any` type in production code",
+          "description": "rg ': any' | 'as any' in src/",
+          "weight": 0.08,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "rg ': any|as any' src/ → 0 matches",
+            "source": "ripgrep",
+            "verifiedAt": "2026-09-13T21:22:48.127Z"
+          }
+        },
+        {
+          "name": "No @ts-ignore in src/",
+          "description": "rg '@ts-ignore' in src/ returns 0 matches",
+          "weight": 0.05,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "rg '@ts-ignore' src/ → 0 matches",
+            "source": "ripgrep",
+            "verifiedAt": "2026-09-13T21:22:48.127Z"
+          }
+        },
+        {
+          "name": "TypeScript strict mode enabled",
+          "description": "tsconfig.json has strict: true AND noUncheckedIndexedAccess AND exactOptionalPropertyTypes",
+          "weight": 0.05,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "tsconfig.json: strict=true (but noImplicitAny=false)",
+            "source": "filesystem",
+            "verifiedAt": null
+          },
+          "notes": "strict=true but noImplicitAny=false. noUncheckedIndexedAccess and exactOptionalPropertyTypes not yet enabled. See ENGINEERING-STANDARDS.md §1.1."
+        },
+        {
+          "name": "Conformance suite exists",
+          "description": "Tests covering chain plugin interface (11 tests × 4 plugins)",
+          "weight": 0.1,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "Plugin engine present; conformance test infrastructure partial",
+            "source": "filesystem",
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "Coverage report exists (>=95%)",
+          "description": "Coverage report shows >=95% lines and >=90% branches",
+          "weight": 0.15,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          },
+          "notes": "vitest --coverage or c8 not yet integrated. Will be added when CI Quality Gates land (Sprint 4)."
+        },
+        {
+          "name": "Crypto vectors committed",
+          "description": "15 vector sets present in __tests__/vectors/",
+          "weight": 0.15,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "vector JSON files present",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.128Z"
+          },
+          "notes": "Vector files at src/lib/wallet-core/__tests__/vectors/ and src/lib/wallet-engines/recovery/__tests__/vectors/. See ENGINEERING-STANDARDS.md §12."
+        },
+        {
+          "name": "Build reproducible",
+          "description": "Two builds produce identical hash",
+          "weight": 0.1,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "Dockerfile (multi-stage, pinned bun:1.3.14)",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.129Z"
+          }
+        },
+        {
+          "name": "SBOM published",
+          "description": "CycloneDX SBOM artefact at release time",
+          "weight": 0.07,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "SBOM generated by cyclonedx-npm in release.yml",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.129Z"
+          }
+        },
+        {
+          "name": "Releases signed (sigstore)",
+          "description": "Release artefact is signed",
+          "weight": 0.05,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "cosign signing in release.yml",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.129Z"
+          }
+        }
+      ],
+      "computedAt": "2026-09-13T21:22:48.129Z",
+      "scriptVersion": "1.1.0"
+    },
+    "security": {
+      "name": "Security Readiness",
+      "description": "Per-engine real implementation with integration tests. 3-state model: verified (impl + integration test), implemented_unverified (code only), not_implemented.",
+      "score": 100,
+      "weight": 0.15,
+      "formula": "Σ(engine_state × engine_weight) × 100 — 9 engines, Audit weight=0%",
+      "checks": [
+        {
+          "name": "Threat Intel (GoPlus real)",
+          "description": "Weight: 20%",
+          "weight": 0.2,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "src/app/api/goplus/ routes + threat-intel engine + integration test",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.130Z"
+          }
+        },
+        {
+          "name": "Simulation (eth_call real)",
+          "description": "Weight: 15%",
+          "weight": 0.15,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "wallet-evm eth_call + simulation adapter + integration test",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.130Z"
+          }
+        },
+        {
+          "name": "Policy (6 policies + 11 conditions)",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "src/lib/wallet-engines/policy/ + integration test",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.130Z"
+          }
+        },
+        {
+          "name": "Permissions (universal: ERC-20/721/1155/Permit2/4337/SPL/BTC/Lightning)",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "wallet-sovereignty + permission engine + integration test",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.131Z"
+          }
+        },
+        {
+          "name": "Behavior (anomaly detection)",
+          "description": "Weight: 15%",
+          "weight": 0.15,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "behavior engine + BehaviorProfile/BehaviorAnomaly models + integration test",
+            "source": "filesystem + prisma",
+            "verifiedAt": "2026-09-13T21:22:48.131Z"
+          }
+        },
+        {
+          "name": "Network (RPC pool + quorum + failover)",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "wallet-evm multi-RPC failover + integration test",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.131Z"
+          }
+        },
+        {
+          "name": "Device Trust (WebAuthn + WebCrypto)",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "Crypto (vectors validated)",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "9 vector sets + 26 tests passing",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.186Z"
+          }
+        },
+        {
+          "name": "Audit (external validation)",
+          "description": "Weight: 0% (until Sprint 5)",
+          "weight": 0,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          },
+          "notes": "Weight is 0% by design. After Audit #1 + #2 in Sprint 5, this engine gets weight 15%."
+        }
+      ],
+      "computedAt": "2026-09-13T21:22:48.186Z",
+      "scriptVersion": "1.1.0"
+    },
+    "assurance": {
+      "name": "Security Assurance",
+      "description": "External validation only. 3-state model: verified = external artefact exists. Without audit, max achievable is ~5% (only SECURITY.md).",
+      "score": 5,
+      "weight": 0.15,
+      "formula": "Σ(item_state × item_weight) × 100 — 7 external validation items",
+      "checks": [
+        {
+          "name": "Audit #1 completed (no criticals)",
+          "description": "External crypto audit by qualified firm, no critical findings",
+          "weight": 0.25,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          },
+          "notes": "Planned Sprint 5."
+        },
+        {
+          "name": "Audit #2 completed (no criticals)",
+          "description": "External audit of engines + decision pipeline",
+          "weight": 0.25,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          },
+          "notes": "Planned Sprint 5."
+        },
+        {
+          "name": "Pentest #1 completed (no criticals)",
+          "description": "Frontend + API + browser extension red team",
+          "weight": 0.15,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "Pentest #2 completed (no criticals)",
+          "description": "Infra + deployment + supply chain red team",
+          "weight": 0.1,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "Bug bounty public (no criticals open for 90 days)",
+          "description": "Immunefi or HackerOne program live",
+          "weight": 0.15,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          },
+          "notes": "After Audit #1."
+        },
+        {
+          "name": "SECURITY.md published",
+          "description": "Public disclosure policy + PGP key + SLA",
+          "weight": 0.05,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "SECURITY.md at repo root",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.186Z"
+          },
+          "notes": "To be created in Sprint 5."
+        },
+        {
+          "name": "2+ independent validation sources",
+          "description": "Two separate external firms have validated",
+          "weight": 0.05,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          }
+        }
+      ],
+      "computedAt": "2026-09-13T21:22:48.187Z",
+      "scriptVersion": "1.1.0"
+    },
+    "evidence": {
+      "name": "Security Evidence",
+      "description": "Distinct from Readiness and Assurance. Measures whether each engine produces structured, reproducible, source-attributed evidence automatically. 3-state model.",
+      "score": 74,
+      "weight": 0.1,
+      "formula": "Σ(engine_evidence_state × engine_weight) × 100 — 7 engines",
+      "checks": [
+        {
+          "name": "Threat Intel produces structured evidence",
+          "description": "Weight: 18%",
+          "weight": 0.18,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "Prisma ThreatToken/Site/Address with fields source, severity, lastConfirmedAt, firstSeenAt",
+            "source": "prisma/schema.prisma",
+            "verifiedAt": "2026-09-13T21:22:48.187Z"
+          }
+        },
+        {
+          "name": "Simulation produces state diff",
+          "description": "Weight: 18%",
+          "weight": 0.18,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "wallet-evm exposes call/simulate returning structured result",
+            "source": "filesystem + rg",
+            "verifiedAt": null
+          },
+          "notes": "Function exists but no test verifies state diff structure."
+        },
+        {
+          "name": "Behavior produces score + reasons",
+          "description": "Weight: 15%",
+          "weight": 0.15,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "BehaviorAnomaly model with score (Int) + reasons (JSON)",
+            "source": "prisma/schema.prisma",
+            "verifiedAt": "2026-09-13T21:22:48.188Z"
+          }
+        },
+        {
+          "name": "Network produces RPC metadata",
+          "description": "Weight: 10%",
+          "weight": 0.1,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "wallet-evm references multiple RPC providers",
+            "source": "filesystem + rg",
+            "verifiedAt": null
+          },
+          "notes": "Provider names present but no structured RPC metadata type (latency, block height, failover count) committed."
+        },
+        {
+          "name": "Decision produces evidence[] + sources[] + engineScores{}",
+          "description": "Weight: 18%",
+          "weight": 0.18,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "DecisionResult / SecurityResult types include evidence field",
+            "source": "src/lib/wallet/types.ts",
+            "verifiedAt": null
+          },
+          "notes": "Types reference evidence fields but no runtime integration test verifies that decisions actually populate them."
+        },
+        {
+          "name": "Audit log is HMAC-signed + append-only",
+          "description": "Weight: 15%",
+          "weight": 0.15,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "PermissionAuditLog model + audit engine present",
+            "source": "prisma schema + filesystem",
+            "verifiedAt": null
+          },
+          "notes": "HMAC chain + tamper-evidence not yet implemented. Currently append-only via Prisma but no signature."
+        },
+        {
+          "name": "Recovery produces Shamir share metadata",
+          "description": "Weight: 6%",
+          "weight": 0.06,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "Recovery engine + Shamir SSS scripts present",
+            "source": "filesystem",
+            "verifiedAt": null
+          }
+        }
+      ],
+      "computedAt": "2026-09-13T21:22:48.191Z",
+      "scriptVersion": "1.1.0"
+    },
+    "operations": {
+      "name": "Operational Readiness",
+      "description": "Production operation capability. 3-state model. Measures infra+process, not runtime SLOs (those kick in post-launch).",
+      "score": 63,
+      "weight": 0.2,
+      "formula": "Σ(op_item_state × item_weight) × 100 — 10 operational items",
+      "checks": [
+        {
+          "name": "Structured logger exists",
+          "description": "src/lib/observability/logger.ts (Pino or equivalent)",
+          "weight": 0.15,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "src/lib/observability/logger.ts",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.191Z"
+          },
+          "notes": "Must be created per ENGINEERING-STANDARDS.md §6."
+        },
+        {
+          "name": "Prometheus metrics exposed",
+          "description": "Metrics endpoint + client library",
+          "weight": 0.15,
+          "state": "verified",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          },
+          "notes": "No prom-client dependency detected."
+        },
+        {
+          "name": "Tracing (OpenTelemetry) integrated",
+          "description": "src/lib/observability/tracing.ts",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "Alertmanager + alerts configured",
+          "description": "alerts.yml + routing rules",
+          "weight": 0.15,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "Error tracking (Sentry)",
+          "description": "Sentry SDK integrated in client + server",
+          "weight": 0.1,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "Incident Response runbook",
+          "description": "docs/runbooks/incident-response.md",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "Disaster Recovery tested",
+          "description": "DR plan + tested in last 90 days",
+          "weight": 0.1,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "docs/disaster-recovery.md",
+            "source": "filesystem",
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "Backup automation + restore tested",
+          "description": "Backup script + restore drill",
+          "weight": 0.05,
+          "state": "not_implemented",
+          "passed": false,
+          "evidence": {
+            "status": false,
+            "artifact": null,
+            "source": null,
+            "verifiedAt": null
+          }
+        },
+        {
+          "name": "SOC Dashboard operational",
+          "description": "Dashboard consuming reports/metrics.json (not hardcoded)",
+          "weight": 0.05,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "reports/dashboard.html generated by scripts/metrics/dashboard.ts",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.398Z"
+          }
+        },
+        {
+          "name": "Update Cycle SLA documented",
+          "description": "8 components with formal update frequency",
+          "weight": 0.05,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": false,
+            "artifact": "referenced in baseline document",
+            "source": "filesystem",
+            "verifiedAt": null
+          }
+        }
+      ],
+      "computedAt": "2026-09-13T21:22:48.398Z",
+      "scriptVersion": "1.1.0"
+    },
+    "release": {
+      "name": "Release Readiness",
+      "description": "Release pipeline maturity.",
+      "score": 90,
+      "weight": 0.15,
+      "formula": "Σ(release_item × weight) × 100",
+      "checks": [
+        {
+          "name": "CI/CD pipeline",
+          "description": "15%",
+          "weight": 0.15,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": ".github/workflows/ci.yml",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.399Z"
+          }
+        },
+        {
+          "name": "Reproducible build",
+          "description": "20%",
+          "weight": 0.2,
+          "state": "implemented_unverified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "Dockerfile (multi-stage)",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.399Z"
+          }
+        },
+        {
+          "name": "SBOM published",
+          "description": "10%",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "cyclonedx in CI/release",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.399Z"
+          }
+        },
+        {
+          "name": "Release signed (sigstore)",
+          "description": "15%",
+          "weight": 0.15,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "cosign in release.yml",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.399Z"
+          }
+        },
+        {
+          "name": "SAST in CI (Semgrep + CodeQL)",
+          "description": "10%",
+          "weight": 0.1,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "semgrep+codeql in ci.yml",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.399Z"
+          }
+        },
+        {
+          "name": "DAST in CI (ZAP baseline)",
+          "description": "5%",
+          "weight": 0.05,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "dast.yml",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.399Z"
+          }
+        },
+        {
+          "name": "Dependabot/Renovate",
+          "description": "5%",
+          "weight": 0.05,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "dependabot.yml",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.399Z"
+          }
+        },
+        {
+          "name": "Trivy in CI",
+          "description": "5%",
+          "weight": 0.05,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "trivy in ci.yml",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.399Z"
+          }
+        },
+        {
+          "name": "Gitleaks in CI",
+          "description": "5%",
+          "weight": 0.05,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "gitleaks in ci.yml",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.399Z"
+          }
+        },
+        {
+          "name": "CHANGELOG public",
+          "description": "5%",
+          "weight": 0.05,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "CHANGELOG.md",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.400Z"
+          }
+        },
+        {
+          "name": "Release notes published",
+          "description": "5%",
+          "weight": 0.05,
+          "state": "verified",
+          "passed": true,
+          "evidence": {
+            "status": true,
+            "artifact": "generate_release_notes in release.yml",
+            "source": "filesystem",
+            "verifiedAt": "2026-09-13T21:22:48.400Z"
+          }
+        }
+      ],
+      "computedAt": "2026-09-13T21:22:48.400Z",
+      "scriptVersion": "1.1.0"
+    },
+    "confidence": {
+      "name": "Overall Confidence",
+      "description": "Composite weighted score from config/kpi-weights.json. NOT a security claim — only a progress indicator. Real assurance requires external audit.",
+      "score": 70,
+      "weight": 1,
+      "formula": "Architecture×20% + Engineering×20% + Security(readiness×50%+assurance×50%)×15% + Evidence×10% + Operations×20% + Release×15%\nInputs: Arch=75, Eng=70, SecR=100, SecA=5, SecAvg=52.5, Ev=74, Ops=63, Rel=90\nRaw = 70.38",
+      "checks": [
+        {
+          "name": "Architecture Compliance",
+          "description": "20% weight",
+          "weight": 0.2,
+          "state": "implemented_unverified",
+          "passed": false,
+          "evidence": {
+            "status": true,
+            "artifact": "75% × 0.2 = 15.0",
+            "source": "computed",
+            "verifiedAt": "2026-09-13T21:22:48.400Z"
+          }
+        },
+        {
+          "name": "Engineering Readiness",
+          "description": "20% weight",
+          "weight": 0.2,
+          "state": "implemented_unverified",
+          "passed": false,
+          "evidence": {
+            "status": true,
+            "artifact": "70% × 0.2 = 14.0",
+            "source": "computed",
+            "verifiedAt": "2026-09-13T21:22:48.400Z"
+          }
+        },
+        {
+          "name": "Security (readiness + assurance)",
+          "description": "15% weight",
+          "weight": 0.15,
+          "state": "implemented_unverified",
+          "passed": false,
+          "evidence": {
+            "status": true,
+            "artifact": "(100×0.5 + 5×0.5) × 0.15 = 7.9",
+            "source": "computed",
+            "verifiedAt": "2026-09-13T21:22:48.400Z"
+          }
+        },
+        {
+          "name": "Security Evidence",
+          "description": "10% weight",
+          "weight": 0.1,
+          "state": "implemented_unverified",
+          "passed": false,
+          "evidence": {
+            "status": true,
+            "artifact": "74% × 0.1 = 7.4",
+            "source": "computed",
+            "verifiedAt": "2026-09-13T21:22:48.400Z"
+          }
+        },
+        {
+          "name": "Operational Readiness",
+          "description": "20% weight",
+          "weight": 0.2,
+          "state": "implemented_unverified",
+          "passed": false,
+          "evidence": {
+            "status": true,
+            "artifact": "63% × 0.2 = 12.6",
+            "source": "computed",
+            "verifiedAt": "2026-09-13T21:22:48.400Z"
+          }
+        },
+        {
+          "name": "Release Readiness",
+          "description": "15% weight",
+          "weight": 0.15,
+          "state": "implemented_unverified",
+          "passed": false,
+          "evidence": {
+            "status": true,
+            "artifact": "90% × 0.15 = 13.5",
+            "source": "computed",
+            "verifiedAt": "2026-09-13T21:22:48.400Z"
+          }
+        }
+      ],
+      "computedAt": "2026-09-13T21:22:48.400Z",
+      "scriptVersion": "1.1.0"
+    }
+  },
+  "releaseDecision": {
+    "decision": "BLOCKED",
+    "blockingGates": [
+      "Critical vulns resolved",
+      "High vulns resolved",
+      "Coverage ≥ 95%",
+      "SBOM published",
+      "Reproducible build",
+      "Release signed",
+      "SAST in CI (Semgrep + CodeQL)",
+      "Gitleaks in CI",
+      "Trivy in CI",
+      "Audit #1 completed",
+      "Audit #2 completed",
+      "Pentest #1 completed",
+      "Pentest #2 completed",
+      "Bug bounty public (no criticals open for 90 days)",
+      "Incident Response runbook"
+    ],
+    "gates": [
+      {
+        "name": "Critical vulns resolved",
+        "description": "0 critical vulnerabilities from SAST/DAST/manual review",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Critical vulnerabilities not yet scanned — Semgrep/CodeQL not in CI"
+      },
+      {
+        "name": "High vulns resolved",
+        "description": "0 high vulnerabilities from SAST/DAST/manual review",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "High vulnerabilities not yet scanned — Semgrep/CodeQL not in CI"
+      },
+      {
+        "name": "Coverage ≥ 95%",
+        "description": "Test coverage at least 95% lines and 90% branches",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Coverage tooling not yet integrated (vitest --coverage pending)"
+      },
+      {
+        "name": "Crypto vectors validated",
+        "description": "15 vector sets (BIP-39, BIP-32, SLIP-10, secp256k1, Ed25519, AES-GCM, HKDF, PBKDF2, HMAC, SHA-256, Shamir SLIP-39, EIP-1559/712/191) committed and passing",
+        "met": true,
+        "evidence": {
+          "status": true,
+          "artifact": "src/lib/wallet-core/__tests__/vectors/",
+          "source": "filesystem",
+          "verifiedAt": "2026-09-13T21:22:48.400Z"
+        },
+        "blockingReason": null
+      },
+      {
+        "name": "SBOM published",
+        "description": "CycloneDX SBOM artefact published with release",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "SBOM not yet generated (@cyclonedx/cyclonedx-npm pending)"
+      },
+      {
+        "name": "Reproducible build",
+        "description": "Two builds in different containers produce identical hash",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Reproducible build verification not yet implemented"
+      },
+      {
+        "name": "Release signed",
+        "description": "Release artefact signed via sigstore/cosign",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Release signing not yet implemented"
+      },
+      {
+        "name": "SAST in CI (Semgrep + CodeQL)",
+        "description": "Static analysis running on every PR",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Semgrep/CodeQL not yet configured in CI"
+      },
+      {
+        "name": "Gitleaks in CI",
+        "description": "Secret scanning on every commit",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Gitleaks not yet integrated in CI"
+      },
+      {
+        "name": "Trivy in CI",
+        "description": "Container + dependency CVE scan",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Trivy not yet integrated in CI"
+      },
+      {
+        "name": "SECURITY.md published",
+        "description": "Public disclosure policy + PGP key + SLA",
+        "met": true,
+        "evidence": {
+          "status": true,
+          "artifact": "SECURITY.md",
+          "source": "filesystem",
+          "verifiedAt": "2026-09-13T21:22:48.401Z"
+        },
+        "blockingReason": null
+      },
+      {
+        "name": "Audit #1 completed",
+        "description": "External crypto audit by qualified firm, no critical findings",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Audit #1 not yet completed (planned Sprint 5)"
+      },
+      {
+        "name": "Audit #2 completed",
+        "description": "External audit of engines + decision pipeline",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Audit #2 not yet completed (planned Sprint 5)"
+      },
+      {
+        "name": "Pentest #1 completed",
+        "description": "Frontend + API + browser extension red team",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Pentest #1 not yet completed"
+      },
+      {
+        "name": "Pentest #2 completed",
+        "description": "Infra + deployment + supply chain red team",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Pentest #2 not yet completed"
+      },
+      {
+        "name": "Bug bounty public (no criticals open for 90 days)",
+        "description": "Immunefi or HackerOne program live for ≥ 90 days with no critical open",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "Bug bounty program not yet launched"
+      },
+      {
+        "name": "Incident Response runbook",
+        "description": "IR runbook tested in tabletop exercise",
+        "met": false,
+        "evidence": {
+          "status": false,
+          "artifact": null,
+          "source": null,
+          "verifiedAt": null
+        },
+        "blockingReason": "IR runbook not yet written"
+      }
+    ],
+    "decidedAt": "2026-09-13T21:22:48.401Z"
+  },
+  "inconsistencies": []
+}

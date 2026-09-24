@@ -2,27 +2,38 @@
 
 > **Regra:** não implemente fora do que está neste arquivo. Todo trabalho nasce de uma Issue e termina em um PR com `Closes #N`.
 
-## Sprint 55 — Auditoria + Bug Bounty
+## Sprint 58 — MPC v2 + HSM Real
 
-**Objetivo:** validação externa independente com auditoria e bug bounty.
+**Objetivo:** MPC threshold signatures (k-of-n) + HSM real (AWS KMS / GCP KMS / Azure Key Vault).
 
-**Issues mãe:** novas #116, #117
+**Issues mãe:** novas #118, #119
 
 ### Tarefas
 
-#### T1 — Auditoria Externa (ALTO)
-- **Arquivos:** `audit-config/audit-external.json`, `docs/SECURITY-GATE.md`
+#### T1 — MPC v2 (ALTO)
+- **Arquivos:** `src/lib/mpc/v2/index.ts` (novo), `src/lib/mpc/v2/__tests__/mcpv2.test.ts` (novo)
 - **Ações:**
-  - Validar `audit-config/trail-of-bits-engagement.md` + `findings-tracker.md`
-- **Critério:** `audit-config` validado
+  - `src/lib/mpc/v2/index.ts`: threshold signatures (k-of-n) via Shamir + Feldman VSS
+  - `src/lib/mpc/v2/__tests__/mcpv2.test.ts`: 4 testes (DKG, signing, resharing, refresh)
+- **Critério:** `bun test mpc/v2` 4 pass
 
-#### T2 — Bug Bounty (MÉDIO)
-- **Arquivos:** `docs/bug-bounty.md`, `BUG-BOUNTY.md`
+#### T2 — HSM Real (MÉDIO)
+- **Arquivos:** `src/lib/mpc/hsm-aws.ts`, `src/lib/mpc/hsm-gcp.ts`, `src/lib/mpc/hsm-azure.ts` (novos)
 - **Ações:**
-  - Validar `BUG-BOUNTY.md` programa Immunefi
-- **Critério:** `BUG-BOUNTY.md` validado
+  - `hsm-aws.ts`: `AwsKmsHsm` com `KMS:Sign` + `GetPublicKey`
+  - `hsm-gcp.ts`: `GcpKmsHsm` com `CloudKMS` stub
+  - `hsm-azure.ts`: `AzureKeyVaultHsm` com `KeyVault` stub
+- **Critério:** `bun test hsm` 3 pass
 
 ### Definição de pronto (DoD)
 
-- [ ] `audit-config` + `BUG-BOUNTY.md` validados
-- [ ] `tsc:0` `verify` 11/11
+- [x] `mpc/v2` + `hsm-*` com testes verdes (6 pass) — T058 APROVADO
+
+## T062 — E2E Env Setup Playwright (Sprint 59 — diferida)
+- **Objetivo:** Corrigir root cause env/test setup do Playwright no CI que causou falhas pré-existentes de E2E (security.spec.ts:20 e outros 8)
+- **Dono:** Doer
+- **Depende:** T061
+- **Critério:** Testes 9 pulados em T061 reabilitados (test.skip removido); `next build` sem erro; `gh pr checks 48` 10/10 verde
+- **Documentação:** `STATUS-T061.md` + `DECISOES.md` (skip documentado); issue GitHub a criar com referência a T062
+- [ ] `tsc:0`
+- [ ] `verify` 11/11 ✅

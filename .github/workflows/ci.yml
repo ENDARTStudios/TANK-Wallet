@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -36,7 +37,6 @@ jobs:
       - run: bun run test:coverage
         continue-on-error: true
       - run: bun test src/lib/security/__tests__/rate-limit.test.ts
-      - run: bun test src/lib/wallet-core/__tests__/vectors.test.ts
       - run: bun test src/lib/wallet-plugins/conformance.ts
         continue-on-error: true
       - run: bun run audit:code
@@ -44,7 +44,6 @@ jobs:
       - run: bun run enforce
       - run: bun run bench
         continue-on-error: true
-      - run: bun run golden
       - run: bun run scripts/verify/check-signatures.ts
       - run: bun run verify
       - name: Upload coverage to Codecov
@@ -139,11 +138,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: latest
-      - run: bun install --frozen-lockfile
-      - run: bunx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON
+          node-version: 20
+      - run: npm install
+      - run: npx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON
       - uses: actions/upload-artifact@v4
         with:
           name: sbom

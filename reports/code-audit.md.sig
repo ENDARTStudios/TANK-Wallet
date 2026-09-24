@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1.0",
   "artifact": "reports/code-audit.md",
-  "integrityHash": "f0413b2b36e1909a9d4632208c7e10ac41cd57792366a584f82058f612f00892",
+  "integrityHash": "6f22ea9302d488ff95c24afd70957350dc784480cd19e8b769e3ea6a4cb36ed1",
   "algorithm": "sha256",
   "signature": null,
   "signatureAlgorithm": null,
   "keyId": null,
-  "signedAt": "2026-07-17T22:45:53.945Z",
-  "commit": "03787fe955740a03ed10b9e339c1c834f301aabd",
+  "signedAt": "2026-09-13T23:59:23.691Z",
+  "commit": "9a77ef80ae0e21ff76c849af3e27a992e09080fb",
   "signedBy": "scripts/audit/code-audit.ts"
 }
