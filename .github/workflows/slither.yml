@@ -21,7 +21,7 @@ jobs:
     name: Slither Static Analysis
     runs-on: ubuntu-latest
     # Only run if Solidity contracts exist
-    if: hashFiles('contracts/**/*.sol') != '' || hashFiles('src/contracts/**/*.sol') != ''
+    if: ${{ hashFiles('contracts/**/*.sol') != '' || hashFiles('src/contracts/**/*.sol') != '' }}
     steps:
       - uses: actions/checkout@v4
 
