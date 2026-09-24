@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Lockdown e skeleton compliance", () => {
-  test.fixme("T061 — skip aceito: env/test setup Playwright (ver T062 Sprint 59); motivo: h1 TANK invisível após 20s timeout (H1+H2)", async ({ page }) => {
+  test.fixme("T061 - skip aceito: env/test setup Playwright (ver T062 Sprint 59); motivo: h1 TANK invisivel apos 20s timeout (H1+H2)", async ({ page }) => {
     await page.goto("/", { waitUntil: "load", timeout: 20000 });
     await expect(page.locator("h1").filter({ hasText: "TANK" })).toBeVisible({ timeout: 20000 });
     await expect(page.getByText("ZERO TRUST SECURITY")).toBeVisible();
