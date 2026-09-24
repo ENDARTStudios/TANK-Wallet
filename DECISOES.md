@@ -182,3 +182,7 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Slither/Fuzzing: if hashFiles sem ${{ }} corrigido para ${{ hashFiles(...) }}.
 - Regra permanente: zero push direto em main — inclusive docs via PR. c33fdb9 excecao historica.
 
+
+## 2026-09-24 — T073 Remove dead workflows
+- Removidos fuzzing.yml e slither.yml (0 .sol, workflows mortos, hashFiles em if: falhou). Decisao: remocao completa, nao condicionar. Plano restauracao: se .sol adicionados, recriar com toolchain correta.
+
