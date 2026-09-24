@@ -18,7 +18,7 @@ jobs:
   foundry:
     name: Foundry Fuzz Tests
     runs-on: ubuntu-latest
-    if: hashFiles('contracts/**/*.sol') != '' || hashFiles('src/contracts/**/*.sol') != ''
+    if: ${{ hashFiles('contracts/**/*.sol') != '' || hashFiles('src/contracts/**/*.sol') != '' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,7 +48,7 @@ jobs:
   echidna:
     name: Echidna Property Tests
     runs-on: ubuntu-latest
-    if: hashFiles('contracts/**/*.sol') != '' || hashFiles('src/contracts/**/*.sol') != ''
+    if: ${{ hashFiles('contracts/**/*.sol') != '' || hashFiles('src/contracts/**/*.sol') != '' }}
     steps:
       - uses: actions/checkout@v4
         with:

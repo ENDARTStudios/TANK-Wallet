@@ -176,3 +176,9 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 ## 2026-09-24 — D074 Regra Operador: Doer executa tarefas via CLI
 - Repo publico intencional (confirmado Operador). Doer ajusta protection via CLI (reviews=0) preservando required status checks. Plano restauracao: reviews=1 quando 2a conta existir.
 
+
+## 2026-09-24 — T072 Main CI Fix
+- Commit metrics: continue-on-error true + push || echo (branch protection).
+- Slither/Fuzzing: if hashFiles sem ${{ }} corrigido para ${{ hashFiles(...) }}.
+- Regra permanente: zero push direto em main — inclusive docs via PR. c33fdb9 excecao historica.
+
