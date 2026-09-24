@@ -37,3 +37,9 @@
 - **Documentação:** `STATUS-T061.md` + `DECISOES.md` (skip documentado); issue GitHub a criar com referência a T062
 - [ ] `tsc:0`
 - [ ] `verify` 11/11 ✅
+## Sprint 58 — Fechamento
+- Merge: 57c4079880755bea03c632562785511a1466efe4 (PR #50, 2026-09-24T20:17:35Z)
+- Branch: chore/sprint-58-mpc-v2-hsm-real (deletado)
+- CI: 10/10 required verdes (run 36014311459)
+- Vercel: PENDENCIA_OPERADOR (projeto nao vinculado)
+

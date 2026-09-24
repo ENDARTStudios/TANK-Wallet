@@ -1,49 +1,49 @@
-# DECISOES.md
+﻿# DECISOES.md
 
-> Registro de todas as decisões técnicas e de produto do projeto.
-> Formatado conforme Seção 5 do `PROTOCOLO_MESTRE.md`.
+> Registro de todas as decisÃµes tÃ©cnicas e de produto do projeto.
+> Formatado conforme SeÃ§Ã£o 5 do `PROTOCOLO_MESTRE.md`.
 >
 > Mantenedor: Doer (registra) + Thinker (decide)
-> Atualiza quando: toda nova decisão do Thinker ou resposta do Discovery.
+> Atualiza quando: toda nova decisÃ£o do Thinker ou resposta do Discovery.
 
 ---
 
 ## Discovery
 
 > Respostas definitivas confirmadas pelo Operador em 2026-07-16.
-> Substituem as versões preliminares registradas anteriormente.
+> Substituem as versÃµes preliminares registradas anteriormente.
 
-### [2026-07-16] Decisão: Discovery — O que é o projeto
-**Resposta:** Zero Trust Security Platform — plataforma autocustodial de segurança para ativos digitais que implementa defesa preventiva, análise de risco em tempo real e soberania do usuário sobre suas chaves e permissões. O Security Kernel orquestra 16 engines em pipeline de 12 estágios antes de qualquer assinatura, produzindo evidence chain verificável e reproduzível.
-Motivo: Diferencial competitivo absoluto — carteiras tradicionais (MetaMask, Phantom, Rabby) focam em armazenar e assinar; nenhuma oferece pipeline de decisão preventiva com evidence chain. A Tank Wallet é uma camada de segurança que acontece antes da assinatura, não depois.
-Alternativas consideradas: Hot wallet convencional com plugins de segurança (descartada — segurança não pode ser plugin, tem que ser arquitetura).
+### [2026-07-16] DecisÃ£o: Discovery â€” O que Ã© o projeto
+**Resposta:** Zero Trust Security Platform â€” plataforma autocustodial de seguranÃ§a para ativos digitais que implementa defesa preventiva, anÃ¡lise de risco em tempo real e soberania do usuÃ¡rio sobre suas chaves e permissÃµes. O Security Kernel orquestra 16 engines em pipeline de 12 estÃ¡gios antes de qualquer assinatura, produzindo evidence chain verificÃ¡vel e reproduzÃ­vel.
+Motivo: Diferencial competitivo absoluto â€” carteiras tradicionais (MetaMask, Phantom, Rabby) focam em armazenar e assinar; nenhuma oferece pipeline de decisÃ£o preventiva com evidence chain. A Tank Wallet Ã© uma camada de seguranÃ§a que acontece antes da assinatura, nÃ£o depois.
+Alternativas consideradas: Hot wallet convencional com plugins de seguranÃ§a (descartada â€” seguranÃ§a nÃ£o pode ser plugin, tem que ser arquitetura).
 
-### [2026-07-16] Decisão: Discovery — Quem vai usar
-**Resposta:** Três perfis com escalonamento claro:
+### [2026-07-16] DecisÃ£o: Discovery â€” Quem vai usar
+**Resposta:** TrÃªs perfis com escalonamento claro:
 
-| Plano | Público | Preço | Pilares |
+| Plano | PÃºblico | PreÃ§o | Pilares |
 |-------|---------|-------|---------|
-| Free | Usuários individuais, iniciantes em cripto | US$ 0 | Todos os engines de segurança sem restrição; serviços contínuos limitados; swap com taxa 0,20% |
-| PRO | Investidores e usuários avançados que movimentam valores significativos | US$ 19,99/mês | Continuous Protection (Behavioral AI, Fortress, monitoramento 24/7); Smart Access (Passkeys, biometria, Smart Recovery); Smart Accounts (ERC-4337, Session Keys, Spending Limits); Privacy (RPC Quorum, Private Broadcast); zero swap fee |
-| Enterprise Starter | Empresas pequenas, DAOs | US$ 499/mês | MPC, HSM Cloud, RBAC, SSO, SCIM, API, até 10 usuários |
-| Enterprise Business | Empresas médias, instituições | US$ 1.499/mês | Usuários ilimitados, múltiplos HSMs, SIEM avançado, SOC2, SLA 99,9% |
-| Enterprise Custom | Grandes instituições, bancos | Sob consulta | HSM dedicado, on-premises, ISO 27001, SLA 24×7 |
+| Free | UsuÃ¡rios individuais, iniciantes em cripto | US$ 0 | Todos os engines de seguranÃ§a sem restriÃ§Ã£o; serviÃ§os contÃ­nuos limitados; swap com taxa 0,20% |
+| PRO | Investidores e usuÃ¡rios avanÃ§ados que movimentam valores significativos | US$ 19,99/mÃªs | Continuous Protection (Behavioral AI, Fortress, monitoramento 24/7); Smart Access (Passkeys, biometria, Smart Recovery); Smart Accounts (ERC-4337, Session Keys, Spending Limits); Privacy (RPC Quorum, Private Broadcast); zero swap fee |
+| Enterprise Starter | Empresas pequenas, DAOs | US$ 499/mÃªs | MPC, HSM Cloud, RBAC, SSO, SCIM, API, atÃ© 10 usuÃ¡rios |
+| Enterprise Business | Empresas mÃ©dias, instituiÃ§Ãµes | US$ 1.499/mÃªs | UsuÃ¡rios ilimitados, mÃºltiplos HSMs, SIEM avanÃ§ado, SOC2, SLA 99,9% |
+| Enterprise Custom | Grandes instituiÃ§Ãµes, bancos | Sob consulta | HSM dedicado, on-premises, ISO 27001, SLA 24Ã—7 |
 
-Estimativa de lançamento: não definida formalmente, mas o produto está pronto tecnicamente (AUDIT_READY).
-Motivo: Monetização em camadas — segurança é grátis para todos (diferencial competitivo), mas proteção contínua, privacidade e features avançadas são pagas. Enterprise atende demanda institucional por compliance e SLA.
-Alternativas consideradas: Modelo totalmente gratuito com monetização por swap (descartada — não sustenta operação de segurança 24/7); modelo pago apenas (descartada — limita adoção e rede de proteção colaborativa).
+Estimativa de lanÃ§amento: nÃ£o definida formalmente, mas o produto estÃ¡ pronto tecnicamente (AUDIT_READY).
+Motivo: MonetizaÃ§Ã£o em camadas â€” seguranÃ§a Ã© grÃ¡tis para todos (diferencial competitivo), mas proteÃ§Ã£o contÃ­nua, privacidade e features avanÃ§adas sÃ£o pagas. Enterprise atende demanda institucional por compliance e SLA.
+Alternativas consideradas: Modelo totalmente gratuito com monetizaÃ§Ã£o por swap (descartada â€” nÃ£o sustenta operaÃ§Ã£o de seguranÃ§a 24/7); modelo pago apenas (descartada â€” limita adoÃ§Ã£o e rede de proteÃ§Ã£o colaborativa).
 
-### [2026-07-16] Decisão: Discovery — Referência existente
-**Resposta:** Carteiras tradicionais como MetaMask, Phantom e Rabby servem como referência de UX e fluxo de interação, mas nenhuma oferece o que a Tank Wallet propõe. A diferença fundamental:
-- MetaMask/Phantom/Rabby: usuário assina → transação vai → se deu errado, perdeu.
-- Tank Wallet: usuário pede para assinar → Kernel analisa com 16 engines → se perigoso, bloqueia com evidence → se seguro, permite com verificação.
+### [2026-07-16] DecisÃ£o: Discovery â€” ReferÃªncia existente
+**Resposta:** Carteiras tradicionais como MetaMask, Phantom e Rabby servem como referÃªncia de UX e fluxo de interaÃ§Ã£o, mas nenhuma oferece o que a Tank Wallet propÃµe. A diferenÃ§a fundamental:
+- MetaMask/Phantom/Rabby: usuÃ¡rio assina â†’ transaÃ§Ã£o vai â†’ se deu errado, perdeu.
+- Tank Wallet: usuÃ¡rio pede para assinar â†’ Kernel analisa com 16 engines â†’ se perigoso, bloqueia com evidence â†’ se seguro, permite com verificaÃ§Ã£o.
 
-O conceito mais próximo no mercado é o de "firewall de transações" (como o Pocket Universe ou Blowfish), mas esses são produtos separados que se conectam a carteiras existentes. A Tank Wallet integra a segurança na própria carteira — não é um add-on, é a arquitetura.
-Motivo: Nenhuma carteira do mercado oferece pipeline de decisão preventiva com evidence chain verificável integrado nativamente. O posicionamento "Zero Trust Security Platform" é único.
-Alternativas consideradas: Posicionar como "carteira com segurança extra" (descartada — diminui o diferencial); posicionar como firewall de transações standalone (descartada — perde a vantagem da custódia integrada).
+O conceito mais prÃ³ximo no mercado Ã© o de "firewall de transaÃ§Ãµes" (como o Pocket Universe ou Blowfish), mas esses sÃ£o produtos separados que se conectam a carteiras existentes. A Tank Wallet integra a seguranÃ§a na prÃ³pria carteira â€” nÃ£o Ã© um add-on, Ã© a arquitetura.
+Motivo: Nenhuma carteira do mercado oferece pipeline de decisÃ£o preventiva com evidence chain verificÃ¡vel integrado nativamente. O posicionamento "Zero Trust Security Platform" Ã© Ãºnico.
+Alternativas consideradas: Posicionar como "carteira com seguranÃ§a extra" (descartada â€” diminui o diferencial); posicionar como firewall de transaÃ§Ãµes standalone (descartada â€” perde a vantagem da custÃ³dia integrada).
 
-### [2026-07-16] Decisão: Discovery — Login, pagamento, dado sensível
-**Resposta:** Sim para login, pagamento e dado sensível. Não para upload de arquivo.
+### [2026-07-16] DecisÃ£o: Discovery â€” Login, pagamento, dado sensÃ­vel
+**Resposta:** Sim para login, pagamento e dado sensÃ­vel. NÃ£o para upload de arquivo.
 
 **Login:**
 - Free: senha + biometria (WebAuthn Platform Authenticator).
@@ -51,145 +51,128 @@ Alternativas consideradas: Posicionar como "carteira com segurança extra" (desc
 - Enterprise: SSO (SAML/OIDC), SCIM, RBAC.
 
 **Pagamento:**
-- Free: taxa de swap 0,20% por transação.
+- Free: taxa de swap 0,20% por transaÃ§Ã£o.
 - PRO: assinatura mensal US$ 19,99, zero taxa de swap.
-- Enterprise: assinatura mensal US$ 499–1.499+, com SLA e features institucionais.
+- Enterprise: assinatura mensal US$ 499â€“1.499+, com SLA e features institucionais.
 
-**Dado sensível — NÍVEL MÁXIMO:**
-- Chaves privadas (AES-256-GCM vault, PBKDF2 250k iterações, SecureBuffer com zeroização).
+**Dado sensÃ­vel â€” NÃVEL MÃXIMO:**
+- Chaves privadas (AES-256-GCM vault, PBKDF2 250k iteraÃ§Ãµes, SecureBuffer com zeroizaÃ§Ã£o).
 - Mnemonic BIP-39 (nunca em texto plano, nunca logada, nunca em DB).
-- Endereços de carteira (considerados PII — mascarados em logs).
-- Transações (calldata analisado para PII, state diff estruturado).
-- Behavior profiles (horários típicos, chains típicas, valores típicos — em Prisma SQLite local).
-- Permissões ERC-20/721/1155 (allowances infinitos = risco crítico).
-- Audit log (HMAC chain tamper-evident — modificação detectável).
+- EndereÃ§os de carteira (considerados PII â€” mascarados em logs).
+- TransaÃ§Ãµes (calldata analisado para PII, state diff estruturado).
+- Behavior profiles (horÃ¡rios tÃ­picos, chains tÃ­picas, valores tÃ­picos â€” em Prisma SQLite local).
+- PermissÃµes ERC-20/721/1155 (allowances infinitos = risco crÃ­tico).
+- Audit log (HMAC chain tamper-evident â€” modificaÃ§Ã£o detectÃ¡vel).
 
-**Upload de arquivo:** não aplicável. A carteira não recebe uploads de usuário. O único "arquivo" é o vault criptografado em localStorage, que é gerado internamente.
+**Upload de arquivo:** nÃ£o aplicÃ¡vel. A carteira nÃ£o recebe uploads de usuÃ¡rio. O Ãºnico "arquivo" Ã© o vault criptografado em localStorage, que Ã© gerado internamente.
 
-Motivo: Produto de segurança financeira autocustodial. Perda de chave = perda de fundos. Nível de sensibilidade justifica: AES-256-GCM, PBKDF2 250k, HMAC chain, SecureBuffer zeroização, PII sanitization em logger e Sentry, e a arquitetura completa de 16 engines de segurança.
-Alternativas consideradas: Custodial (descartada — o usuário deve ter soberania total sobre suas chaves); semi-custodial com HSM (apenas Enterprise tier, não para Free/PRO).
+Motivo: Produto de seguranÃ§a financeira autocustodial. Perda de chave = perda de fundos. NÃ­vel de sensibilidade justifica: AES-256-GCM, PBKDF2 250k, HMAC chain, SecureBuffer zeroizaÃ§Ã£o, PII sanitization em logger e Sentry, e a arquitetura completa de 16 engines de seguranÃ§a.
+Alternativas consideradas: Custodial (descartada â€” o usuÃ¡rio deve ter soberania total sobre suas chaves); semi-custodial com HSM (apenas Enterprise tier, nÃ£o para Free/PRO).
 
-### [2026-07-16] Decisão: Discovery — Prazo
-**Resposta:** Nenhum prazo formal definido. O status atual é AUDIT_READY (Overall Confidence 71%, `bun run verify` APPROVED com 11/11 gates). O bloqueio para GA é exclusivamente externo: auditorias de segurança independentes (Audit #1 crypto, Audit #2 engines), pentests (Pentest #1 frontend/API, Pentest #2 infra/supply chain), e lançamento de bug bounty público (Immunefi).
+### [2026-07-16] DecisÃ£o: Discovery â€” Prazo
+**Resposta:** Nenhum prazo formal definido. O status atual Ã© AUDIT_READY (Overall Confidence 71%, `bun run verify` APPROVED com 11/11 gates). O bloqueio para GA Ã© exclusivamente externo: auditorias de seguranÃ§a independentes (Audit #1 crypto, Audit #2 engines), pentests (Pentest #1 frontend/API, Pentest #2 infra/supply chain), e lanÃ§amento de bug bounty pÃºblico (Immunefi).
 
-A parte técnica está completa. Não há tarefa de código pendente sem violar o Architecture Freeze 1.0.0. O Doer está em standby ativo, aguardando findings de auditoria para corrigir.
-Motivo: Produto de segurança financeira não pode ir para GA sem validação externa. É uma decisão de governança, não de engenharia.
-Alternativas consideradas: Lançar sem auditorias (descartada — risco reputacional e legal inaceitável para produto financeiro); lançar apenas para beta fechado sem auditorias (possível, mas Security Assurance permaneceria em 5%, limitando a credibilidade).
+A parte tÃ©cnica estÃ¡ completa. NÃ£o hÃ¡ tarefa de cÃ³digo pendente sem violar o Architecture Freeze 1.0.0. O Doer estÃ¡ em standby ativo, aguardando findings de auditoria para corrigir.
+Motivo: Produto de seguranÃ§a financeira nÃ£o pode ir para GA sem validaÃ§Ã£o externa. Ã‰ uma decisÃ£o de governanÃ§a, nÃ£o de engenharia.
+Alternativas consideradas: LanÃ§ar sem auditorias (descartada â€” risco reputacional e legal inaceitÃ¡vel para produto financeiro); lanÃ§ar apenas para beta fechado sem auditorias (possÃ­vel, mas Security Assurance permaneceria em 5%, limitando a credibilidade).
 
-### [2026-07-16] Decisão: Discovery — Nome, domínio, marca
+### [2026-07-16] DecisÃ£o: Discovery â€” Nome, domÃ­nio, marca
 **Resposta:**
-- **Nome**: Tank Wallet — confirmado e estabelecido em toda documentação, UI, e governança.
-- **Domínio**: não definido. Pendente registro pelo Operador.
-- **Marca visual**: não definida. O produto usa atualmente tema dark com paleta emerald (verde) como cor de segurança, mas não há identidade visual formal (logo profissional, guidelines de marca, etc.).
+- **Nome**: Tank Wallet â€” confirmado e estabelecido em toda documentaÃ§Ã£o, UI, e governanÃ§a.
+- **DomÃ­nio**: nÃ£o definido. Pendente registro pelo Operador.
+- **Marca visual**: nÃ£o definida. O produto usa atualmente tema dark com paleta emerald (verde) como cor de seguranÃ§a, mas nÃ£o hÃ¡ identidade visual formal (logo profissional, guidelines de marca, etc.).
 - **Copyright**: END ART Studios (confirmado no arquivo `LICENSE`).
 - **Contato comercial**: endart.studios@gmail.com (confirmado no arquivo `NOTICE`).
 
-Motivo: Nome já estabelecido e consistente. Domínio e marca exigem investimento e decisão externa — não bloqueiam o desenvolvimento técnico, mas são necessários antes do deploy público.
-Alternativas consideradas: Nenhum nome alternativo foi considerado — Tank Wallet foi o nome escolhido desde o início do projeto.
+Motivo: Nome jÃ¡ estabelecido e consistente. DomÃ­nio e marca exigem investimento e decisÃ£o externa â€” nÃ£o bloqueiam o desenvolvimento tÃ©cnico, mas sÃ£o necessÃ¡rios antes do deploy pÃºblico.
+Alternativas consideradas: Nenhum nome alternativo foi considerado â€” Tank Wallet foi o nome escolhido desde o inÃ­cio do projeto.
 
-### [2026-07-16] Decisão: Discovery — Definição de "pronto"
-**Resposta:** O projeto é considerado "pronto" (GA) quando **todos** os seguintes critérios são atendidos simultaneamente:
+### [2026-07-16] DecisÃ£o: Discovery â€” DefiniÃ§Ã£o de "pronto"
+**Resposta:** O projeto Ã© considerado "pronto" (GA) quando **todos** os seguintes critÃ©rios sÃ£o atendidos simultaneamente:
 
-1. **Release Decision: READY_FOR_GA** — 17/17 hard gates aprovados automaticamente via `bun run metrics`, incluindo:
+1. **Release Decision: READY_FOR_GA** â€” 17/17 hard gates aprovados automaticamente via `bun run metrics`, incluindo:
    - Audit #1 completada sem criticals.
    - Audit #2 completada sem criticals.
    - Pentest #1 completado sem criticals.
    - Pentest #2 completado sem criticals.
-   - Bug bounty público ativo por ≥90 dias sem criticals abertos.
+   - Bug bounty pÃºblico ativo por â‰¥90 dias sem criticals abertos.
    - SECURITY.md publicado.
    - Incident Response runbook testado.
-2. **Overall Confidence ≥ 75%** — medido por `bun run metrics`, reproduzível, com SHA-256 assinado.
-3. **Security Assurance ≥ 80%** — auditorias externas elevam Assurance de 5% para ≥80%.
-4. **`bun run verify` APPROVED** — todos os 11 gates passando (lint, typecheck, tests, conformance, metrics, audit, enforce, SBOM, secrets-scan, dependency-scan, signature-verify).
-5. **Deploy em produção** — confirmado pelo Operador acessando a URL real.
-6. **MANUAL_DO_OPERADOR.md entregue** — com instruções em linguagem simples: como saber se está no ar, o que fazer se parar de funcionar, como pedir alteração futura.
+2. **Overall Confidence â‰¥ 75%** â€” medido por `bun run metrics`, reproduzÃ­vel, com SHA-256 assinado.
+3. **Security Assurance â‰¥ 80%** â€” auditorias externas elevam Assurance de 5% para â‰¥80%.
+4. **`bun run verify` APPROVED** â€” todos os 11 gates passando (lint, typecheck, tests, conformance, metrics, audit, enforce, SBOM, secrets-scan, dependency-scan, signature-verify).
+5. **Deploy em produÃ§Ã£o** â€” confirmado pelo Operador acessando a URL real.
+6. **MANUAL_DO_OPERADOR.md entregue** â€” com instruÃ§Ãµes em linguagem simples: como saber se estÃ¡ no ar, o que fazer se parar de funcionar, como pedir alteraÃ§Ã£o futura.
 
-A decisão de release é **automática e baseada em evidência** — não há aprovação manual subjetiva. Quando os hard gates passam, o sistema declara READY_FOR_GA.
-Motivo: Produto de segurança financeira exige validação externa, evidência reproduzível, e processo automático de decisão. Não pode depender de "achar que está pronto" — precisa ser mensurado e verificado.
-Alternativas consideradas: Aprovação manual por comitê (descartada — subjetiva e não reproduzível); GA sem auditorias (descartada — risco inaceitável).
+A decisÃ£o de release Ã© **automÃ¡tica e baseada em evidÃªncia** â€” nÃ£o hÃ¡ aprovaÃ§Ã£o manual subjetiva. Quando os hard gates passam, o sistema declara READY_FOR_GA.
+Motivo: Produto de seguranÃ§a financeira exige validaÃ§Ã£o externa, evidÃªncia reproduzÃ­vel, e processo automÃ¡tico de decisÃ£o. NÃ£o pode depender de "achar que estÃ¡ pronto" â€” precisa ser mensurado e verificado.
+Alternativas consideradas: AprovaÃ§Ã£o manual por comitÃª (descartada â€” subjetiva e nÃ£o reproduzÃ­vel); GA sem auditorias (descartada â€” risco inaceitÃ¡vel).
 
 ---
 
-## Decisões técnicas (espelho de .ai/decisions/DECISION_LOG.md)
+## DecisÃµes tÃ©cnicas (espelho de .ai/decisions/DECISION_LOG.md)
 
-> As 12 decisões operacionais (D-001 a D-012) e 10 ADRs (ADR-001 a ADR-010)
+> As 12 decisÃµes operacionais (D-001 a D-012) e 10 ADRs (ADR-001 a ADR-010)
 > continuam registradas integralmente em `.ai/decisions/DECISION_LOG.md` e
-> `.ai/decisions/ARCHITECTURE_DECISIONS.md`. Este arquivo é o ponto de
-> entrada do protocolo v2.0; os arquivos em `.ai/` são a fonte canônica
+> `.ai/decisions/ARCHITECTURE_DECISIONS.md`. Este arquivo Ã© o ponto de
+> entrada do protocolo v2.0; os arquivos em `.ai/` sÃ£o a fonte canÃ´nica
 > detalhada.
 
-### Resumo das decisões ativas
+### Resumo das decisÃµes ativas
 
-| ID | Título | Status |
+| ID | TÃ­tulo | Status |
 |----|--------|--------|
 | D-001 | Architecture Freeze 1.0 | Accepted |
-| D-002 | Security Evidence como 3ª dimensão | Accepted |
+| D-002 | Security Evidence como 3Âª dimensÃ£o | Accepted |
 | D-003 | Release Decision via Hard Gates | Accepted |
 | D-004 | Modelo de 3 estados por check | Accepted |
 | D-005 | Zero percentuais hardcoded | Accepted |
-| D-006 | Pesos configuráveis via config/kpi-weights.json | Accepted |
-| D-007 | Histórico imutável em reports/history/ | Accepted |
+| D-006 | Pesos configurÃ¡veis via config/kpi-weights.json | Accepted |
+| D-007 | HistÃ³rico imutÃ¡vel em reports/history/ | Accepted |
 | D-008 | SHA-256 do report para integridade | Accepted |
-| D-009 | Governance layer .ai/ como memória operacional | Accepted |
-| D-010 | Refatoração estrutural da governança .ai/ | Accepted |
-| D-011 | Finalização da baseline de governança (9 documentos) | Accepted |
-| D-012 | Governance as Code (enforcement automático) | Accepted |
+| D-009 | Governance layer .ai/ como memÃ³ria operacional | Accepted |
+| D-010 | RefatoraÃ§Ã£o estrutural da governanÃ§a .ai/ | Accepted |
+| D-011 | FinalizaÃ§Ã£o da baseline de governanÃ§a (9 documentos) | Accepted |
+| D-012 | Governance as Code (enforcement automÃ¡tico) | Accepted |
 
 ### ADRs ativos
 
-| ID | Título | Status |
+| ID | TÃ­tulo | Status |
 |----|--------|--------|
-| ADR-001 | Security Kernel como orquestrador único | Accepted |
+| ADR-001 | Security Kernel como orquestrador Ãºnico | Accepted |
 | ADR-002 | Security Event Bus tipado | Accepted |
 | ADR-003 | SecurityEngine interface | Accepted |
 | ADR-004 | ChainPlugin Interface (apiVersion 1.0) | Accepted |
 | ADR-005 | Unified Data Model (15 objetos centrais) | Accepted |
-| ADR-006 | Tank Security Standard (TSS) — 10 specs | Accepted |
-| ADR-007 | Tank Security Framework (TSF) — 7 domínios | Accepted |
+| ADR-006 | Tank Security Standard (TSS) â€” 10 specs | Accepted |
+| ADR-007 | Tank Security Framework (TSF) â€” 7 domÃ­nios | Accepted |
 | ADR-008 | Decision Engine evidence-based | Accepted |
 | ADR-009 | Security Governance Layer (7 registries) | Accepted |
-| ADR-010 | Architecture Contracts (15 contratos imutáveis) | Accepted |
+| ADR-010 | Architecture Contracts (15 contratos imutÃ¡veis) | Accepted |
 
 ---
 
-<!-- Novas decisões são adicionadas abaixo neste formato:
-## [YYYY-MM-DD] Decisão: <o quê>
-Motivo: <por quê>
+<!-- Novas decisÃµes sÃ£o adicionadas abaixo neste formato:
+## [YYYY-MM-DD] DecisÃ£o: <o quÃª>
+Motivo: <por quÃª>
 Alternativas consideradas: <se houver>
 -->
 
-## [2026-07-17] Decisão: D-013 — Camadas de segurança gratuitas em vez de auditoria paga
-Motivo: Operador confirmou que não há orçamento para auditorias externas pagas. Thinker propôs empilhar todas as camadas gratuitas disponíveis (Slither, Mythril, Echidna, Foundry, Trail of Bits tools, CodeQL, Semgrep, Gitleaks, Trivy, OWASP ZAP, bug bounty público) como alternativa. Isso não substitui o selo de uma firma reconhecida, mas maximiza a confiança alcançável sem orçamento.
-Alternativas consideradas: Auditoria paga (descartada — sem orçamento); lançar sem nenhuma validação externa (descartada — risco inaceitável); esperar por orçamento futuro (descartada — opera em paralelo com camadas gratuitas).
+## [2026-07-17] DecisÃ£o: D-013 â€” Camadas de seguranÃ§a gratuitas em vez de auditoria paga
+Motivo: Operador confirmou que nÃ£o hÃ¡ orÃ§amento para auditorias externas pagas. Thinker propÃ´s empilhar todas as camadas gratuitas disponÃ­veis (Slither, Mythril, Echidna, Foundry, Trail of Bits tools, CodeQL, Semgrep, Gitleaks, Trivy, OWASP ZAP, bug bounty pÃºblico) como alternativa. Isso nÃ£o substitui o selo de uma firma reconhecida, mas maximiza a confianÃ§a alcanÃ§Ã¡vel sem orÃ§amento.
+Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento); lanÃ§ar sem nenhuma validaÃ§Ã£o externa (descartada â€” risco inaceitÃ¡vel); esperar por orÃ§amento futuro (descartada â€” opera em paralelo com camadas gratuitas).
 
- - - - 
- 
- # #   D e c i s � e s      S p r i n t   5 8   ( F 0 6 - a v a n � a d o )      T 0 6 1   /   T 0 6 2   /   T 0 5 9   ( 2 0 2 6 - 0 9 - 1 4 ) 
- 
- # # #   T 0 6 1      E 2 E   t e r m s - s s r - e 2 e - m o c k s 
- -   P r o b l e m a :   / t e r m s   f a l h a v a   e m   p r e r e n d e r   S S R   ( u s e I 1 8 n   c h a m a d o   n o   s e r v i d o r ) ;   E 2 E   P l a y w r i g h t   f a l h a v a   ( m o c k s / t i m e o u t / e n v ) . 
- -   A � � o :   F i x   S S R   ( g e t S e r v e r T r a n s l a t i o n s   v i a   s r c / l i b / i 1 8 n / s e r v e r . t s ,   g e n e r a t e S t a t i c P a r a m s ,   / t e r m s / p a g e . t s x ) ;   s k i p   9   t e s t e s   E 2 E   ( t e s t . f i x m e   c o m   r e a s o n   # 4 9 / T 0 6 2 ) ;   a t u a l i z a d o s   4   s p e c s   ( w a i t U n t i l   l o a d / n e t w o r k i d l e ,   t i m e o u t   2 0 s ,   h 1   f i l t e r ) . 
- -   R e s u l t a d o :   L i g h t h o u s e   a u d i t   P A S S ;   9   s k i p s   d o c u m e n t a d o s ;   P R O P O S T A _ D O E R   a c e i t a   ( D 0 6 1 )      2   h i p � t e s e s   ( H 1 / H 2 )   f a l h a s   c o m   l o g . 
- 
- # # #   T 0 6 2      E 2 E   e n v / t e s t   s e t u p   P l a y w r i g h t   ( S p r i n t   5 9 ,   d i f e r i d a ) 
- -   I s s u e :   h t t p s : / / g i t h u b . c o m / E N D A R T S t u d i o s / T A N K - W a l l e t / i s s u e s / 4 9 
- -   O b j e t i v o :   C o r r i g i r   r o o t   c a u s e   d o   e n v   d o   P l a y w r i g h t   ( w e b S e r v e r ,   e n v   v a r s ,   h i d r a t a � � o )   p a r a   r e a b i l i t a r   o s   9   t e s t e s . 
- -   D o n o :   D o e r . 
- 
- # # #   T 0 5 9      R e n a m e   /   r e g i s t r o s   f i n a i s   ( D O N E ) 
- -   R e n o m e a d o   v i a   A P I   G i t H u b :   c h o r e / s p r i n t - 5 7 - m p c - v 2 - h s m - r e a l   �!  c h o r e / s p r i n t - 5 8 - m p c - v 2 - h s m - r e a l   ( n � o   p u s h + d e l e t e ) . 
- -   P R   # 4 8   r e t a r g e t a d o   a u t o m a t i c a m e n t e . 
- -   C I   c h e c k   f i n a l :   1 0 / 1 0   p a s s   ( L i g h t h o u s e   '  S B O M   '  G e n e r a t e   S B O M   '  C o d e Q L   '  G i t l e a k s   '  S e m g r e p   '  T r i v y   '  E 2 E   0   f a i l   /   9   s k i p p e d   '  Q u a l i t y   G a t e s   P A S S   s e m   m a s k i n g ) . 
- 
- # # #   T y p e S a f e   A I      c o r r e � � o   d e   r e g i s t r o   ( T 0 5 8 / T 0 6 1 ) 
- -   S k i l l   i n s t a l a d o :   . a g e n t s / s k i l l s / t y p e s a f e - a i /   ( i s s u e   # 4 9   n � o   r e l a c i o n a d o ;   s k i l l   i n s t a l a d o   p a r a   o r q u e s t r a � � o   d e   I A ,   N � O   s e g u r a n � a ) . 
- -   D e c i s � o :   T y p e S a f e   �   b i b l i o t e c a   d e   o r q u e s t r a � � o   d e   I A   ( C h o i c e ,   N o u l ,   S c o r e ,   C o m p o s i t e ,   V e r i f i c a t i o n   c a s c a d e s )      n � o   s u b s t i t u i   M P C / H S M / c o n t r o l e s   d e   s e g u r a n � a   d a s   F a s e s   7 / 8 . 
- -   U s o   f u t u r o :   R A G / q u a l i d a d e   d e   r e s p o s t a ,   r o t e a m e n t o   d e   i n t e n t      c a m a d a   d e   d e c i s � o   d e   p r o d u t o ,   n � o   d e   p r o t e � � o   d e   c h a v e s . 
-  
- 
-## 2026-09-24 � T068 Saneamento PR #50
+
+## 2026-09-24 — T068 Saneamento PR #50
 - Golden removido: step bun run golden excluido de ci.yml (nao mascarado). Decisao: script nao existe nesta fase.
 - 27 skips: 9 test.fixme x 3 projetos Playwright = 27 skips confirmados.
-- Vercel: fail Deployment has failed (dpl_A6Fxi...) por projeto nao vinculado � PENDENCIA_OPERADOR.
-- PR 48 CLOSED superseded by 50.
+- Vercel: fail Deployment has failed (dpl_A6Fxi...) por projeto nao vinculado — PENDENCIA_OPERADOR.
+- PR #48 CLOSED superseded by #50.
+
+
+## 2026-09-24 — D070 Delegacao merge ao Doer
+- Operador delegou review+merge ao Doer via CLI (2026-09-24). Corpo do review cita delegacao. Gates: CI 10/10 (R069), merge commit 57c4079, branch deletado, CI main success. Self-approval aceito pontualmente; restaurar review humano distinto em PRs F07/F08.
+
+## 2026-09-24 — D074 Regra Operador: Doer executa tarefas via CLI
+- Repo publico intencional (confirmado Operador). Doer ajusta protection via CLI (reviews=0) preservando required status checks. Plano restauracao: reviews=1 quando 2a conta existir.
 

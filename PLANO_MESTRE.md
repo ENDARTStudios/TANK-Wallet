@@ -309,3 +309,8 @@ Após este plano ser commitado, o Doer procura o primeiro `[ ]` de cima para bai
  [ x ]   T 0 6 3   ( R 0 6 3   A P P R O V E D )  
  [ x ]   T 0 5 9   ( R 0 6 4   A P P R O V E D      r e n a m e   v i a   A P I ,   C I   1 0 / 1 0 ,   P R   # 4 8   O P E N ,   d e s c   a t u a l i z a d a )  
  
+## Sprint 58 — T067/T068
+- [x] T067-corrigir-pr48-real (R069)
+- [x] T068-sanear-pr50 (R069)
+- [x] T069-merge-pr50-delegado (D070/D074, merge 57c4079)
+
