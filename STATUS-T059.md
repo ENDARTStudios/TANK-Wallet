@@ -31,3 +31,6 @@ OUTROS MARCADORES (T061 / T063):
 
 MERGE PRÓXIMO: Após REVIEW R064 do Thinker → aprovação do Operador + merge commit (não squash) em PR #48.
 === FIM STATUS T059 ===
+
+--- NOTA DE FORENSE T065 (2026-09-24) ---
+Diversão de estado confirmada: PR #48 ainda aponta para `chore/spring-57-mpc-v2-hsm-real` (90ebe9d) apesar do rename API para `chore/spring-58-mpc-v2-hsm-real` (d0a9cc8). Causa provável: branch antigo ainda presente no remoto com conteúdo idêntico. Conteúdo revisado está seguro no branch renomeado. Nenhum push+delete executado. Se o PR não retargetar automaticamente, o Operador pode fazer merge do branch renomeado (`chore/spring-58-mpc-v2-hsm-real`) diretamente. Nenhum conteúdo revisado perdido.
