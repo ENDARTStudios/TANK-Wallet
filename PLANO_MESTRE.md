@@ -305,4 +305,7 @@ Commits atômicos por tarefa. Referenciar o ID da tarefa (ex.: `feat: 3.4 lockou
 
 ## Próxima tarefa (PROTOCOLO_MESTRE.md Seção 6)
 
-Após este plano ser commitado, o Doer procura o primeiro `[ ]` de cima para baixo: **Fase 0, tarefa 0.1**. Já está feita no MVP? Re-verificar com evidência. Se passar, marcar `[x]` e seguir. Se não, executar.
+Após este plano ser commitado, o Doer procura o primeiro `[ ]` de cima para baixo: **Fase 0, tarefa 0.1**. Já está feita no MVP? Re-verificar com evidência. Se passar, marcar `[x]` e seguir. Se não, executar.[ x ]   T 0 6 1   ( R 0 6 2   A P P R O V E D )  
+ [ x ]   T 0 6 3   ( R 0 6 3   A P P R O V E D )  
+ [ x ]   T 0 5 9   ( R 0 6 4   A P P R O V E D      r e n a m e   v i a   A P I ,   C I   1 0 / 1 0 ,   P R   # 4 8   O P E N ,   d e s c   a t u a l i z a d a )  
+ 
