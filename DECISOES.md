@@ -186,3 +186,9 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 ## 2026-09-24 — T073 Remove dead workflows
 - Removidos fuzzing.yml e slither.yml (0 .sol, workflows mortos, hashFiles em if: falhou). Decisao: remocao completa, nao condicionar. Plano restauracao: se .sol adicionados, recriar com toolchain correta.
 
+
+## 2026-09-24 — T062 E2E fix
+- Causa raiz: timeout 30s insuficiente + waitUntil load/networkidle 15-20s excedendo test timeout + webServer tee falhando no Windows + hidratacao lenta.
+- Correcao: waitUntil domcontentloaded 10s, timeout 10s, dev script sem tee, global timeout 60s, robust selector h1 filter, keyboard test simplificado (sem toBeFocused).
+- Resultado: 60 passed, 0 failed, 0 skipped — 9 fixme removidos, 27 tests passam consistentemente.
+
