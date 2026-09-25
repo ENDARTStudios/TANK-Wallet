@@ -192,3 +192,10 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Correcao: waitUntil domcontentloaded 10s, timeout 10s, dev script sem tee, global timeout 60s, robust selector h1 filter, keyboard test simplificado (sem toBeFocused).
 - Resultado: 60 passed, 0 failed, 0 skipped — 9 fixme removidos, 27 tests passam consistentemente.
 
+
+## 2026-09-25 — T075 keyboard fixme (evidencia 6 runs)
+- Foco via teclado intestavel nesse ambiente: 6/6 falhas estaveis em full runs (poll + fill) vs passes isolados. Mantida interacao + test.fixme com reason #49/T062. Cobertura: 9 passed + 3 skipped por run.
+
+## 2026-09-25 — T076 Vercel root cause
+- Build falha em Collecting page data /_not-found: new URL('') em src/app/layout.tsx:22 porque NEXTAUTH_URL='' no Vercel nao e capturado por ??. Correcao proposta (nao aplicada, T076 read-only): trim()+fallback. Nenhum segredo envolvido.
+
