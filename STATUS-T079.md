@@ -29,3 +29,8 @@
 TDD red→green em 1 ciclo; 5 arquivos, +57/-3.
 
 STATUS: DONE — pronto para REVIEW. Sem merge até APPROVED (D078).
+
+## Vercel preview (PR #55)
+- Vercel: pass — Deployment has completed (3yccCVtqQkFAi6AULTEdZyzk2h61). PEND-VERCEL fechada.
+- CI required: 10/10 pass (E2E 1m53s, Quality Gates 1m9s, Lighthouse, SBOM x2, CodeQL, Semgrep, Trivy, Gitleaks).
+
