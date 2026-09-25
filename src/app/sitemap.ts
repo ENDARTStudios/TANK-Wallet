@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import { resolveBaseUrl } from "@/lib/env/url";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXTAUTH_URL ?? "https://tankwallet.dev";
+  const base = resolveBaseUrl();
   const now = new Date();
   return [
     { url: `${base}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
