@@ -43,3 +43,7 @@
 - CI: 10/10 required verdes (run 36014311459)
 - Vercel: PENDENCIA_OPERADOR (projeto nao vinculado)
 
+
+## T081 — Reconciliacao PLANO_MESTRE (Sprint 59)
+- [x] Preservar antigo em docs/historical + novo plano TANK Wallet + DECISOES (aguardando REVIEW, sem merge — D078).
+

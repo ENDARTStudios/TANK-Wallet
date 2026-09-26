@@ -209,3 +209,7 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 ## 2026-09-26 — T080 flag-wiring Jev (default off)
 - Flag JEV_ENABLED default false (isJevFlagOn). aggregateThreatIntel aceita opts.jev (enabled injetavel p/ testes); anexa jev opcional sem alterar recommendation. GET /api/risk expoe jev.enabled. ThreatIntelView mostra risk.jev_signal ACTIVE ou risk.jev_unavailable (i18n pt/en/es). Smoke real: benign/allow, confidence 0.80, sem skip. Skipped != seguro na UI.
 
+
+## 2026-09-26 — T081 Reconciliacao PLANO_MESTRE
+- PLANO antigo (Almanaque dos Clubes, Fastify/pnpm, futebol) preservado em docs/historical/PLANO_MESTRE_ALMANAQUE.md via git mv. Novo PLANO reflete TANK Wallet real (Next 16, MPC v2, HSM, Vercel). Evidencia grep: Almanaque/Clube presentes no antigo (linhas 27/31/168/172/180/193).
+
