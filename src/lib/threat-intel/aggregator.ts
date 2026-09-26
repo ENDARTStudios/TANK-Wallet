@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { THREAT_INTEL_THRESHOLDS } from "@/lib/risk/thresholds";
 import { checkGoPlus } from "./sources/goplus";
 import { checkChainPatrol } from "./sources/chainpatrol";
 import { checkScamSniffer } from "./sources/scamsniffer";
@@ -65,8 +66,8 @@ export async function aggregateThreatIntel(input: RiskInput, opts?: { timeoutMs?
   const score = sources.length ? Math.min(100, maxSeverity + Math.min(20, sources.length * 5)) : 0;
   const risks = sources.map((s) => `${s.source}:${s.reason}`);
   let recommendation: RiskResult["recommendation"] = "allow";
-  if (score >= 85) recommendation = "block";
-  else if (score >= 35) recommendation = "limit";
+  if (score >= THREAT_INTEL_THRESHOLDS.blockScore) recommendation = "block";
+  else if (score >= THREAT_INTEL_THRESHOLDS.limitScore) recommendation = "limit";
 
   const result: RiskResult = { score, maxSeverity, sources, risks, recommendation, cached: false };
   cache.set(key, { result, at: now });

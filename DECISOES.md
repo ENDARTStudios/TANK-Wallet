@@ -199,3 +199,9 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 ## 2026-09-25 — T076 Vercel root cause
 - Build falha em Collecting page data /_not-found: new URL('') em src/app/layout.tsx:22 porque NEXTAUTH_URL='' no Vercel nao e capturado por ??. Correcao proposta (nao aplicada, T076 read-only): trim()+fallback. Nenhum segredo envolvido.
 
+
+## 2026-09-26 — T077 Piloto Jev TypeSafe (advisory-only)
+- Desenho: server-side only, zod na entrada, 1 chamada Noul+Score, thresholds em const compartilhada src/lib/risk/thresholds.ts (aggregator + jev), fail-open skipped, cliente injetavel, sdk 0.6.0 pinado.
+- STRIDE: dapp_url a terceiro = disclosure baixa; timeout+fallback; chave nunca em logs; .env gitignored.
+- Regra: skipped != seguro (vale para T079 wiring). Nao fiado ao pipeline (grep prova).
+
