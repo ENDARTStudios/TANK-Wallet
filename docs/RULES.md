@@ -98,3 +98,12 @@ Detectar: código duplicado, arquivo órfão, função não usada, dependência 
 - **Comentários:** zero, salvo se solicitado.
 - **Trabalho sem issue é proibido**; mínimo 1 PR por entrega.
 - **Commits:** padrão do repo ("só o commit").
+
+## R13 — Terminal & CLI First (autonomia de agente)
+
+Política completa: `../AGENTS.md` §12. Em resumo:
+
+- **Nunca** pedir ao operador para abrir browser/dashboard (Vercel, Railway, Supabase, Netlify, AWS, GitHub web) ou criar projeto/trigger deploy/setar variável/ver log pela UI.
+- **Sempre** usar o CLI respectivo (`gh`, `vercel`, `prisma`, ...). Antes de pedir credencial, verificar sessão (`gh auth status`, `vercel whoami`).
+- Variáveis de ambiente: injetar via CLI — nunca copy-paste manual.
+- **Exceções permitidas:** OAuth que exige validação em browser que o ambiente não contorna, ou restrição de conta (pagamento/permissão) não programável.
