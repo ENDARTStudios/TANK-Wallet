@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { assessDappRisk, isJevFlagOn, type JevPhishingAssessment, type JevSystemOneClient } from "@/lib/ai-risk/typesafe-jev";
 import { THREAT_INTEL_THRESHOLDS } from "@/lib/risk/thresholds";
 import { checkGoPlus } from "./sources/goplus";
 import { checkChainPatrol } from "./sources/chainpatrol";
@@ -6,7 +7,8 @@ import { checkScamSniffer } from "./sources/scamsniffer";
 
 export interface RiskInput { chain?: string; address?: string; url?: string; workspaceId?: string }
 export interface RiskSource { source: string; isMalicious: boolean; severity: number; reason: string }
-export interface RiskResult { score: number; maxSeverity: number; sources: RiskSource[]; risks: string[]; recommendation: "allow" | "limit" | "block"; cached: boolean }
+export interface RiskResult { score: number; maxSeverity: number; sources: RiskSource[]; risks: string[]; recommendation: "allow" | "limit" | "block"; cached: boolean; jev?: JevPhishingAssessment }
+export interface JevWireOptions { enabled?: boolean; assess?: JevSystemOneClient; timeoutMs?: number }
 
 const cache = new Map<string, { result: RiskResult; at: number }>();
 const CACHE_MS = 5 * 60 * 1000;
@@ -15,8 +17,9 @@ function cacheKey(input: RiskInput): string {
   return `${input.chain ?? ""}:${input.address ?? ""}:${input.url ?? ""}:${input.workspaceId ?? ""}`;
 }
 
-export async function aggregateThreatIntel(input: RiskInput, opts?: { timeoutMs?: number; now?: number }): Promise<RiskResult> {
-  const key = cacheKey(input);
+export async function aggregateThreatIntel(input: RiskInput, opts?: { timeoutMs?: number; now?: number; jev?: JevWireOptions }): Promise<RiskResult> {
+  const jevEnabled = opts?.jev?.enabled ?? isJevFlagOn();
+  const key = `${cacheKey(input)}:jev=${jevEnabled ? 1 : 0}`;
   const now = opts?.now ?? Date.now();
   const cached = cache.get(key);
   if (cached && now - cached.at < CACHE_MS) return { ...cached.result, cached: true };
@@ -70,6 +73,13 @@ export async function aggregateThreatIntel(input: RiskInput, opts?: { timeoutMs?
   else if (score >= THREAT_INTEL_THRESHOLDS.limitScore) recommendation = "limit";
 
   const result: RiskResult = { score, maxSeverity, sources, risks, recommendation, cached: false };
+  if (jevEnabled) {
+    const jev = await assessDappRisk(
+      { url: input.url, address: input.address, chain: input.chain },
+      opts?.jev?.assess !== undefined ? { client: opts.jev.assess, timeoutMs: opts?.jev?.timeoutMs } : { timeoutMs: opts?.jev?.timeoutMs },
+    );
+    result.jev = jev;
+  }
   cache.set(key, { result, at: now });
   return result;
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { aggregateThreatIntel } from "@/lib/threat-intel/aggregator";
+import { isJevFlagOn } from "@/lib/ai-risk/typesafe-jev";
 import { getAuthContextFromRequest, requirePermission } from "@/lib/auth/rbac";
 import { withWorkspaceFilter } from "@/lib/db/rls";
 
@@ -32,5 +33,5 @@ export async function GET(req: Request) {
   const ctx = await getAuthContextFromRequest(req);
   const perm = requirePermission(ctx, "get_threats");
   if (!perm.ok) return NextResponse.json({ error: perm.message }, { status: perm.status });
-  return NextResponse.json({ ok: true, service: "risk", version: "1.0.0" });
+  return NextResponse.json({ ok: true, service: "risk", version: "1.0.0", jev: { enabled: isJevFlagOn() } });
 }
