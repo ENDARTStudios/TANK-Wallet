@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import { resolveBaseUrl } from "@/lib/env/url";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = process.env.NEXTAUTH_URL ?? "https://tankwallet.dev";
+  const base = resolveBaseUrl();
   return {
     rules: [
       {

@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { WalletFooter } from "@/components/wallet/wallet-footer";
 import { I18nProvider } from "@/i18n/provider";
 import { LanguageSelector } from "@/components/ui/language-selector";
+import { resolveBaseUrl } from "@/lib/env/url";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const baseUrl = process.env.NEXTAUTH_URL ?? "https://tankwallet.dev";
+const baseUrl = resolveBaseUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
