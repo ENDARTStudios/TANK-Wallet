@@ -104,6 +104,8 @@
   "risk.block": "Bloquear",
   "risk.review": "Revisar",
   "risk.limited": "Limitado",
+  "risk.jev_signal": "Sinal IA Jev",
+  "risk.jev_unavailable": "Sinal indisponível",
 
   "auth.signin": "Entrar",
   "auth.signup": "Cadastrar",

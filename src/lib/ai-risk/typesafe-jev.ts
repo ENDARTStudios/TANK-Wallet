@@ -56,6 +56,12 @@ export function isJevEnabled(): boolean {
   return (process.env.TYPESAFE_API_KEY ?? "").trim().length > 0;
 }
 
+export function isJevFlagOn(env: Record<string, string | undefined> = process.env): boolean {
+  const raw = env.JEV_ENABLED;
+  if (raw === undefined) return false;
+  return raw === "1" || raw.toLowerCase() === "true";
+}
+
 function toRecommendation(phishingProb: number, severity: number): JevRecommendation {
   if (phishingProb >= THREAT_INTEL_THRESHOLDS.blockPhishingProb || severity >= THREAT_INTEL_THRESHOLDS.blockSeverity) return "block";
   if (phishingProb >= THREAT_INTEL_THRESHOLDS.limitPhishingProb || severity >= THREAT_INTEL_THRESHOLDS.limitSeverity) return "limit";

@@ -10,6 +10,7 @@ import {
   TrendingDown, Clock, Search,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useI18n } from '@/i18n/provider'
 import {
   getThreatStats, seedThreatDatabase, queryExploits,
   type ThreatExploit,
@@ -25,10 +26,12 @@ interface Stats {
 
 export function ThreatIntelView() {
   const { toast } = useToast()
+  const { t } = useI18n()
   const [stats, setStats] = useState<Stats | null>(null)
   const [exploits, setExploits] = useState<ThreatExploit[]>([])
   const [loading, setLoading] = useState(true)
   const [seeding, setSeeding] = useState(false)
+  const [jevEnabled, setJevEnabled] = useState(false)
 
   const loadData = async () => {
     setLoading(true)
@@ -48,9 +51,20 @@ export function ThreatIntelView() {
         getThreatStats(),
         queryExploits(false),
       ])
+      let jev = false
+      try {
+        const res = await fetch('/api/risk', { credentials: 'same-origin' })
+        if (res.ok) {
+          const data = (await res.json()) as { jev?: { enabled?: boolean } }
+          jev = data.jev?.enabled === true
+        }
+      } catch {
+        jev = false
+      }
       if (mounted) {
         setStats(s)
         setExploits(e)
+        setJevEnabled(jev)
         setLoading(false)
       }
     }
@@ -177,6 +191,7 @@ export function ThreatIntelView() {
               { name: 'Community reports', status: 'active', desc: 'User-submitted threats' },
               { name: 'OFAC sanctions', status: 'active', desc: 'Sanctioned addresses' },
               { name: 'Internal heuristics', status: 'active', desc: 'Auto-detection' },
+              { name: t('risk.jev_signal'), status: jevEnabled ? 'active' : 'unavailable', desc: jevEnabled ? 'AI risk signal (advisory)' : t('risk.jev_unavailable') },
             ].map((src) => (
               <div
                 key={src.name}
@@ -204,7 +219,7 @@ export function ThreatIntelView() {
                       : 'border-muted-foreground/40 text-muted-foreground'
                   )}
                 >
-                  {src.status === 'active' ? 'ACTIVE' : 'PLANNED'}
+                  {src.status === 'active' ? 'ACTIVE' : src.status === 'unavailable' ? t('risk.jev_unavailable').toUpperCase() : 'PLANNED'}
                 </Badge>
               </div>
             ))}
