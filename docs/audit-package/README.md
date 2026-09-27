@@ -228,3 +228,10 @@ DATABASE_URL=file:./db/custom.db
 | Versão | Data | Mudança |
 |--------|------|---------|
 | 1.0 | 2026-07-16 | Versão inicial. Commit fdae6e35b22b congelado. |
+
+---
+
+## Adendo T085 (2026-09-26) - Sprint 60
+- Escopos atualizados: SCOPE-AUDIT1.md (inclui MPC v2 + HSM), SCOPE-AUDIT2.md (inclui TypeSafe Jev/intent).
+- Novo commit frozen: COMMIT-FROZEN.md (2977f20). Firms: FIRMS-CANDIDATES.md. Contrato: ENGAGEMENT-TEMPLATE.md.
+- Reproducao: REPRODUCTION.md. Contato: CONTACT-RUNBOOK.md.
