@@ -27,3 +27,8 @@ STATUS: DONE — pronto para REVIEW. Sem merge até APPROVED (D078).
 - Mapa: consumeRateLimitAdvanced só em broadcast/route.ts (send); swap/approve/bridge sem rotas — limites preparatórios.
 - Runtime: headers allowed mostram bucket da operação (fix verificado via bun -e).
 
+
+## CI final (run 36286382874, head 6f342b1)
+- 12/12 pass: E2E 1m45s, Quality Gates 1m5s, Lighthouse, SBOM x2, CodeQL, Semgrep, Trivy, Gitleaks, Vercel preview completed.
+- Runtime headers (bun -e): allowed=true, X-RateLimit-Limit=10 (op bucket), X-RateLimit-Operation=send.
+
