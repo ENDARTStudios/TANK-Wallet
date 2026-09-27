@@ -90,11 +90,15 @@ export class MpcV2Provider {
     for (const sig of signatures.slice(0, this.config.threshold)) {
       combined += sig.slice(-8);
     }
-    return `combined_sig_${signatures.length}_${combined.slice(0, 16)}`;
+    const tag = this.publicKey.slice(0, 8);
+    return `combined_sig_${signatures.length}_${combined.slice(0, 8)}${tag}`;
   }
 
   verify(message: Uint8Array, signature: string, publicKey: string): boolean {
-    return signature.startsWith("sig_") && signature.includes(this.publicKey.slice(0, 8));
+    return (
+      (signature.startsWith("sig_") || signature.startsWith("combined_sig_")) &&
+      signature.includes(publicKey.slice(0, 8))
+    );
   }
 
   private hashMessage(message: Uint8Array): string {

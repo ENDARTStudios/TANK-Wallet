@@ -54,3 +54,26 @@ Depois de feito: responda "feito o item Nº X"
 ### [PEND-AUDIT] Escolher audit firm + aprovar orcamento + assinar engagement letter
 Por que: pacote pronto em docs/audit-package/ (T085). Seguir docs/audit-package/CONTACT-RUNBOOK.md. Decisao de negocio (orcamento/contrato), fora do ciclo simbiotico.
 
+### [4] Decidir: SSO em Production e intencional? + status DNS tankwallet.dev
+Por quê: Produção e previews estão atrás de Vercel Authentication (login SSO) — público externo não carrega o app; isso invalida qualquer medição de produção e bloqueia a ativação do CSP enforcing (T087/T092).
+Onde: Vercel dashboard → projeto tank-wallet → Settings → Deployment Protection; provedor DNS do domínio.
+Passo a passo:
+1. Informar se o SSO em Production é intencional (gate pré-lançamento) ou misconfiguração.
+2. Se misconfiguração: restringir proteção a Preview e liberar Production.
+3. Informar status do DNS tankwallet.dev (não resolve; configurar ou confirmar descarte).
+Como saber que deu certo: curl público em produção retorna o app (não "Login - Vercel"); tankwallet.dev resolve ou decisão de descarte registrada.
+Depois de feito: responda "feito o item Nº 4".
+
+### [5] Fornecer meio de diagnóstico atrás do SSO (bypass) — sem colar segredo no chat
+Por quê: Separar H1 (build antigo) de H2 (middleware não compila) exige ler headers do app atrás do muro SSO (T092).
+Onde: Vercel dashboard → projeto tank-wallet → Settings → Deployment Protection → Bypass.
+Passo a passo (SEM colar o token no chat):
+1. Com o header x-vercel-protection-bypass, rodar: GET / e GET /terms no preview do PR #65/#67 e anotar APENAS presença/ausência de: x-csp-nonce, Reporting-Endpoints, Content-Security-Policy-Report-Only.
+2. Devolver só o resultado redigido (ex.: "preview T086: nonce AUSENTE").
+Alternativa sem token: autorizar o Doer a ler via sessão CLI vinculada (sem exibir valores).
+Como saber que deu certo: resposta redigida permite fechar H1/H2 e retomar T087.
+Depois de feito: responda "feito o item Nº 5".
+
+### [PEND-VERCEL-QUOTA] RESOLVIDA (transitória — não requer ação)
+Quota 402 api-deployments-free-per-day estourou em 2026-09-26 e resetou no dia seguinte (previews dos PRs #67/#68 deployaram). Nenhuma ação do Operador. Se recursar, vira decisão de custo (upgrade Hobby→Pro).
+

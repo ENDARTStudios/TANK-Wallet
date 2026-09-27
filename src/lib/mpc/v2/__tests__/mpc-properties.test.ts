@@ -76,7 +76,7 @@ describe("mpc v2 properties (T088)", () => {
     );
   }, TIMEOUT_MS);
 
-  it.skip("P4 [QUARENTENA issue #66/T088]: round-trip sign->verify sempre false no stub (verify exige prefixo sig_, sign retorna combined_sig_) — reabilitar apos excecao ao freeze MPC", async () => {
+  it("P4 [T097 reabilitada]: round-trip sign->verify", async () => {
     await fc.assert(
       fc.asyncProperty(
         arbThresholdTotal,
@@ -91,7 +91,7 @@ describe("mpc v2 properties (T088)", () => {
           expect(provider.verify(message, sig, publicKey)).toBe(true);
         },
       ),
-      { numRuns: 100 },
+      { numRuns: NUM_RUNS },
     );
   }, TIMEOUT_MS);
 });

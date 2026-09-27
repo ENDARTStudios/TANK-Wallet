@@ -275,3 +275,8 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 ## 2026-09-27 — D094 F07-pausado / F08-prosseguir (decisor: Thinker; registro: Doer)
 - F07 operational-incomplete (T087/T092 aguardam Operador: SSO/DNS/bypass/quota); Sprint 61/F08 prossegue (T088+T089 paralelas). T088 executada nesta entrada; T089 em andamento.
 
+
+## 2026-09-27 — T097 correcao bug crypto (D095 excecao ao freeze + D097)
+- Excecao ao freeze MPC (T058/T080) aprovada pelo Thinker (D095): bug real #66 provado por P4; correcao minima (2 linhas, mesmo bloco), nao feature.
+- Correcao: combineSignatures embute tag publicKey[0:8] (formato/length intactos); verify aceita sig_|combined_sig_ + amarra no ARGUMENTO publicKey (nao this.publicKey — semantica correta; teste wrong_key prova). Fragmento mpc_pk_X nao-hex => colisao impossivel.
+- P4 reabilitada 1000 runs PASS; P1-P3 intactas; 17 pass mpc/; tsc+eslint limpos. Issue #66 fecha apos merge. Limitacao honesta do stub: mensagem nao amarrada no verify (pre-existente).
