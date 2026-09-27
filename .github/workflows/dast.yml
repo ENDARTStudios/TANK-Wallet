@@ -35,6 +35,7 @@ jobs:
       - name: ZAP baseline (Automation Framework, local only)
         run: |
           mkdir -p zap-out
+          chmod 777 zap-out
           docker run --rm --network="host" \
             -v "${{ github.workspace }}/dast-config:/zap/wrk:ro" \
             -v "${{ github.workspace }}/zap-out:/zap/out" \
