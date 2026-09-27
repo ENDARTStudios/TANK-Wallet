@@ -1,4 +1,19 @@
 # Changelog
+## [Unreleased] — Sprint 61 — F08 testes + F07 operacional + F10 manual
+### Added
+- **T088**: property-based MPC (`mpc-properties.test.ts`, fast-check; P1–P3 1000 runs) (PR #67)
+- **T089**: keyboard E2E reabilitado (fix pré-hidratação + `toBeFocused`) (PR #68)
+- **T090**: DAST ZAP baseline local-first (`dast.yml` weekly+manual, runbook) — High 0 (PR #71)
+- **T091**: k6 local (health/risk/broadcast/rate-limit + baselines) + `bun run test:load` (PR #73)
+- **T098**: rate-limit keying por userId (JWT) + bucket monitoria 600/min p/ `/api/health` (PR #76)
+- **T100**: `MANUAL_DO_OPERADOR.md` (critério de projeto pronto) (PR #78)
+- **T101**: k6 autenticado (JWT dev + isolamento uid: provado 2544/2544) (PR #79)
+### Fixed
+- **T097**: bug MPC #66 (prefixos sign/verify) + #70 message-binding rastreada; **T099**: X-Powered-By removido + invariante E2E (#74); **T093**: safe-state CSP_ENFORCE
+- **T062→T089**: fila E2E zerada de fixmes funcionais
+### Docs
+- STATUS-T087/T092 (ativação CSP pausada: quota 402 + muro SSO; evidência §3 anulada com honestidade)
+- D098 (resposta ao budget), D100 (comentário≠código), D101 (fila não esvaziada), D102 (Sprint 61 fechada)
 ## [Unreleased] — Sprint 59 — TypeSafe + CI/E2E
 ### Added
 - **T077**: `src/lib/ai-risk/typesafe-jev.ts` assessDappRisk (Noul+Score, zod, fail-open skipped) + `src/lib/risk/thresholds.ts` const compartilhada (PR #56)
