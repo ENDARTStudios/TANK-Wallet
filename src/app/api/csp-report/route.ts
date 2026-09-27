@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getAuthContextFromRequest, requirePermission } from "@/lib/auth/rbac";
-import { consumeRateLimitAdvanced, getRateLimitHeaders } from "@/lib/security/rate-limit";
+import { consumeRateLimitAdvanced } from "@/lib/security/rate-limit";
 import { validateCspReport, recordCspViolation, CSP_REPORT_MAX_BYTES } from "@/lib/security/csp";
 
 const Body = z.object({}).passthrough();
 
 export async function POST(req: Request) {
-  const ctx = await getAuthContextFromRequest(req);
-  const perm = requirePermission(ctx, "get_threats");
-  if (!perm.ok) return NextResponse.json({ error: perm.message }, { status: perm.status });
-  const limit = consumeRateLimitAdvanced(req, { userId: ctx?.userId });
+  const limit = consumeRateLimitAdvanced(req, {});
   if (!limit.allowed) {
     return NextResponse.json({ error: "Too Many Requests", retryAfter: limit.retryAfter }, { status: 429, headers: limit.headers });
   }

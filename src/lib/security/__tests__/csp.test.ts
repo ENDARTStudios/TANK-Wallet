@@ -27,6 +27,7 @@ describe("csp nonce", () => {
   it("valida report: ok, grande e malformado", async () => {
     const { validateCspReport, recordCspViolation, snapshotCspCounters, resetCspForTest } = await import("../csp");
     expect(validateCspReport({ "csp-report": {} }, 100)).toEqual({ ok: true, status: 204 });
+    expect(validateCspReport({}, 10)).toEqual({ ok: false, status: 400 });
     expect(validateCspReport({ "csp-report": {} }, CSP_REPORT_MAX_BYTES + 1)).toEqual({ ok: false, status: 413 });
     expect(validateCspReport("nope", 10)).toEqual({ ok: false, status: 400 });
     expect(validateCspReport(null, 10)).toEqual({ ok: false, status: 400 });

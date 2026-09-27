@@ -19,6 +19,8 @@ export function resetCspForTest(): void {
 export function validateCspReport(body: unknown, byteLength: number): { ok: boolean; status: number } {
   if (byteLength > CSP_REPORT_MAX_BYTES) return { ok: false, status: 413 };
   if (typeof body !== "object" || body === null || Array.isArray(body)) return { ok: false, status: 400 };
+  const report = (body as Record<string, unknown>)["csp-report"];
+  if (typeof report !== "object" || report === null || Array.isArray(report)) return { ok: false, status: 400 };
   return { ok: true, status: 204 };
 }
 

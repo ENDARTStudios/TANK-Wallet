@@ -238,3 +238,8 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - STRIDE: spoofing (nonce server-side); tampering (valida+descarta malformados); repudiation (counters sem PII); info disclosure (sem query/cookies nos logs); DoS (rate limit + 64KB); elevation (sem mudanca).
 - Plano de promocao (T086): N requests sem violacao nao explicada => enforcing; terceiros sem nonce documentados como excecao.
 
+
+## 2026-09-26 — T084 fechamento (Opcao A)
+- Endpoint /api/csp-report sem auth (browsers nao autenticam reports); abuso mitigado por rate limit T083 + 64KB (413) + forma (400) + logs sem PII. Runtime: 400/204/413 sem auth.
+- report-uri deprecated (usar report-to em paralelo na T086, manter report-uri como fallback).
+
