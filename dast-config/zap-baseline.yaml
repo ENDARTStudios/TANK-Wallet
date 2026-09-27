@@ -15,7 +15,7 @@ env:
         - http://localhost:3000/robots.txt
 
 jobs:
-  - type: passiveScan
+  - type: passiveScan-config
     name: passive
     parameters:
       maxAlertsPerRule: 10
@@ -28,19 +28,22 @@ jobs:
       maxDepth: 5
       maxDuration: 10
 
+  - type: passiveScan-wait
+    name: wait
+    parameters:
+      maxDuration: 5
+
   - type: report
     parameters:
       template: traditional-html
       reportDir: /zap/out
       reportFile: zap-report.html
-      reportFormat: html
 
   - type: report
     parameters:
       template: traditional-json
       reportDir: /zap/out
       reportFile: zap-report.json
-      reportFormat: json
 
 # Thresholds (Sprint 25, mantidos):
 # high=0 bloqueia o job; medium/low = triagem documentada (D-quando-ocorrer).
