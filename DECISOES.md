@@ -260,6 +260,24 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Evidencia de promocao: zero hits csp-report nos logs de producao (vercel logs, sem PII); nenhum CI E2E falhou por CSP desde 2977f20; enforcing preserva unsafe-inline (mudanca zero por construcao).
 
 
+## 2026-09-27 — T087 ativacao enforcing (D081: diferida + correcao T086 + achado proxy)
+- CSP_ENFORCE=true setada via CLI em Production e Preview (canario); redeploy via API bloqueado por quota Hobby 402 (>100/dia, reset ~24h) — ativacao efetiva ocorre no proximo deploy de producao (auto no proximo merge). Pre-check local: flag off => report-only; flag on => enforcing nonce-only, report-only ausente.
+- CORRECAO a T086: enforcing do middleware e nonce-only SEM 'unsafe-inline' (csp.ts:45-70); "mudanca zero" impreciso — com 2 policies enforcing, browsers aplicam intersecao (inline sem nonce bloqueado). E2E local flag-on 57/57 sustenta compatibilidade em dev, mas risco prod nao-zero => canario + 24-48h monitoramento + rollback (env rm + redeploy; rollback tambem consome quota!).
+- ACHADO (**SUPERSEDED por D092 em 2026-09-27**: curls mediram a pagina "Login - Vercel", nao o app; conclusao INVALIDA — texto original mantido p/ auditoria): src/proxy.ts aparenta nao executar nos builds Vercel — prod e preview (com codigo T086) servem /api/health 200 SEM x-csp-nonce/Reporting-Endpoints/X-RateLimit/report-only; policy estatica servida diverge da next.config.ts@main. Impacta T083/T084/T086 em prod (validos apenas local/CI). Investigacao dedicada: T092-proxy-vercel (Sprint 61/F08).
+- Sessao Vercel linkada localmente (.vercel/, git-ignored).
+
+
+## 2026-09-27 — T093 safe-state da flag CSP (R092, D093)
+- `vercel env rm CSP_ENFORCE production --yes` (Removed); Preview mantem true como canario isolado. Nenhum deploy no intervalo (vercel ls). Nenhum comportamento de producao pode mudar sem deploy supervisionado.
+- Regra permanente: flag de seguranca em Production so e alterada no mesmo ato em que comeca o monitoramento supervisionado. Ativacao real => T087 retomada (apos T092 + T093).
+
+
+## 2026-09-27 — T092 diagnostico middleware/Vercel (D092: evidencia T087-§3 anulada, H1/H2 abertas)
+- Erro metodologico owned: curls Vercel da T087 mediram a pagina "Login - Vercel" (SSO wall, LEN=341103), nao o app. Conclusao "proxy nao executa" = INVALIDA; policy vercel.com/stripe = policy da pagina de login.
+- Confirmado: Vercel Authentication ON em Preview E Production; tankwallet.dev sem DNS; vercel logs vazio. Janela "zero violacoes" T086 = vacuidade CONFIRMADA (ninguem externo carregava o app; POST csp-report = 401 da plataforma). Promocao segue pausada.
+- H1 vs H2 inseparaveis de fora (inspect sem metadados git; fingerprint inconclusivo atras do muro). Inferencia: prod ~= 8118004, preview = branch T086 (ambos provavelmente COM codigo proxy).
+- Pendencias Operador: PEND-SSO-PROD (SSO em Production intencional? + DNS tankwallet.dev); PEND-BYPASS-CURLS (com x-vercel-protection-bypass, devolver presenca redigida de x-csp-nonce/Reporting-Endpoints/CSP em / e /terms no preview T086); PEND-VERCEL-QUOTA.
+
 ## 2026-09-27 — T088 property-based crypto/MPC (D088: escopo honesto + bug #66)
 - Escopo adaptado (decisao Doer, p/ Thinker ratificar): stub MPC v2 (T058) nao tem combine/reconstruct/Feldman/keypair real — fabricar 4 arquivos property seria teatro. Propriedades do contrato VERDADEIRO em 1 arquivo (mpc-properties.test.ts, fast-check 4.10.2 devDep): P1 shares estruturais, P2 gate k<t, P3 determinismo — 1000 runs PASS cada.
 - P4 round-trip sign->verify FALHA (prova TDD: Expected true, Received false, primeiro run) — bug real issue #66 (verify exige prefixo sig_, sign retorna combined_sig_, index.ts:71-98); quarentena it.skip com reason; correcao de 1 linha requer excecao ao freeze MPC (decisao Thinker).
