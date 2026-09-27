@@ -49,6 +49,8 @@ describe("csp nonce", () => {
     resetCspForTest();
     recordCspViolation("example.com");
     recordCspViolation("example.com");
-    expect(snapshotCspCounters()).toEqual({ report: 2 });
+    expect(snapshotCspCounters()).toEqual({ "report:report-only": 2 });
+    recordCspViolation("example.com", "enforcing");
+    expect(snapshotCspCounters()["report:enforcing"]).toBe(1);
   });
 });

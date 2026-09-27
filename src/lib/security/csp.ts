@@ -14,8 +14,11 @@ export function isCspEnforceOn(env: Record<string, string | undefined> = process
 
 const cspViolationCounters = new Map<string, number>();
 
-export function recordCspViolation(documentHost: string): void {
-  const key = documentHost.length > 0 ? "report" : "report:unknown-host";
+export type CspMode = "enforcing" | "report-only";
+
+export function recordCspViolation(documentHost: string, mode: CspMode = "report-only"): void {
+  const scope = documentHost.length > 0 ? "report" : "report:unknown-host";
+  const key = `${scope}:${mode}`;
   cspViolationCounters.set(key, (cspViolationCounters.get(key) ?? 0) + 1);
 }
 

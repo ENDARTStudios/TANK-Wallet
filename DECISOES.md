@@ -254,3 +254,8 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - STRIDE: spoofing (nonce server-side, flag via env); tampering (headers server-side); repudiation (counters + STATUS-T086); info disclosure (sem PII, sem query nos logs); DoS (rate limit + 64KB); elevation (sem mudanca).
 - Rollback: CSP_ENFORCE=false volta a report-only sem redeploy de codigo.
 
+
+## 2026-09-26 — T086 fechamento (contadores por modo)
+- recordCspViolation(host, mode): chaves report:<modo> distinguem enforcing vs report-only. Rota passa modo da flag.
+- Evidencia de promocao: zero hits csp-report nos logs de producao (vercel logs, sem PII); nenhum CI E2E falhou por CSP desde 2977f20; enforcing preserva unsafe-inline (mudanca zero por construcao).
+

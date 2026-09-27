@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { consumeRateLimitAdvanced } from "@/lib/security/rate-limit";
-import { validateCspReport, recordCspViolation, CSP_REPORT_MAX_BYTES } from "@/lib/security/csp";
+import { validateCspReport, recordCspViolation, isCspEnforceOn, CSP_REPORT_MAX_BYTES } from "@/lib/security/csp";
 
 const Body = z.object({}).passthrough();
 
@@ -24,6 +24,6 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(body);
   const checked = validateCspReport(parsed.success ? parsed.data : null, byteLength);
   if (!checked.ok) return NextResponse.json({ error: "Invalid report" }, { status: checked.status, headers: limit.headers });
-  recordCspViolation("");
+  recordCspViolation("", isCspEnforceOn() ? "enforcing" : "report-only");
   return new NextResponse(null, { status: 204, headers: limit.headers });
 }
