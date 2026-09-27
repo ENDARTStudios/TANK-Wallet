@@ -50,3 +50,7 @@ Passo a passo:
 Como saber que deu certo: <o que aparece na tela>
 Depois de feito: responda "feito o item Nº X"
 -->
+
+### [PEND-AUDIT] Escolher audit firm + aprovar orcamento + assinar engagement letter
+Por que: pacote pronto em docs/audit-package/ (T085). Seguir docs/audit-package/CONTACT-RUNBOOK.md. Decisao de negocio (orcamento/contrato), fora do ciclo simbiotico.
+

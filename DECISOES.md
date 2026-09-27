@@ -243,3 +243,7 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Endpoint /api/csp-report sem auth (browsers nao autenticam reports); abuso mitigado por rate limit T083 + 64KB (413) + forma (400) + logs sem PII. Runtime: 400/204/413 sem auth.
 - report-uri deprecated (usar report-to em paralelo na T086, manter report-uri como fallback).
 
+
+## 2026-09-26 — T085 pacote de auditoria (2 escopos)
+- Audit 1 (crypto/MPC/HSM/recovery) + Audit 2 (engines/pipeline/TypeSafe). Commit frozen 2977f20. Firms: fit tecnico > preco > prazo. Criterio de escolha documentado em docs/audit-package/FIRMS-CANDIDATES.md.
+
