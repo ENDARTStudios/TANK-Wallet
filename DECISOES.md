@@ -278,3 +278,38 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - H1 vs H2 inseparaveis de fora (inspect sem metadados git; fingerprint inconclusivo atras do muro). Inferencia: prod ~= 8118004, preview = branch T086 (ambos provavelmente COM codigo proxy).
 - Pendencias Operador: PEND-SSO-PROD (SSO em Production intencional? + DNS tankwallet.dev); PEND-BYPASS-CURLS (com x-vercel-protection-bypass, devolver presenca redigida de x-csp-nonce/Reporting-Endpoints/CSP em / e /terms no preview T086); PEND-VERCEL-QUOTA.
 
+## 2026-09-27 — T088 property-based crypto/MPC (D088: escopo honesto + bug #66)
+- Escopo adaptado (decisao Doer, p/ Thinker ratificar): stub MPC v2 (T058) nao tem combine/reconstruct/Feldman/keypair real — fabricar 4 arquivos property seria teatro. Propriedades do contrato VERDADEIRO em 1 arquivo (mpc-properties.test.ts, fast-check 4.10.2 devDep): P1 shares estruturais, P2 gate k<t, P3 determinismo — 1000 runs PASS cada.
+- P4 round-trip sign->verify FALHA (prova TDD: Expected true, Received false, primeiro run) — bug real issue #66 (verify exige prefixo sig_, sign retorna combined_sig_, index.ts:71-98); quarentena it.skip com reason; correcao de 1 linha requer excecao ao freeze MPC (decisao Thinker).
+- Nao enfraquecer propriedades: codigo crypto intacto; falha = bug, nao teste fraco.
+
+
+## 2026-09-27 — T089 keyboard fixme reabilitado (D089: clique pré-hidratação)
+- Causa raiz: clique em "Importar com seed phrase" antes da hidratação React (goto domcontentloaded + dev frio + 3 projetos paralelos) = evento perdido sem erro; step ficava em welcome, textarea inexistente. 9/9 determinístico — não era flake aleatório. App sem bug (textarea existe, handler trivial).
+- Correção: expect().toPass({30s}) — retry do clique-efeito até hidratar; + assert novo toBeFocused (teste ficou mais forte). Config CI intacta (já workers:1 + retries:2).
+- Evidência: -g keyboard --repeat-each=3 → 9 passed; spec inteiro → 12 passed.
+
+
+## 2026-09-27 — D094 F07-pausado / F08-prosseguir (decisor: Thinker; registro: Doer)
+- F07 operational-incomplete (T087/T092 aguardam Operador: SSO/DNS/bypass/quota); Sprint 61/F08 prossegue (T088+T089 paralelas). T088 executada nesta entrada; T089 em andamento.
+
+
+## 2026-09-27 — T097 correcao bug crypto (D095 excecao ao freeze + D097)
+- Excecao ao freeze MPC (T058/T080) aprovada pelo Thinker (D095): bug real #66 provado por P4; correcao minima (2 linhas, mesmo bloco), nao feature.
+- Correcao: combineSignatures embute tag publicKey[0:8] (formato/length intactos); verify aceita sig_|combined_sig_ + amarra no ARGUMENTO publicKey (nao this.publicKey — semantica correta; teste wrong_key prova). Fragmento mpc_pk_X nao-hex => colisao impossivel.
+- P4 reabilitada 1000 runs PASS; P1-P3 intactas; 17 pass mpc/; tsc+eslint limpos. Issue #66 fecha apos merge. Limitacao honesta do stub: mensagem nao amarrada no verify (pre-existente).
+
+## 2026-09-27 — T090 DAST ZAP baseline local-first (D090: triagem)
+- Harness: yaml re-alvejado localhost (prod proibida) + AF corrigido (passiveScan-config/wait; config Sprint-25 nunca funcionou) + chmod zap-out. Run 36324303494 SUCCESS: High 0, Medium 4, Low 2, Info 3 (dentro 5/20). Workflow nao-required.
+- Triagem: Mediums CSP x4 (policy estatica) = MITIGA EM CURSO (T084/T086/T087; aperto da estatica na retomada); Low X-Powered-By = ISSUE #74; Low Timestamp = ACEITA (FP build). Scan prod adiado (PEND-SSO/BYPASS).
+
+
+## 2026-09-27 — T091 k6 load testing local-first (D091: teto do limiter)
+- Baseline dev local (1VU paced): health p95 20.7ms 90/90; risk p95 18.4ms 92/92; broadcast(invalido) p95 34.6ms 14/14; rate-limit rajada 3166/3166 (200/429 c/ Retry-After). Thresholds p95<100 (4x baseline).
+- Teto single-IP POR DESENHO: reads 120/min + writes 30/min hardcoded no proxy (T083) — 10VU/60s toma 429 (1171x429 vs 120x200, zero 503). Nao e instabilidade. Load alem do budget = multi-IP ou janela propria (nunca prod sem decisao). Issue #72 (falso alarme de checks caros) corrigida e fechada.
+- Seguranca do harness: broadcast so corpo invalido (nunca transmite); risk so GET (sem queimar quota terceiros); alvo sempre local. Pergunta ao Thinker: budget 120/min/IP comporta monitores + uso real?
+
+## 2026-09-27 — T098 rate-limit keying (D098: resposta ao budget)
+- Keying: reads/writes autenticados por userId (JWT via getToken, nunca header); anonimos por IP. rateLimitKey com prefixo uid: (sem colisao). Monitoria em bucket proprio 600/min (health sai do proxy-limiter; comentario mentiroso corrigido). Limites T083 intactos + monitor:600.
+- STRIDE: spoofing (so JWT validado; header nao alimenta keying); tampering (chave server-side); repudiation (contadores+headers bucket efetivo); info disclosure (sem userId nos headers); DoS (CGNAT mitigado autenticados; anonimos por IP); elevation (sem mudanca).
+- Overhead getToken/JWE por request estourou p95 k6 -> guard de cookie (sem cookie, sem decrypt; semantica identica). TDD 4/4 + 14 security + test:load EXIT 0.

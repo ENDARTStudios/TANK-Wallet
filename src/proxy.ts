@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 import { consumeRateLimit, getRateLimitHeaders } from "@/lib/security/rate-limit";
 import { analyzeBotSignal, getBotMode, shouldBlockBot } from "@/lib/security/bot-guard";
 import { generateNonce, buildReportOnlyPolicy, buildEnforcingPolicy, isCspEnforceOn, reportingEndpointsHeader } from "@/lib/security/csp";
 
-export default function proxy(request: NextRequest): NextResponse | Response {
+export default async function proxy(request: NextRequest): Promise<NextResponse | Response> {
   const pathname = request.nextUrl.pathname;
   const cspNonce = generateNonce();
   const enforcing = isCspEnforceOn();
@@ -11,7 +12,14 @@ export default function proxy(request: NextRequest): NextResponse | Response {
   const cspHeaderName = enforcing ? "Content-Security-Policy" : "Content-Security-Policy-Report-Only";
 
   if (pathname.startsWith("/api/")) {
-    // /api/health is exempt from rate-limit and bot checks (monitoring only)
+    if (pathname === "/api/health") {
+      // Monitoria em bucket próprio na rota (600/min, T098): não consome budget de negócio.
+      const healthRes = NextResponse.next();
+      healthRes.headers.set(cspHeaderName, cspPolicy);
+      healthRes.headers.set("Reporting-Endpoints", reportingEndpointsHeader());
+      healthRes.headers.set("x-csp-nonce", cspNonce);
+      return healthRes;
+    }
     if (pathname !== "/api/health") {
       const botSignal = analyzeBotSignal({ headers: request.headers });
       const botMode = getBotMode();
@@ -29,14 +37,29 @@ export default function proxy(request: NextRequest): NextResponse | Response {
 
     const isWrite = ["POST", "PUT", "PATCH", "DELETE"].includes(request.method);
     // 30 req/min for writes (POST/PUT/PATCH/DELETE), 120 req/min for reads (GET/HEAD/OPTIONS)
+    // Key = userId de sessão JWT validada (T098, anti-CGNAT); fallback IP p/ anônimos.
+    // Nunca header client-supplied (spoofing: rotação de identidade p/ evadir limite).
     const limit = isWrite ? 30 : 120;
+    let userId: string | undefined;
+    // Otimização: sem cookie de sessão não há identidade — evita decrypt JWE por request.
+    const cookies = request.cookies;
+    const hasSessionCookie =
+      cookies.has("next-auth.session-token") || cookies.has("__Secure-next-auth.session-token");
+    if (hasSessionCookie) {
+      try {
+        const token = await getToken({ req: request });
+        if (token && typeof token.sub === "string" && token.sub) userId = token.sub;
+      } catch {
+        userId = undefined;
+      }
+    }
     const result = consumeRateLimit(
       {
         headers: request.headers,
         url: request.url,
         ip: (request as unknown as { ip?: string }).ip,
       },
-      { limit },
+      { limit, userId },
     );
 
     const headers = getRateLimitHeaders(result);
