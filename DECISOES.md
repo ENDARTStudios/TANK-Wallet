@@ -284,3 +284,9 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 ## 2026-09-27 — T090 DAST ZAP baseline local-first (D090: triagem)
 - Harness: yaml re-alvejado localhost (prod proibida) + AF corrigido (passiveScan-config/wait; config Sprint-25 nunca funcionou) + chmod zap-out. Run 36324303494 SUCCESS: High 0, Medium 4, Low 2, Info 3 (dentro 5/20). Workflow nao-required.
 - Triagem: Mediums CSP x4 (policy estatica) = MITIGA EM CURSO (T084/T086/T087; aperto da estatica na retomada); Low X-Powered-By = ISSUE #74; Low Timestamp = ACEITA (FP build). Scan prod adiado (PEND-SSO/BYPASS).
+
+
+## 2026-09-27 — T091 k6 load testing local-first (D091: teto do limiter)
+- Baseline dev local (1VU paced): health p95 20.7ms 90/90; risk p95 18.4ms 92/92; broadcast(invalido) p95 34.6ms 14/14; rate-limit rajada 3166/3166 (200/429 c/ Retry-After). Thresholds p95<100 (4x baseline).
+- Teto single-IP POR DESENHO: reads 120/min + writes 30/min hardcoded no proxy (T083) — 10VU/60s toma 429 (1171x429 vs 120x200, zero 503). Nao e instabilidade. Load alem do budget = multi-IP ou janela propria (nunca prod sem decisao). Issue #72 (falso alarme de checks caros) corrigida e fechada.
+- Seguranca do harness: broadcast so corpo invalido (nunca transmite); risk so GET (sem queimar quota terceiros); alvo sempre local. Pergunta ao Thinker: budget 120/min/IP comporta monitores + uso real?
