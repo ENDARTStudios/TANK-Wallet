@@ -259,3 +259,10 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - recordCspViolation(host, mode): chaves report:<modo> distinguem enforcing vs report-only. Rota passa modo da flag.
 - Evidencia de promocao: zero hits csp-report nos logs de producao (vercel logs, sem PII); nenhum CI E2E falhou por CSP desde 2977f20; enforcing preserva unsafe-inline (mudanca zero por construcao).
 
+
+## 2026-09-27 — T087 ativacao enforcing (D081: diferida + correcao T086 + achado proxy)
+- CSP_ENFORCE=true setada via CLI em Production e Preview (canario); redeploy via API bloqueado por quota Hobby 402 (>100/dia, reset ~24h) — ativacao efetiva ocorre no proximo deploy de producao (auto no proximo merge). Pre-check local: flag off => report-only; flag on => enforcing nonce-only, report-only ausente.
+- CORRECAO a T086: enforcing do middleware e nonce-only SEM 'unsafe-inline' (csp.ts:45-70); "mudanca zero" impreciso — com 2 policies enforcing, browsers aplicam intersecao (inline sem nonce bloqueado). E2E local flag-on 57/57 sustenta compatibilidade em dev, mas risco prod nao-zero => canario + 24-48h monitoramento + rollback (env rm + redeploy; rollback tambem consome quota!).
+- ACHADO (pre-existente, nao causado por T087): src/proxy.ts aparenta nao executar nos builds Vercel — prod e preview (com codigo T086) servem /api/health 200 SEM x-csp-nonce/Reporting-Endpoints/X-RateLimit/report-only; policy estatica servida diverge da next.config.ts@main. Impacta T083/T084/T086 em prod (validos apenas local/CI). Investigacao dedicada: T092-proxy-vercel (Sprint 61/F08).
+- Sessao Vercel linkada localmente (.vercel/, git-ignored).
+
