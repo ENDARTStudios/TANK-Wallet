@@ -259,3 +259,13 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - recordCspViolation(host, mode): chaves report:<modo> distinguem enforcing vs report-only. Rota passa modo da flag.
 - Evidencia de promocao: zero hits csp-report nos logs de producao (vercel logs, sem PII); nenhum CI E2E falhou por CSP desde 2977f20; enforcing preserva unsafe-inline (mudanca zero por construcao).
 
+
+## 2026-09-27 — T088 property-based crypto/MPC (D088: escopo honesto + bug #66)
+- Escopo adaptado (decisao Doer, p/ Thinker ratificar): stub MPC v2 (T058) nao tem combine/reconstruct/Feldman/keypair real — fabricar 4 arquivos property seria teatro. Propriedades do contrato VERDADEIRO em 1 arquivo (mpc-properties.test.ts, fast-check 4.10.2 devDep): P1 shares estruturais, P2 gate k<t, P3 determinismo — 1000 runs PASS cada.
+- P4 round-trip sign->verify FALHA (prova TDD: Expected true, Received false, primeiro run) — bug real issue #66 (verify exige prefixo sig_, sign retorna combined_sig_, index.ts:71-98); quarentena it.skip com reason; correcao de 1 linha requer excecao ao freeze MPC (decisao Thinker).
+- Nao enfraquecer propriedades: codigo crypto intacto; falha = bug, nao teste fraco.
+
+
+## 2026-09-27 — D094 F07-pausado / F08-prosseguir (decisor: Thinker; registro: Doer)
+- F07 operational-incomplete (T087/T092 aguardam Operador: SSO/DNS/bypass/quota); Sprint 61/F08 prossegue (T088+T089 paralelas). T088 executada nesta entrada; T089 em andamento.
+
