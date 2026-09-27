@@ -271,3 +271,10 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - `vercel env rm CSP_ENFORCE production --yes` (Removed); Preview mantem true como canario isolado. Nenhum deploy no intervalo (vercel ls). Nenhum comportamento de producao pode mudar sem deploy supervisionado.
 - Regra permanente: flag de seguranca em Production so e alterada no mesmo ato em que comeca o monitoramento supervisionado. Ativacao real => T087 retomada (apos T092 + T093).
 
+
+## 2026-09-27 — T092 diagnostico middleware/Vercel (D092: evidencia T087-§3 anulada, H1/H2 abertas)
+- Erro metodologico owned: curls Vercel da T087 mediram a pagina "Login - Vercel" (SSO wall, LEN=341103), nao o app. Conclusao "proxy nao executa" = INVALIDA; policy vercel.com/stripe = policy da pagina de login.
+- Confirmado: Vercel Authentication ON em Preview E Production; tankwallet.dev sem DNS; vercel logs vazio. Janela "zero violacoes" T086 = vacuidade CONFIRMADA (ninguem externo carregava o app; POST csp-report = 401 da plataforma). Promocao segue pausada.
+- H1 vs H2 inseparaveis de fora (inspect sem metadados git; fingerprint inconclusivo atras do muro). Inferencia: prod ~= 8118004, preview = branch T086 (ambos provavelmente COM codigo proxy).
+- Pendencias Operador: PEND-SSO-PROD (SSO em Production intencional? + DNS tankwallet.dev); PEND-BYPASS-CURLS (com x-vercel-protection-bypass, devolver presenca redigida de x-csp-nonce/Reporting-Endpoints/CSP em / e /terms no preview T086); PEND-VERCEL-QUOTA.
+
