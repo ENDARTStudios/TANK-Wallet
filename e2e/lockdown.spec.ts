@@ -7,6 +7,12 @@ test.describe("Lockdown e skeleton compliance", () => {
     await expect(page.getByText("ZERO TRUST SECURITY")).toBeVisible();
   });
 
+  test("T099: X-Powered-By ausente (finding DAST #74; invariante anti-fingerprint)", async ({ page }) => {
+    const resp = await page.goto("/", { waitUntil: "domcontentloaded", timeout: 10000 });
+    expect(resp).toBeTruthy();
+    expect(resp!.headers()["x-powered-by"]).toBeUndefined();
+  });
+
   test("skeleton placeholder verificado (quando existir data-skeleton)", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(page.locator("h1").filter({ hasText: "TANK" })).toBeVisible({ timeout: 10000 });
