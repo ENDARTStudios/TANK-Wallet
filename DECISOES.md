@@ -219,3 +219,9 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Flag INTENT_ROUTING_ENABLED default off (separada de JEV_ENABLED); UI IntentBadge com source visivel + risk/intent i18n pt/en/es; skipped != seguro.
 - STRIDE: spoofing (mock so em teste, sdk pinado); tampering (intent nao altera decisao — teste intent-advisory); repudiation (STATUS-T082); info disclosure (só metadados: chain/address/selector/value/dapp_origin, nunca texto livre); DoS (timeout+flag off); elevation (server-only).
 
+
+## 2026-09-26 — T083 rate limiting avancado
+- consumeRateLimitAdvanced: buckets por (userId||ip):operacao (send 10, swap 5, approve 3, bridge 2/min) + teto global IP 100/min; headers X-RateLimit-* + X-RateLimit-Operation + Retry-After; contadores in-memory por operacao/resultado; exports antigos intactos.
+- /api/broadcast POST: operacao send com userId real apos auth; 429 com headers quando bloqueado.
+- STRIDE: spoofing (userId so de ctx autenticado; sem auth cai p/ IP); tampering (headers read-only); repudiation (counters + STATUS-T083); info disclosure (sem userId nos headers); DoS (teto global impede diluicao por userId falso); elevation (sem mudanca de permissao).
+

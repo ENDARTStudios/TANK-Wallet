@@ -58,6 +58,70 @@ export function consumeRateLimit(
 
 export function resetRateLimitForTest(): void {
   buckets.clear();
+  counters.clear();
+}
+
+export type RateLimitOperation = "send" | "swap" | "approve" | "bridge";
+
+export const OPERATION_LIMITS: Record<RateLimitOperation, number> = {
+  send: 10,
+  swap: 5,
+  approve: 3,
+  bridge: 2,
+};
+
+export const GLOBAL_IP_LIMIT = 100;
+
+const counters = new Map<string, number>();
+
+function recordRateLimit(operation: string, allowed: boolean): void {
+  const key = `${operation}:${allowed ? "allowed" : "blocked"}`;
+  counters.set(key, (counters.get(key) ?? 0) + 1);
+}
+
+export function snapshotRateLimitCounters(): Record<string, number> {
+  return Object.fromEntries(counters);
+}
+
+export interface AdvancedRateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  retryAfter: number;
+  limit: number;
+  resetAt: number;
+  operation?: RateLimitOperation;
+  headers: Record<string, string>;
+}
+
+export function consumeRateLimitAdvanced(
+  req: Request | { headers: Headers; url: string; ip?: string },
+  opts?: { userId?: string; operation?: RateLimitOperation; windowMs?: number; now?: number },
+): AdvancedRateLimitResult {
+  const windowMs = opts?.windowMs ?? getWindowMs();
+  const now = opts?.now ?? Date.now();
+  const anyReq = req as unknown as { ip?: string; headers: Headers; url?: string };
+  const forwarded = anyReq.headers.get("x-forwarded-for") ?? "";
+  const ip = anyReq.ip ?? forwarded.split(",")[0]?.trim() ?? anyReq.headers.get("x-real-ip") ?? "unknown";
+  const operation = opts?.operation;
+  const opLimit = operation !== undefined ? OPERATION_LIMITS[operation] : GLOBAL_IP_LIMIT;
+  const subject = opts?.userId ?? ip;
+  const opKey = `${subject}:op:${operation ?? "global"}`;
+  const opRes = checkRateLimit(opKey, { limit: opLimit, windowMs, now });
+  const ipRes = checkRateLimit(`${ip}:global`, { limit: GLOBAL_IP_LIMIT, windowMs, now });
+  const blocked = !opRes.allowed || !ipRes.allowed;
+  const primary = !opRes.allowed ? opRes : ipRes;
+  recordRateLimit(operation ?? "global", !blocked);
+  const headers: Record<string, string> = { ...getRateLimitHeaders(primary) };
+  if (operation !== undefined) headers["X-RateLimit-Operation"] = operation;
+  return {
+    allowed: !blocked,
+    remaining: primary.remaining,
+    retryAfter: primary.retryAfter,
+    limit: primary.limit,
+    resetAt: primary.resetAt,
+    operation,
+    headers,
+  };
 }
 
 export function getRateLimitHeaders(result: { remaining: number; limit: number; resetAt: number; retryAfter: number }) {
