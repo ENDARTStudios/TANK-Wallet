@@ -48,6 +48,16 @@ k6 run -u 10 -d 60s scripts/k6/health.js   # baseline (dentro do budget? NÃO �
 
 `bun run test:load` = health + risk + broadcast + rate-limit em sequência.
 
+## Cenário autenticado (T101, quita dívida D100)
+
+```bash
+K6_TOKENS=$(bun scripts/k6/gen-dev-tokens.ts) k6 run scripts/k6/authenticated.js
+```
+
+Tokens JWT dev (segredo local, via env — nunca commitados); steady 4 usuários 200s +
+flooder user-0 com 429s próprios e `Retry-After` (isolamento uid: provado: 2544/2544,
+p95 34ms). Header-identity (x-user-id) NÃO alimenta keying — só JWT de sessão.
+
 ## Baseline atual
 
 `reports/load/baseline.json`: health p95 20.7ms · risk p95 18.4ms ·
