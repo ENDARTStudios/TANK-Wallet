@@ -43,7 +43,7 @@
 ## Comunicação
 
 - Slack: `tank-wallet-security` (privado)
-- Email: `security@endart.studios` + PGP `docs/security/pgp-key.asc`
+- Email: `security@endart.studios` + PGP `docs/05-security-compliance/security/pgp-key.asc`
 - Conf-call semanal: terça 14:00 UTC
 
 ## SLA de Resposta

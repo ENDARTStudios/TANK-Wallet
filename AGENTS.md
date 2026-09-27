@@ -5,7 +5,7 @@
 
 ## 0. Regra zero (não-negociável)
 
-Nunca commit um segredo. Nunca versionar `.env`, chaves, DSN ou tokens. Descubra um → rode agora (ver `docs/SECRETS.md`).
+Nunca commit um segredo. Nunca versionar `.env`, chaves, DSN ou tokens. Descubra um → rode agora (ver `docs/05-security-compliance/SECRETS.md`).
 
 ## 0.5. GRAFT-FIRST — navegação com grafo (obrigatório)
 
@@ -32,12 +32,12 @@ Se em algum momento o agente não usar o grafo, lembre-o: **"siga o AGENTS.md �
    Closes #123
    #REF: issue nominal
    ```
-4. O PR roda o **deploy gate** (sem green, no merge — ver `docs/SECURITY-GATE.md`):
+4. O PR roda o **deploy gate** (sem green, no merge — ver `docs/05-security-compliance/SECURITY-GATE.md`):
    - ESLint · `tsc --noEmit` · `bun test` · `audit:code` · Semgrep · CodeQL · Gitleaks · Trivy · SBOM.
 5. Depois do merge, `release.yml` assina a imagem (cosign keyless + Ed25519) + SBOM assinado + GHCR.
 6. Regra de docs: todo PR de feature precisa atualizar os docs relacionados (PRD, UML, RBAC, RLS, ...).
 
-> Nota: no terminal da equipe `gh` pode não existir. Na ausência, use o `docs/ISSUES-BACKLOG.md` como fonte de issue (title/body/labels prontas).
+> Nota: no terminal da equipe `gh` pode não existir. Na ausência, use o `docs/03-development-process/ISSUES-BACKLOG.md` como fonte de issue (title/body/labels prontas).
 
 ## 2. Disciplina de Sprint
 
@@ -70,8 +70,8 @@ Bibliotecas de animação/3D (escolher conforme necessidade, não empilhar): Fra
 
 ## 4. Observabilidade & Quality (mínimo de merge)
 
-- **Erro:** `error.tsx` + `global-error.tsx` + logger estruturado; Sentry + OpenTelemetry rodando (ver `docs/OBSERVABILITY.md`).
-- **Cobertura:** Codecov; PR não pode reduzir cobertura agregada (ver `docs/TESTING.md`).
+- **Erro:** `error.tsx` + `global-error.tsx` + logger estruturado; Sentry + OpenTelemetry rodando (ver `docs/07-operations-marketing/OBSERVABILITY.md`).
+- **Cobertura:** Codecov; PR não pode reduzir cobertura agregada (ver `docs/03-development-process/TESTING.md`).
 - **E2E:** Playwright para fluxos críticos.
 - **Lint:** ESLint (+ Biome e/ou Commitlint quando adotar). Estilo: tipagem estrita, sem `any` não justificado, validação com `zod` na entrada.
 
@@ -80,8 +80,8 @@ Bibliotecas de animação/3D (escolher conforme necessidade, não empilhar): Fra
 Checklist obrigatório (zero-trust): Autenticação/autorização · permissões · rotas · banco (RLS) · inputs (zod) · segredos (.env) · upload · webhooks · SQL Injection · XSS · SSRF · APIs · criptografia · sessão · IA/agent security · race condition · config perigosa · dependências.
 
 Exigências mínimas:
-- `401` se não autenticado; `403` se sem permissão (RBAC → `docs/RBAC.md`, `docs/RLS.md`).
-- Rate limit em toda rota de escrita (`docs/SECURITY-GATE.md`).
+- `401` se não autenticado; `403` se sem permissão (RBAC → `docs/05-security-compliance/RBAC.md`, `docs/05-security-compliance/RLS.md`).
+- Rate limit em toda rota de escrita (`docs/05-security-compliance/SECURITY-GATE.md`).
 - Header de sessão + HSTS + CSP presentes.
 - Teste "tenta acessar o que não é seu": conta de outro / rota admin / registro alheio / API sem sessão.
 
@@ -92,10 +92,10 @@ Exigências mínimas:
 
 ## 7. Banco (skill Auditoria de Banco)
 
-- Toda tabela com tenant → `workspace_id` + RLS (`docs/RLS.md`).
+- Toda tabela com tenant → `workspace_id` + RLS (`docs/05-security-compliance/RLS.md`).
 - Consulta com `LIMIT`; índice (B-Tree) na chave de tenant.
 - Sem query sem limite; sem exposição de dados sensíveis desnecessários.
-- **Sempre:** exista backup restaurável (`docs/disaster-recovery.md`); teste no sprint.
+- **Sempre:** exista backup restaurável (`docs/06-devops-deployment/BACKUP_DR.md`); teste no sprint.
 
 ## 8. SEO / AEO / AIO / GEO
 
@@ -112,16 +112,16 @@ Periodicamente (ou ao PR `chore/`): detectar código duplicado, arquivo órfão,
 ## 10. Docs vivos (mantêm e atualizam no PR)
 
 - `PRD.md` — produto (o que/por quê)
-- `docs/uml/UML.md` — diagrama de classe e sequência
-- `docs/RBAC.md` — matrix de níveis de acesso
-- `docs/RLS.md` — segurança por linha
-- `docs/SECRETS.md` + `.env.example` — segredos
-- `docs/ARCHITECTURE-MODULES.md` — catálogo de apps + feature flags
-- `docs/OBSERVABILITY.md` — error reporting + observabilidade
-- `docs/TESTING.md` — unit/integração/E2E
-- `docs/SECURITY-GATE.md` — gate de deploy + WAF/bot/rate + TLS/HSTS
+- `docs/02-architecture-design/UML.md` — diagrama de classe e sequência
+- `docs/05-security-compliance/RBAC.md` — matrix de níveis de acesso
+- `docs/05-security-compliance/RLS.md` — segurança por linha
+- `docs/05-security-compliance/SECRETS.md` + `.env.example` — segredos
+- `docs/02-architecture-design/ARCHITECTURE-MODULES.md` — catálogo de apps + feature flags
+- `docs/07-operations-marketing/OBSERVABILITY.md` — error reporting + observabilidade
+- `docs/03-development-process/TESTING.md` — unit/integração/E2E
+- `docs/05-security-compliance/SECURITY-GATE.md` — gate de deploy + WAF/bot/rate + TLS/HSTS
 - `SPRINT.md` — feature atual (não implemente fora dele)
-- `docs/ISSUES-BACKLOG.md` — issues prontas (title/body/labels)
+- `docs/03-development-process/ISSUES-BACKLOG.md` — issues prontas (title/body/labels)
 - `ARCHITECTURE.md` — arquitetura e fases técnicas
 
 ## 11. Convenções

@@ -33,7 +33,7 @@ using the public key below.
 
 ### PGP key
 
-Public key file: [`docs/security/pgp-key.asc`](docs/security/pgp-key.asc)
+Public key file: [`docs/05-security-compliance/security/pgp-key.asc`](docs/05-security-compliance/security/pgp-key.asc)
 
 ```
 Fingerprint: 2F3D 3620 50E3 7DA9 140A 3973 8F04 CCBE 4064 2412
@@ -44,7 +44,7 @@ Expires:     2028-07-16
 
 To encrypt your report:
 ```bash
-gpg --import docs/security/pgp-key.asc
+gpg --import docs/05-security-compliance/security/pgp-key.asc
 gpg --encrypt --recipient "Tank Wallet Security" --armor report.txt
 # Send the encrypted report.txt.asc to security@tankwallet.dev
 ```
@@ -57,7 +57,7 @@ Please include:
 3. Affected versions.
 4. Potential impact.
 5. Suggested fix (if any).
-6. Your name/handle for credit (optional — see [Hall of Fame](docs/security/hall-of-fame.md)).
+6. Your name/handle for credit (optional — see [Hall of Fame](docs/05-security-compliance/security/hall-of-fame.md)).
 
 ### Response timeline
 
@@ -77,7 +77,7 @@ Please include:
 3. **Triage**: within 7 days, we assess severity (Critical/High/Medium/Low) and validity.
 4. **Fix**: we develop and deploy a fix within the SLA for the severity.
 5. **Disclosure**: after fix + 90-day grace period (or sooner if researcher agrees).
-6. **Credit**: researcher added to [Hall of Fame](docs/security/hall-of-fame.md) unless anonymous.
+6. **Credit**: researcher added to [Hall of Fame](docs/05-security-compliance/security/hall-of-fame.md) unless anonymous.
 
 ---
 
@@ -126,10 +126,10 @@ Researchers who follow these guidelines will not face legal action from Tank Wal
 
 Tank Wallet operates a bug bounty program. Details:
 
-- **Platform**: [Immunefi](https://immunefi.com) (launch pending — see [launch guide](docs/security/bug-bounty-launch-guide.md)).
+- **Platform**: [Immunefi](https://immunefi.com) (launch pending — see [launch guide](docs/05-security-compliance/security/bug-bounty-launch-guide.md)).
 - **Scope**: see "In scope" above.
 - **Rewards**: see [`BUG-BOUNTY.md`](BUG-BOUNTY.md) for tier table.
-- **Hall of Fame**: [Security Hall of Fame](docs/security/hall-of-fame.md).
+- **Hall of Fame**: [Security Hall of Fame](docs/05-security-compliance/security/hall-of-fame.md).
 - **GitHub Security Advisories**: enable via repository "Security" tab.
 
 ---

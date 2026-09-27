@@ -1,7 +1,7 @@
 # MANUAL_DO_OPERADOR — TANK Wallet (T100)
 
 > Operação real do produto. Sem segredos aqui (só placeholders). Estado refletido: main pós-Sprint 61.
-> Aponta (não duplica): `docs/audit-package/`, `docs/DAST-RUNBOOK.md`, `docs/LOAD-TESTING.md`, `DECISOES.md`.
+> Aponta (não duplica): `docs/05-security-compliance/audit-package/`, `docs/06-devops-deployment/DAST-RUNBOOK.md`, `docs/06-devops-deployment/LOAD-TESTING.md`, `DECISOES.md`.
 
 ## 1. Run local
 
@@ -77,7 +77,7 @@ bun test src/lib/mpc/             # property-tests MPC (P1–P4, 1000 runs)
 ```
 
 Limites: k6 só localhost; ZAP só localhost (muro SSO invalida scan externo);
-detalhes em `docs/LOAD-TESTING.md` e `docs/DAST-RUNBOOK.md`.
+detalhes em `docs/06-devops-deployment/LOAD-TESTING.md` e `docs/06-devops-deployment/DAST-RUNBOOK.md`.
 
 ## 7. Incidentes (3 cenários)
 
@@ -101,11 +101,11 @@ outros erros → `vercel ls` + build logs no dashboard + `bun run build` local p
 - **PEND-VERCEL-QUOTA**: 402 recorrente (3×) = padrão do Hobby no nosso ritmo. Decisão de
   custo: upgrade Pro OU aceite de janelas espaçadas de deploy.
 - **PEND-AUDIT**: escolher firma + aprovar orçamento + assinar engagement
-  (pacote em `docs/audit-package/`, runbook `CONTACT-RUNBOOK.md`).
+  (pacote em `docs/05-security-compliance/audit-package/`, runbook `CONTACT-RUNBOOK.md`).
 
 ## 9. Ponteiros
 
-- Auditoria externa: `docs/audit-package/README.md`
+- Auditoria externa: `docs/05-security-compliance/audit-package/README.md`
 - Decisões técnicas: `DECISOES.md` (D001…D101)
-- Fila de trabalho: `docs/ISSUES-BACKLOG.md` (+ issues GitHub #66 fechada, #70, #72 fechada, #74 fechada, #75 reorg docs)
+- Fila de trabalho: `docs/03-development-process/ISSUES-BACKLOG.md` (+ issues GitHub #66 fechada, #70, #72 fechada, #74 fechada, #75 reorg docs)
 - Segurança: `SECURITY.md`, `BUG-BOUNTY.md` (raiz, convenção)

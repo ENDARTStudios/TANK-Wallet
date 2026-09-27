@@ -6,7 +6,7 @@
 
 ## Evidência — arquivos (8 novos)
 
-- `docs/audit-package/README.md` (índice + como usar)
+- `docs/05-security-compliance/audit-package/README.md` (índice + como usar)
 - `SCOPE-AUDIT1.md` (crypto/MPC/HSM/recovery + 5 perguntas)
 - `SCOPE-AUDIT2.md` (engines/pipeline/TypeSafe + 5 perguntas)
 - `COMMIT-FROZEN.md` (hash 2977f20 + instruções + regra de re-escopo)
@@ -22,7 +22,7 @@
 
 ## Verificação
 
-- `ls docs/audit-package/`: 8 arquivos
+- `ls docs/05-security-compliance/audit-package/`: 8 arquivos
 - CI do PR: docs-only (aguardando run)
 - Nenhum contato real com firms (ação do Operador)
 

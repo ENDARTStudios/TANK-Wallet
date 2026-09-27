@@ -31,9 +31,9 @@ Resultado: **DONE** — 4 scripts verdes, baseline registrado, teto documentado.
 ## 4. Verificação T091
 
 - [x] 4 scripts rodam local c/ thresholds (`bun run test:load`).
-- [x] Baseline em `reports/load/baseline.json`; runbook `docs/LOAD-TESTING.md`.
+- [x] Baseline em `reports/load/baseline.json`; runbook `docs/06-devops-deployment/LOAD-TESTING.md`.
 - [x] DECISOES.md (D091). PR dedicado; merge após REVIEW (D078).
 
 Arquivos: `scripts/k6/*.js` (4), `package.json` (test:load), `reports/load/baseline.json`,
-`docs/LOAD-TESTING.md`, `STATUS-T091.md`, `DECISOES.md`.
+`docs/06-devops-deployment/LOAD-TESTING.md`, `STATUS-T091.md`, `DECISOES.md`.
 Pergunta ao Thinker: budget reads 120/min/IP comporta monitores + uso real? (teto p/ decisão futura).

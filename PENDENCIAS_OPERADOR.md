@@ -28,14 +28,14 @@ Passo a passo:
 2. Exporte a chave privada: `gpg --export-secret-keys "Tank Wallet Security" > tank-wallet-sec-private.key`
 3. Guarde o arquivo `tank-wallet-sec-private.key` em local seguro (pen drive criptografado, gerenciador de senhas, ou 1Password/Bitwarden)
 4. Delete o arquivo do computador após guardar: `shred -u tank-wallet-sec-private.key`
-5. A chave pública já está commitada em `docs/security/pgp-key.asc` — não é sensível
+5. A chave pública já está commitada em `docs/05-security-compliance/security/pgp-key.asc` — não é sensível
 Como saber que deu certo: Você consegue importar a chave privada em outro computador com `gpg --import tank-wallet-sec-private.key` e ela mostra "Tank Wallet Security"
 Depois de feito: responda "feito o item Nº 2"
 
 ### [3] Criar conta e lançar bug bounty no Immunefi
 Por quê: O bug bounty público permite que pesquisadores encontrem vulnerabilidades por recompensa. É a principal camada de validação externa gratuita.
 Onde: https://immunefi.com/
-Passo a passo: ver `docs/security/bug-bounty-launch-guide.md` (guia completo)
+Passo a passo: ver `docs/05-security-compliance/security/bug-bounty-launch-guide.md` (guia completo)
 Como saber que deu certo: O programa aparece em https://immunefi.com/bounty/tankwallet
 Depois de feito: responda "feito o item Nº 3"
 
@@ -52,7 +52,7 @@ Depois de feito: responda "feito o item Nº X"
 -->
 
 ### [PEND-AUDIT] Escolher audit firm + aprovar orcamento + assinar engagement letter
-Por que: pacote pronto em docs/audit-package/ (T085). Seguir docs/audit-package/CONTACT-RUNBOOK.md. Decisao de negocio (orcamento/contrato), fora do ciclo simbiotico.
+Por que: pacote pronto em docs/05-security-compliance/audit-package/ (T085). Seguir docs/05-security-compliance/audit-package/CONTACT-RUNBOOK.md. Decisao de negocio (orcamento/contrato), fora do ciclo simbiotico.
 
 ### [4] Decidir: SSO em Production e intencional? + status DNS tankwallet.dev
 Por quê: Produção e previews estão atrás de Vercel Authentication (login SSO) — público externo não carrega o app; isso invalida qualquer medição de produção e bloqueia a ativação do CSP enforcing (T087/T092).

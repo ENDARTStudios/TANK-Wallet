@@ -17,7 +17,7 @@ Closes #
 - [ ] HSTS + CSP + rate `429` + bot `403` verificados (se aplicável)
 - [ ] `error.tsx` + `global-error.tsx` + `Sentry` (se UI)
 - [ ] Skeleton + lazy + animação entrada/saída + progresso + responsivo 375/390/768 (se UI)
-- [ ] Docs vivos atualizados (`PRD.md`, `docs/uml/UML.md`, `docs/RBAC.md`, etc.)
+- [ ] Docs vivos atualizados (`PRD.md`, `docs/02-architecture-design/UML.md`, `docs/05-security-compliance/RBAC.md`, etc.)
 
 ## Evidências
 <!-- `file:line` + screenshots / `curl -I` / `gitleaks` output -->

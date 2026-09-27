@@ -1,4 +1,4 @@
-﻿# DECISOES.md
+# DECISOES.md
 
 > Registro de todas as decisÃµes tÃ©cnicas e de produto do projeto.
 > Formatado conforme SeÃ§Ã£o 5 do `PROTOCOLO_MESTRE.md`.
@@ -211,7 +211,7 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 
 
 ## 2026-09-26 — T081 Reconciliacao PLANO_MESTRE
-- PLANO antigo (Almanaque dos Clubes, Fastify/pnpm, futebol) preservado em docs/historical/PLANO_MESTRE_ALMANAQUE.md via git mv. Novo PLANO reflete TANK Wallet real (Next 16, MPC v2, HSM, Vercel). Evidencia grep: Almanaque/Clube presentes no antigo (linhas 27/31/168/172/180/193).
+- PLANO antigo (Almanaque dos Clubes, Fastify/pnpm, futebol) preservado em docs/08-knowledge-management/historical/PLANO_MESTRE_ALMANAQUE.md via git mv. Novo PLANO reflete TANK Wallet real (Next 16, MPC v2, HSM, Vercel). Evidencia grep: Almanaque/Clube presentes no antigo (linhas 27/31/168/172/180/193).
 
 
 ## 2026-09-26 — T082 roteamento de intent (Choice+Noul, flag propria)
@@ -245,7 +245,7 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 
 
 ## 2026-09-26 — T085 pacote de auditoria (2 escopos)
-- Audit 1 (crypto/MPC/HSM/recovery) + Audit 2 (engines/pipeline/TypeSafe). Commit frozen 2977f20. Firms: fit tecnico > preco > prazo. Criterio de escolha documentado em docs/audit-package/FIRMS-CANDIDATES.md.
+- Audit 1 (crypto/MPC/HSM/recovery) + Audit 2 (engines/pipeline/TypeSafe). Commit frozen 2977f20. Firms: fit tecnico > preco > prazo. Criterio de escolha documentado em docs/05-security-compliance/audit-package/FIRMS-CANDIDATES.md.
 
 
 ## 2026-09-26 — T086 CSP enforcing (flag CSP_ENFORCE, report-to)

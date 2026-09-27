@@ -37,4 +37,4 @@ Prova de autenticação real (não fallback IP): com bucket IP compartilhado, o 
 - [x] LOAD-TESTING.md atualizado (seção autenticado). PR dedicado; merge após REVIEW.
 
 Arquivos: `scripts/k6/gen-dev-tokens.ts`, `scripts/k6/authenticated.js`,
-`docs/LOAD-TESTING.md`, `STATUS-T101.md`. Dívida D100 quitada.
+`docs/06-devops-deployment/LOAD-TESTING.md`, `STATUS-T101.md`. Dívida D100 quitada.
