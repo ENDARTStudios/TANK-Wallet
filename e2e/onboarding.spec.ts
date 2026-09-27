@@ -25,9 +25,13 @@ test.describe("Onboarding", () => {
   test("T089 reenable: onboarding keyboard focuses form (was fixme T061/T075; ver STATUS-T089)", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/", { waitUntil: "domcontentloaded", timeout: 10000 });
-    await page.getByRole("button", { name: /Importar com seed phrase/i }).click();
+    const importBtn = page.getByRole("button", { name: /Importar com seed phrase/i });
     const textarea = page.locator("textarea");
-    await expect(textarea).toBeVisible({ timeout: 10000 });
+    await expect(async () => {
+      await importBtn.click();
+      await expect(textarea).toBeVisible({ timeout: 3000 });
+    }).toPass({ timeout: 30000 });
     await textarea.focus();
+    await expect(textarea).toBeFocused();
   });
 });

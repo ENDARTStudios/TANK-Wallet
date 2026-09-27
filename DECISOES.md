@@ -259,3 +259,9 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - recordCspViolation(host, mode): chaves report:<modo> distinguem enforcing vs report-only. Rota passa modo da flag.
 - Evidencia de promocao: zero hits csp-report nos logs de producao (vercel logs, sem PII); nenhum CI E2E falhou por CSP desde 2977f20; enforcing preserva unsafe-inline (mudanca zero por construcao).
 
+
+## 2026-09-27 — T089 keyboard fixme reabilitado (D089: clique pré-hidratação)
+- Causa raiz: clique em "Importar com seed phrase" antes da hidratação React (goto domcontentloaded + dev frio + 3 projetos paralelos) = evento perdido sem erro; step ficava em welcome, textarea inexistente. 9/9 determinístico — não era flake aleatório. App sem bug (textarea existe, handler trivial).
+- Correção: expect().toPass({30s}) — retry do clique-efeito até hidratar; + assert novo toBeFocused (teste ficou mais forte). Config CI intacta (já workers:1 + retries:2).
+- Evidência: -g keyboard --repeat-each=3 → 9 passed; spec inteiro → 12 passed.
+
