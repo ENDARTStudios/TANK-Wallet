@@ -266,6 +266,12 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Nao enfraquecer propriedades: codigo crypto intacto; falha = bug, nao teste fraco.
 
 
+## 2026-09-27 — T089 keyboard fixme reabilitado (D089: clique pré-hidratação)
+- Causa raiz: clique em "Importar com seed phrase" antes da hidratação React (goto domcontentloaded + dev frio + 3 projetos paralelos) = evento perdido sem erro; step ficava em welcome, textarea inexistente. 9/9 determinístico — não era flake aleatório. App sem bug (textarea existe, handler trivial).
+- Correção: expect().toPass({30s}) — retry do clique-efeito até hidratar; + assert novo toBeFocused (teste ficou mais forte). Config CI intacta (já workers:1 + retries:2).
+- Evidência: -g keyboard --repeat-each=3 → 9 passed; spec inteiro → 12 passed.
+
+
 ## 2026-09-27 — D094 F07-pausado / F08-prosseguir (decisor: Thinker; registro: Doer)
 - F07 operational-incomplete (T087/T092 aguardam Operador: SSO/DNS/bypass/quota); Sprint 61/F08 prossegue (T088+T089 paralelas). T088 executada nesta entrada; T089 em andamento.
 
