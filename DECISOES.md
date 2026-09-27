@@ -313,3 +313,9 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Keying: reads/writes autenticados por userId (JWT via getToken, nunca header); anonimos por IP. rateLimitKey com prefixo uid: (sem colisao). Monitoria em bucket proprio 600/min (health sai do proxy-limiter; comentario mentiroso corrigido). Limites T083 intactos + monitor:600.
 - STRIDE: spoofing (so JWT validado; header nao alimenta keying); tampering (chave server-side); repudiation (contadores+headers bucket efetivo); info disclosure (sem userId nos headers); DoS (CGNAT mitigado autenticados; anonimos por IP); elevation (sem mudanca).
 - Overhead getToken/JWE por request estourou p95 k6 -> guard de cookie (sem cookie, sem decrypt; semantica identica). TDD 4/4 + 14 security + test:load EXIT 0.
+
+## 2026-09-27 — D102 Sprint 61 tecnica fechada (licoes permanentes)
+- D100 comentario!=codigo, aplicado 2x: (1) GET /api/csp-report/stats inventado na T100 -> gap declarado; (2) /api/health 'exempt' comentado mas limitado a 120 -> bucket monitoria 600 real. Regra: invariante de seguranca se prova por teste/header, nunca por comentario.
+- UTF-16 LE em next.config.ts: edicoes trocam line-endings do arquivo inteiro (ruido no diff #77, funcional intacto) — cuidado futuro.
+- Falsos-positivos: wrong_key (acidente de prefixo), 429 (desenho, nao degradacao), proxy-nao-executa (muro SSO). Cultura: desconfiar do proprio alarme com contagens.
+- #75 e Issue (reorg docs), nao PR — verificar artefatos diretamente antes de categorizar.
