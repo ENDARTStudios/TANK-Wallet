@@ -22,7 +22,7 @@ test.describe("Onboarding", () => {
     expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 1);
   });
 
-  test.fixme("T061 - skip: onboarding keyboard not covering form (H1+H2) - env/test setup Playwright; ver T062 Sprint 59", async ({ page }) => {
+  test("T089 reenable: onboarding keyboard focuses form (was fixme T061/T075; ver STATUS-T089)", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/", { waitUntil: "domcontentloaded", timeout: 10000 });
     await page.getByRole("button", { name: /Importar com seed phrase/i }).click();
