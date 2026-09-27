@@ -247,3 +247,10 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 ## 2026-09-26 — T085 pacote de auditoria (2 escopos)
 - Audit 1 (crypto/MPC/HSM/recovery) + Audit 2 (engines/pipeline/TypeSafe). Commit frozen 2977f20. Firms: fit tecnico > preco > prazo. Criterio de escolha documentado em docs/audit-package/FIRMS-CANDIDATES.md.
 
+
+## 2026-09-26 — T086 CSP enforcing (flag CSP_ENFORCE, report-to)
+- Evidencia: zero violacoes nao explicadas observaveis (endpoint sem store persistente por desenho sem PII; nenhum CI E2E falhou por CSP desde 2977f20); E2E local com CSP_ENFORCE=1: 57 passed, 3 skipped (fixme), 0 failed.
+- report-uri mantido como fallback + report-to (Reporting-Endpoints) adicionado; endpoint aceita application/csp-report (objeto) e application/reports+json (array).
+- STRIDE: spoofing (nonce server-side, flag via env); tampering (headers server-side); repudiation (counters + STATUS-T086); info disclosure (sem PII, sem query nos logs); DoS (rate limit + 64KB); elevation (sem mudanca).
+- Rollback: CSP_ENFORCE=false volta a report-only sem redeploy de codigo.
+

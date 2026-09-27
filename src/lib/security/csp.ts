@@ -1,5 +1,16 @@
 export const CSP_REPORT_MAX_BYTES = 65536;
 export const CSP_REPORT_PATH = "/api/csp-report";
+export const CSP_REPORT_ENDPOINT_NAME = "csp-endpoint";
+
+export function reportingEndpointsHeader(): string {
+  return `${CSP_REPORT_ENDPOINT_NAME}="${CSP_REPORT_PATH}"`;
+}
+
+export function isCspEnforceOn(env: Record<string, string | undefined> = process.env): boolean {
+  const raw = env.CSP_ENFORCE;
+  if (raw === undefined) return false;
+  return raw === "1" || raw.toLowerCase() === "true";
+}
 
 const cspViolationCounters = new Map<string, number>();
 
@@ -18,10 +29,18 @@ export function resetCspForTest(): void {
 
 export function validateCspReport(body: unknown, byteLength: number): { ok: boolean; status: number } {
   if (byteLength > CSP_REPORT_MAX_BYTES) return { ok: false, status: 413 };
-  if (typeof body !== "object" || body === null || Array.isArray(body)) return { ok: false, status: 400 };
+  if (typeof body !== "object" || body === null) return { ok: false, status: 400 };
+  if (Array.isArray(body)) {
+    if (body.length === 0) return { ok: false, status: 400 };
+    return { ok: true, status: 204 };
+  }
   const report = (body as Record<string, unknown>)["csp-report"];
   if (typeof report !== "object" || report === null || Array.isArray(report)) return { ok: false, status: 400 };
   return { ok: true, status: 204 };
+}
+
+export function buildEnforcingPolicy(nonce: string): string {
+  return `${buildReportOnlyPolicy(nonce)}; report-to ${CSP_REPORT_ENDPOINT_NAME}`;
 }
 
 export function generateNonce(): string {

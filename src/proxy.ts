@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { consumeRateLimit, getRateLimitHeaders } from "@/lib/security/rate-limit";
 import { analyzeBotSignal, getBotMode, shouldBlockBot } from "@/lib/security/bot-guard";
-import { generateNonce, buildReportOnlyPolicy } from "@/lib/security/csp";
+import { generateNonce, buildReportOnlyPolicy, buildEnforcingPolicy, isCspEnforceOn, reportingEndpointsHeader } from "@/lib/security/csp";
 
 export default function proxy(request: NextRequest): NextResponse | Response {
   const pathname = request.nextUrl.pathname;
   const cspNonce = generateNonce();
-  const reportOnly = buildReportOnlyPolicy(cspNonce);
+  const enforcing = isCspEnforceOn();
+  const cspPolicy = enforcing ? buildEnforcingPolicy(cspNonce) : buildReportOnlyPolicy(cspNonce);
+  const cspHeaderName = enforcing ? "Content-Security-Policy" : "Content-Security-Policy-Report-Only";
 
   if (pathname.startsWith("/api/")) {
     // /api/health is exempt from rate-limit and bot checks (monitoring only)
@@ -45,7 +47,8 @@ export default function proxy(request: NextRequest): NextResponse | Response {
         headers: {
           "Content-Type": "application/json",
           ...headers,
-          "Content-Security-Policy-Report-Only": reportOnly,
+          [cspHeaderName]: cspPolicy,
+          "Reporting-Endpoints": reportingEndpointsHeader(),
         },
       });
     }
@@ -54,14 +57,16 @@ export default function proxy(request: NextRequest): NextResponse | Response {
     for (const [k, v] of Object.entries(headers)) {
       res.headers.set(k, v);
     }
-    res.headers.set("Content-Security-Policy-Report-Only", reportOnly);
+    res.headers.set(cspHeaderName, cspPolicy);
+    res.headers.set("Reporting-Endpoints", reportingEndpointsHeader());
     res.headers.set("x-csp-nonce", cspNonce);
     return res;
   }
 
   // Pages and assets are not rate-limited
   const pageres = NextResponse.next();
-  pageres.headers.set("Content-Security-Policy-Report-Only", reportOnly);
+  pageres.headers.set(cspHeaderName, cspPolicy);
+  pageres.headers.set("Reporting-Endpoints", reportingEndpointsHeader());
   pageres.headers.set("x-csp-nonce", cspNonce);
   return pageres;
 }

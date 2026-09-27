@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { generateNonce, buildReportOnlyPolicy, CSP_REPORT_MAX_BYTES } from "../csp";
+import { generateNonce, buildReportOnlyPolicy, buildEnforcingPolicy, isCspEnforceOn, CSP_REPORT_MAX_BYTES } from "../csp";
 
 describe("csp nonce", () => {
   it("gera nonce unico base64 por chamada", () => {
@@ -17,6 +17,21 @@ describe("csp nonce", () => {
     expect(policy).toContain("frame-ancestors 'none'");
     expect(policy).toContain("object-src 'none'");
     expect(policy).not.toContain("Content-Security-Policy:");
+  });
+
+  it("enforcing preserva diretivas e adiciona report-to", () => {
+    const policy = buildEnforcingPolicy("xyz789");
+    expect(policy).not.toContain("Report-Only");
+    expect(policy).toContain("script-src 'self' 'nonce-xyz789'");
+    expect(policy).toContain("report-uri /api/csp-report");
+    expect(policy).toContain("report-to csp-endpoint");
+  });
+
+  it("flag CSP_ENFORCE default off", () => {
+    expect(isCspEnforceOn({})).toBe(false);
+    expect(isCspEnforceOn({ CSP_ENFORCE: "1" })).toBe(true);
+    expect(isCspEnforceOn({ CSP_ENFORCE: "true" })).toBe(true);
+    expect(isCspEnforceOn({ CSP_ENFORCE: "0" })).toBe(false);
   });
 
   it("limite de payload do report e valido", () => {
