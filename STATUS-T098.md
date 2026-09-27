@@ -42,4 +42,4 @@ síncrono; sem cookie não há identidade — semântica idêntica). Após: `tes
 - [x] LOAD-TESTING.md (tetos/keying) + DECISOES.md (D098). PR dedicado; merge após REVIEW.
 
 Arquivos: `rate-limit.ts`, `proxy.ts`, `health/route.ts`, keying.test.ts, STATUS-T098.md,
-DECISOES.md, `docs/LOAD-TESTING.md`.
+DECISOES.md, `docs/06-devops-deployment/LOAD-TESTING.md`.

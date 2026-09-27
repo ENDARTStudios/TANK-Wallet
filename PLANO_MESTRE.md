@@ -1,7 +1,7 @@
 # PLANO_MESTRE.md — TANK Wallet
 
 > Produto real deste repositório: **TANK Wallet — Zero Trust Security Platform** (hot wallet autocustodial multi-chain com pipeline de decisão preventiva antes de qualquer assinatura).
-> Histórico: a versão anterior deste arquivo descrevia outro produto ("Almanaque dos Clubes", plataforma de futebol com Fastify/pnpm) e foi preservada em `docs/historical/PLANO_MESTRE_ALMANAQUE.md` (T081). Conflito entre este arquivo e o Protocolo: o Protocolo vence.
+> Histórico: a versão anterior deste arquivo descrevia outro produto ("Almanaque dos Clubes", plataforma de futebol com Fastify/pnpm) e foi preservada em `docs/08-knowledge-management/historical/PLANO_MESTRE_ALMANAQUE.md` (T081). Conflito entre este arquivo e o Protocolo: o Protocolo vence.
 
 ---
 

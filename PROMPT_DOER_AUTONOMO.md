@@ -203,7 +203,7 @@ O PLANO_MESTRE.md atual descreve "Almanaque dos Clubes" (produto diferente). Voc
    - Fase 9: IA e automação (TypeSafe integration, threat intelligence, auto-remediation)
    - Fase 10: Produção e escala (multi-region, disaster recovery, compliance)
 
-3. **Preservar histórico:** mover PLANO_MESTRE.md antigo para `docs/historical/PLANO_MESTRE_ALMANAQUE.md`
+3. **Preservar histórico:** mover PLANO_MESTRE.md antigo para `docs/08-knowledge-management/historical/PLANO_MESTRE_ALMANAQUE.md`
 
 4. **Documentar em DECISOES.md:**
    ```markdown
@@ -211,7 +211,7 @@ O PLANO_MESTRE.md atual descreve "Almanaque dos Clubes" (produto diferente). Voc
    - **Contexto:** PLANO_MESTRE.md descrevia produto diferente (Almanaque dos Clubes)
    - **Decisão:** Substituído por versão alinhada com TANK Wallet (crypto wallet)
    - **Justificativa:** Repo real é TANK Wallet com MPC v2 + HSM; plano antigo era de fork anterior
-   - **Histórico:** Preservado em docs/historical/PLANO_MESTRE_ALMANAQUE.md
+   - **Histórico:** Preservado em docs/08-knowledge-management/historical/PLANO_MESTRE_ALMANAQUE.md
    ```
 
 ### 9. **Execução da Sprint 59 (restante)**

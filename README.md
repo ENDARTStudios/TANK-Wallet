@@ -8,10 +8,10 @@
 
 We welcome security research on Tank Wallet. See [`BUG-BOUNTY.md`](BUG-BOUNTY.md) for scope, rules, and rewards.
 
-- **Platform**: Immunefi (launch pending — see [launch guide](docs/security/bug-bounty-launch-guide.md))
+- **Platform**: Immunefi (launch pending — see [launch guide](docs/05-security-compliance/security/bug-bounty-launch-guide.md))
 - **Critical**: R$10,00 – R$50,00
 - **Report**: security@tankwallet.dev (PGP) or via Immunefi when live
-- **Hall of Fame**: See our [Security Hall of Fame](docs/security/hall-of-fame.md) for recognized researchers
+- **Hall of Fame**: See our [Security Hall of Fame](docs/05-security-compliance/security/hall-of-fame.md) for recognized researchers
 
 ## O que é
 
@@ -58,7 +58,7 @@ bun run golden     # Golden test vectors
 
 ## Para auditores
 
-Ver `docs/audit-package/README.md` para o pacote completo de auditoria:
+Ver `docs/05-security-compliance/audit-package/README.md` para o pacote completo de auditoria:
 - Commit frozen: `fdae6e35b22b`
 - Escopo Audit #1: crypto + key management + recovery
 - Escopo Audit #2: engines + decision pipeline + event bus

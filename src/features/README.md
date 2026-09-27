@@ -1,6 +1,6 @@
 # src/features — Catálogo Modular (target)
 
-> Ver `docs/ARCHITECTURE-MODULES.md` e `src/lib/config/feature-flags.ts`.
+> Ver `docs/02-architecture-design/ARCHITECTURE-MODULES.md` e `src/lib/config/feature-flags.ts`.
 
 Estrutura alvo (migração incremental de `src/lib/wallet-*` + `src/components/wallet/*`):
 
@@ -19,4 +19,4 @@ Regras:
 - `feature-flags.ts` controla visibilidade por `tier × flag`.
 - `scripts/verify/` valida fronteiras (sem import cruzado).
 
-Estado: placeholder. Migração em `chore/issue-10` (ver `docs/ISSUES-BACKLOG.md` #10).
+Estado: placeholder. Migração em `chore/issue-10` (ver `docs/03-development-process/ISSUES-BACKLOG.md` #10).

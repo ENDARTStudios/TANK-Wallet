@@ -18,7 +18,7 @@ Resultado: **FILA EXECUTÁVEL ESVAZIADA** — resto é só Operador (4 pendênci
 
 (a) fases aplicáveis concluídas até o limite sem Operador ✓; (b) CI verde consistente ✓;
 (c) MANUAL_DO_OPERADOR.md ✓; (d) zero achado crítico/alto pendente ✓
-(#66 corrigida, #70/#74/#75 rastreadas); (e) `docs/audit-package/` pronto ✓.
+(#66 corrigida, #70/#74/#75 rastreadas); (e) `docs/05-security-compliance/audit-package/` pronto ✓.
 
 ## 3. Pausado (pendências Operador — sem ação técnica possível)
 

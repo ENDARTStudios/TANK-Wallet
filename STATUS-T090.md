@@ -29,9 +29,9 @@ thresholds (5/20). Detalhe por alerta (zap-report.json, artifact 30d):
 
 - [x] `gh workflow run dast.yml` manual → success (run 36324303494).
 - [x] High=0; medium/low triadas (acima).
-- [x] `docs/DAST-RUNBOOK.md` existe; baseline em `reports/dast/baseline-summary.json`.
+- [x] `docs/06-devops-deployment/DAST-RUNBOOK.md` existe; baseline em `reports/dast/baseline-summary.json`.
 - [x] Workflow NÃO-required (nunca bloqueia PRs). DECISOES.md (D090).
 
 Arquivos: `.github/workflows/dast.yml` (novo), `dast-config/zap-baseline.yaml` (re-alvo +
-AF válido), `docs/DAST-RUNBOOK.md`, `reports/dast/baseline-summary.json`, `STATUS-T090.md`,
+AF válido), `docs/06-devops-deployment/DAST-RUNBOOK.md`, `reports/dast/baseline-summary.json`, `STATUS-T090.md`,
 `DECISOES.md`. Scan de produção adiado (PEND-SSO/BYPASS).

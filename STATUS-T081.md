@@ -7,7 +7,7 @@
 
 ## Evidência
 
-- `git mv PLANO_MESTRE.md docs/historical/PLANO_MESTRE_ALMANAQUE.md` (histórico preservado, trilha git mantida)
+- `git mv PLANO_MESTRE.md docs/08-knowledge-management/historical/PLANO_MESTRE_ALMANAQUE.md` (histórico preservado, trilha git mantida)
 - Antigo descrevia outro produto — grep: `Almanaque` (linha 31), `clubes/jogadores/competições` (27), `clube/jogador/competição` (168), `biografias` (172), `pesquisar clube` (180), `lista de clubes` (193); stack Fastify/pnpm/PostgreSQL
 - Novo plano: TANK Wallet real (Next 16, Bun, Prisma, MPC v2, HSM, Vercel, PRs #50–#57, fases F07–F10)
 - `DECISOES.md`: entrada de reconciliação; `SPRINT.md`: `[x] T081` (aguardando REVIEW)
