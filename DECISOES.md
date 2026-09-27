@@ -213,3 +213,9 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 ## 2026-09-26 — T081 Reconciliacao PLANO_MESTRE
 - PLANO antigo (Almanaque dos Clubes, Fastify/pnpm, futebol) preservado em docs/historical/PLANO_MESTRE_ALMANAQUE.md via git mv. Novo PLANO reflete TANK Wallet real (Next 16, MPC v2, HSM, Vercel). Evidencia grep: Almanaque/Clube presentes no antigo (linhas 27/31/168/172/180/193).
 
+
+## 2026-09-26 — T082 roteamento de intent (Choice+Noul, flag propria)
+- Classifier server-side: Choice 6 opcoes + Noul clareza (<0.5 => unclassified); heuristica local allowlist de alta precisao (transfer/approve/3 swaps/stake); resto => TypeSafe; timeout 3000 nao-blocker; tudo => unavailable sem excecao.
+- Flag INTENT_ROUTING_ENABLED default off (separada de JEV_ENABLED); UI IntentBadge com source visivel + risk/intent i18n pt/en/es; skipped != seguro.
+- STRIDE: spoofing (mock so em teste, sdk pinado); tampering (intent nao altera decisao — teste intent-advisory); repudiation (STATUS-T082); info disclosure (só metadados: chain/address/selector/value/dapp_origin, nunca texto livre); DoS (timeout+flag off); elevation (server-only).
+

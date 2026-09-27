@@ -104,6 +104,13 @@
   "risk.block": "Bloquear",
   "risk.review": "Revisar",
   "risk.limited": "Limitado",
+  "intent.send": "Enviar",
+  "intent.swap": "Trocar",
+  "intent.approve": "Aprovar",
+  "intent.stake": "Staking",
+  "intent.bridge": "Ponte",
+  "intent.unclassified": "Não classificado",
+  "intent.unavailable": "Classificação indisponível",
   "risk.jev_signal": "Sinal IA Jev",
   "risk.jev_unavailable": "Sinal indisponível",
 
