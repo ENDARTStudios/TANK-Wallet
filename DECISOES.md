@@ -280,3 +280,7 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Excecao ao freeze MPC (T058/T080) aprovada pelo Thinker (D095): bug real #66 provado por P4; correcao minima (2 linhas, mesmo bloco), nao feature.
 - Correcao: combineSignatures embute tag publicKey[0:8] (formato/length intactos); verify aceita sig_|combined_sig_ + amarra no ARGUMENTO publicKey (nao this.publicKey — semantica correta; teste wrong_key prova). Fragmento mpc_pk_X nao-hex => colisao impossivel.
 - P4 reabilitada 1000 runs PASS; P1-P3 intactas; 17 pass mpc/; tsc+eslint limpos. Issue #66 fecha apos merge. Limitacao honesta do stub: mensagem nao amarrada no verify (pre-existente).
+
+## 2026-09-27 — T090 DAST ZAP baseline local-first (D090: triagem)
+- Harness: yaml re-alvejado localhost (prod proibida) + AF corrigido (passiveScan-config/wait; config Sprint-25 nunca funcionou) + chmod zap-out. Run 36324303494 SUCCESS: High 0, Medium 4, Low 2, Info 3 (dentro 5/20). Workflow nao-required.
+- Triagem: Mediums CSP x4 (policy estatica) = MITIGA EM CURSO (T084/T086/T087; aperto da estatica na retomada); Low X-Powered-By = ISSUE #74; Low Timestamp = ACEITA (FP build). Scan prod adiado (PEND-SSO/BYPASS).
