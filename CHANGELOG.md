@@ -1,4 +1,17 @@
 # Changelog
+## [Unreleased] — Sprint 59 — TypeSafe + CI/E2E
+### Added
+- **T077**: `src/lib/ai-risk/typesafe-jev.ts` assessDappRisk (Noul+Score, zod, fail-open skipped) + `src/lib/risk/thresholds.ts` const compartilhada (PR #56)
+- **T080**: flag-wiring Jev (`JEV_ENABLED` default off, `RiskResult.jev?`, `GET /api/risk` expõe estado, `IntentBadge` com i18n pt/en/es) (PR #57)
+- **T082**: `src/lib/intent/classifier.ts` roteamento de intent (Choice+Noul, flag `INTENT_ROUTING_ENABLED` default off, metadados-only, timeout 3000 não-blocker) + `IntentBadge` + i18n (PR #59)
+- **T079**: `src/lib/env/url.ts` resolveBaseUrl (NEXTAUTH_URL vazio/inválido → fallback; corrige prerender Vercel) (PR #55)
+### Fixed
+- **T062**: 9 E2E `test.fixme` removidos, 60 passed (PR #53, fecha #49)
+- **T072/T073**: main CI restaurada (Commit metrics fallback, remove workflows mortos slither/fuzzing 0 .sol)
+- **T081**: PLANO_MESTRE reconciliado (Almanaque preservado em docs/historical)
+### Docs
+- DECISOES.md: TypeSafe advisory-only, STRIDE Jev/intent, regra skipped != seguro, D078 (merge só após REVIEW)
+
 ## [1.2.1] — 2026-08-30 — Hotfix
 ### Added
 - **Sprint 41**: `.github/workflows/release.yml` remove duplicate env; `.github/workflows/restore-e2e.yml` folded scalar; `.gitleaks.toml` config + allowlist + private key rule

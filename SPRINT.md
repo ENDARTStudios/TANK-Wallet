@@ -47,3 +47,8 @@
 ## T081 — Reconciliacao PLANO_MESTRE (Sprint 59)
 - [x] Preservar antigo em docs/historical + novo plano TANK Wallet + DECISOES (aguardando REVIEW, sem merge — D078).
 
+
+## T082 + Fechamento Sprint 59
+- [x] T082 roteamento de intent (PR #59 mergeado pós-CI verde, R081).
+- [x] Sprint 59 fechada: CHANGELOG [Unreleased], STATUS-SPRINT59.md (aguardando REVIEW, sem merge — D078).
+
