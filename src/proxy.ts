@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { consumeRateLimit, getRateLimitHeaders } from "@/lib/security/rate-limit";
 import { analyzeBotSignal, getBotMode, shouldBlockBot } from "@/lib/security/bot-guard";
+import { generateNonce, buildReportOnlyPolicy } from "@/lib/security/csp";
 
 export default function proxy(request: NextRequest): NextResponse | Response {
   const pathname = request.nextUrl.pathname;
+  const cspNonce = generateNonce();
+  const reportOnly = buildReportOnlyPolicy(cspNonce);
 
   if (pathname.startsWith("/api/")) {
     // /api/health is exempt from rate-limit and bot checks (monitoring only)
@@ -42,6 +45,7 @@ export default function proxy(request: NextRequest): NextResponse | Response {
         headers: {
           "Content-Type": "application/json",
           ...headers,
+          "Content-Security-Policy-Report-Only": reportOnly,
         },
       });
     }
@@ -50,13 +54,18 @@ export default function proxy(request: NextRequest): NextResponse | Response {
     for (const [k, v] of Object.entries(headers)) {
       res.headers.set(k, v);
     }
+    res.headers.set("Content-Security-Policy-Report-Only", reportOnly);
+    res.headers.set("x-csp-nonce", cspNonce);
     return res;
   }
 
   // Pages and assets are not rate-limited
-  return NextResponse.next();
+  const pageres = NextResponse.next();
+  pageres.headers.set("Content-Security-Policy-Report-Only", reportOnly);
+  pageres.headers.set("x-csp-nonce", cspNonce);
+  return pageres;
 }
 
 export const config = {
-  matcher: ["/api/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

@@ -230,3 +230,11 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Enforcement: apenas /api/broadcast (send + userId real). swap/approve/bridge sem rotas existentes (operacoes assinadas client-side) — limites preparatorios, sem rota sem enforcement. proxy.ts inalterado (pre-auth, teto IP global).
 - Fix headers: allowed reflete bucket da operacao (nao global); Retry-After do bucket que bloqueou.
 
+
+## 2026-09-26 — T084 CSP nonce report-only
+- Nonce crypto por request (getRandomValues+btoa, Edge-safe) + Content-Security-Policy-Report-Only com nonce em script/style + report-uri /api/csp-report; enforcing original preservada.
+- Matcher do middleware ampliado para paginas (exceto _next/static|image|favicon); nonce exposto via x-csp-nonce p/ server components futuros.
+- POST /api/csp-report: auth get_threats + rate limit T083 + limite 64KB (413) + valida forma (400) + 204 sem PII (só contadores).
+- STRIDE: spoofing (nonce server-side); tampering (valida+descarta malformados); repudiation (counters sem PII); info disclosure (sem query/cookies nos logs); DoS (rate limit + 64KB); elevation (sem mudanca).
+- Plano de promocao (T086): N requests sem violacao nao explicada => enforcing; terceiros sem nonce documentados como excecao.
+
