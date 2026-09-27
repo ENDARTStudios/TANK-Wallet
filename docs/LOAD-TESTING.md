@@ -19,11 +19,13 @@ Regra de threshold: p95 < 4× baseline medido (dev-mode tem variância; números
 
 ## Por que pacing (importante)
 
-O proxy impõe budget single-IP hardcoded (reads 120/min, writes 30/min — T083).
-Shapes acima do budget tomam **429 por desenho** (medido: 1171×429 vs 120×200 a
-10VU). Isso NÃO é instabilidade — é enforcement. O script `rate-limit.js` prova o
-controle (3166/3166 conformes). Load além do budget exige múltiplos IPs ou janela
-com budget elevado (nunca em produção sem decisão).
+O proxy impõe budget por chave (T083 + T098): anônimos por IP (reads 120/min, writes
+30/min); autenticados por userId via JWT validado (CGNAT-safe); monitoria (`/api/health`)
+em bucket próprio 600/min fora do budget de negócio. Shapes acima do budget tomam
+**429 por desenho** (medido: 1171×429 vs 120×200 a 10VU). Isso NÃO é instabilidade —
+é enforcement. Header-identity (x-user-id, usada pelo k6) NÃO alimenta o keying do proxy
+(anti-spoofing) — baselines k6 medem o caminho anônimo/IP. Load além do budget exige
+múltiplos IPs ou janela própria (nunca em produção sem decisão).
 
 ## Por que broadcast só com corpo inválido
 

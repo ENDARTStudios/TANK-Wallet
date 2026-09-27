@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getMetricsAsString } from "@/lib/observability/metrics";
+import { consumeRateLimitAdvanced } from "@/lib/security/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,15 @@ interface HealthStatus {
   metricsEndpoint: boolean;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  // Bucket de monitoria separado (600/min, T098): monitores não consomem budget de negócio.
+  const limit = consumeRateLimitAdvanced(req, { operation: "monitor" });
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: "Too Many Requests", retryAfter: limit.retryAfter },
+      { status: 429, headers: limit.headers },
+    );
+  }
   const checks: HealthStatus["checks"] = {
     database: true,
     observability: true,
@@ -56,6 +65,6 @@ export async function GET() {
 
   return NextResponse.json(status, {
     status: status.status === "unhealthy" ? 503 : 200,
-    headers: { "Cache-Control": "no-store" },
+    headers: { "Cache-Control": "no-store", ...limit.headers },
   });
 }

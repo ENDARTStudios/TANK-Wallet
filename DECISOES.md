@@ -290,3 +290,8 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Baseline dev local (1VU paced): health p95 20.7ms 90/90; risk p95 18.4ms 92/92; broadcast(invalido) p95 34.6ms 14/14; rate-limit rajada 3166/3166 (200/429 c/ Retry-After). Thresholds p95<100 (4x baseline).
 - Teto single-IP POR DESENHO: reads 120/min + writes 30/min hardcoded no proxy (T083) — 10VU/60s toma 429 (1171x429 vs 120x200, zero 503). Nao e instabilidade. Load alem do budget = multi-IP ou janela propria (nunca prod sem decisao). Issue #72 (falso alarme de checks caros) corrigida e fechada.
 - Seguranca do harness: broadcast so corpo invalido (nunca transmite); risk so GET (sem queimar quota terceiros); alvo sempre local. Pergunta ao Thinker: budget 120/min/IP comporta monitores + uso real?
+
+## 2026-09-27 — T098 rate-limit keying (D098: resposta ao budget)
+- Keying: reads/writes autenticados por userId (JWT via getToken, nunca header); anonimos por IP. rateLimitKey com prefixo uid: (sem colisao). Monitoria em bucket proprio 600/min (health sai do proxy-limiter; comentario mentiroso corrigido). Limites T083 intactos + monitor:600.
+- STRIDE: spoofing (so JWT validado; header nao alimenta keying); tampering (chave server-side); repudiation (contadores+headers bucket efetivo); info disclosure (sem userId nos headers); DoS (CGNAT mitigado autenticados; anonimos por IP); elevation (sem mudanca).
+- Overhead getToken/JWE por request estourou p95 k6 -> guard de cookie (sem cookie, sem decrypt; semantica identica). TDD 4/4 + 14 security + test:load EXIT 0.

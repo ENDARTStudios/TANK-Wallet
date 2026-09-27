@@ -12,7 +12,7 @@ function getLimit(fallback: number): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-export function rateLimitKey(req: Request | { headers: Headers; url: string; ip?: string }): string {
+export function rateLimitKey(req: Request | { headers: Headers; url: string; ip?: string }, userId?: string): string {
   const anyReq = req as unknown as { ip?: string; headers: Headers; url?: string };
   const forwarded = anyReq.headers.get("x-forwarded-for") ?? "";
   const ip = anyReq.ip ?? forwarded.split(",")[0]?.trim() ?? anyReq.headers.get("x-real-ip") ?? "unknown";
@@ -23,6 +23,7 @@ export function rateLimitKey(req: Request | { headers: Headers; url: string; ip?
   } catch {
     path = url || "unknown";
   }
+  if (userId) return `uid:${userId}:${path}`;
   const key = `${ip}:${path}`;
   return key;
 }
@@ -50,9 +51,9 @@ export function checkRateLimit(
 
 export function consumeRateLimit(
   req: Request | { headers: Headers; url: string; ip?: string },
-  opts?: { limit?: number; windowMs?: number },
+  opts?: { limit?: number; windowMs?: number; userId?: string },
 ): { allowed: boolean; remaining: number; retryAfter: number; limit: number; resetAt: number } {
-  const key = rateLimitKey(req);
+  const key = rateLimitKey(req, opts?.userId);
   return checkRateLimit(key, opts);
 }
 
@@ -61,13 +62,14 @@ export function resetRateLimitForTest(): void {
   counters.clear();
 }
 
-export type RateLimitOperation = "send" | "swap" | "approve" | "bridge";
+export type RateLimitOperation = "send" | "swap" | "approve" | "bridge" | "monitor";
 
 export const OPERATION_LIMITS: Record<RateLimitOperation, number> = {
   send: 10,
   swap: 5,
   approve: 3,
   bridge: 2,
+  monitor: 600,
 };
 
 export const GLOBAL_IP_LIMIT = 100;
