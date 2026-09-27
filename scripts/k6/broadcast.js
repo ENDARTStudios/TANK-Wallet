@@ -8,7 +8,6 @@ import { check, sleep } from "k6";
 export const options = {
   vus: 1,
   duration: "10s",
-  noConnectionReuse: true,
   thresholds: {
     checks: ["rate>0.99"],
     http_req_duration: ["p(95)<100"],
@@ -31,5 +30,5 @@ export default function () {
   check(res, {
     "broadcast 400 (invalid body, never broadcast)": (r) => r.status === 400,
   });
-  sleep(0.1);
+  sleep(0.7);
 }

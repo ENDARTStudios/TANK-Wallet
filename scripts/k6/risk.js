@@ -23,5 +23,5 @@ export default function () {
     "risk 200": (r) => r.status === 200,
     "risk service": (r) => r.json("service") === "risk",
   });
-  sleep(0.1);
+  sleep(0.2);
 }

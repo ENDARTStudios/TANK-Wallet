@@ -280,3 +280,8 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - Excecao ao freeze MPC (T058/T080) aprovada pelo Thinker (D095): bug real #66 provado por P4; correcao minima (2 linhas, mesmo bloco), nao feature.
 - Correcao: combineSignatures embute tag publicKey[0:8] (formato/length intactos); verify aceita sig_|combined_sig_ + amarra no ARGUMENTO publicKey (nao this.publicKey — semantica correta; teste wrong_key prova). Fragmento mpc_pk_X nao-hex => colisao impossivel.
 - P4 reabilitada 1000 runs PASS; P1-P3 intactas; 17 pass mpc/; tsc+eslint limpos. Issue #66 fecha apos merge. Limitacao honesta do stub: mensagem nao amarrada no verify (pre-existente).
+
+## 2026-09-27 — T091 k6 load testing local-first (D091: teto do limiter)
+- Baseline dev local (1VU paced): health p95 20.7ms 90/90; risk p95 18.4ms 92/92; broadcast(invalido) p95 34.6ms 14/14; rate-limit rajada 3166/3166 (200/429 c/ Retry-After). Thresholds p95<100 (4x baseline).
+- Teto single-IP POR DESENHO: reads 120/min + writes 30/min hardcoded no proxy (T083) — 10VU/60s toma 429 (1171x429 vs 120x200, zero 503). Nao e instabilidade. Load alem do budget = multi-IP ou janela propria (nunca prod sem decisao). Issue #72 (falso alarme de checks caros) corrigida e fechada.
+- Seguranca do harness: broadcast so corpo invalido (nunca transmite); risk so GET (sem queimar quota terceiros); alvo sempre local. Pergunta ao Thinker: budget 120/min/IP comporta monitores + uso real?

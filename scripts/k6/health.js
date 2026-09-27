@@ -16,5 +16,5 @@ export default function () {
     "health 200": (r) => r.status === 200,
     "health body ok": (r) => ["healthy", "degraded"].includes(r.json("status")),
   });
-  sleep(0.1);
+  sleep(0.2);
 }
