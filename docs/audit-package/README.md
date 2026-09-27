@@ -1,7 +1,237 @@
-﻿# Audit Package ÔÇö Tank Wallet  > Pacote de auditoria para firms externas. Cont├®m escopo, commit > congelado, instru├º├Áes de acesso, e refer├¬ncias de documenta├º├úo. > > Status: **Prepared** > Data: 2026-07-16 > Commit frozen: fdae6e35b22b  ---  ## Overview  Este pacote foi preparado para duas auditorias independentes:  1. **Audit #1 ÔÇö Crypto + Key Management + Recovery**    - Escopo: primitivos criptogr├íficos, deriva├º├úo de chaves, vault      AES-256-GCM, Shamir Secret Sharing, SecureBuffer zeroiza├º├úo.    - Foco: corre├º├úo de implementa├º├úo contra vetores oficiais.  2. **Audit #2 ÔÇö Engines + Decision Pipeline + Event Bus**    - Escopo: 16 security engines, SecurityDecisionPipeline, Event Bus,      Policy engine, Permission engine, Audit HMAC chain.    - Foco: l├│gica de decis├úo, fail-safe modes, tamper-evidence.  ---  ## Commit Frozen  ``` Commit: fdae6e35b22b SHA-256: 3d8639a6ca1e1ecb... Date: 2026-07-15T23:59:38Z Branch: main ```  Este commit ├® o ponto de partida para ambas as auditorias. Qualquer mudan├ºa ap├│s este commit N├âO est├í no escopo da auditoria.  ### Verifica├º├úo de integridade  ```bash git clone https://github.com/ENDART/tank-wallet cd tank-wallet git checkout fdae6e35b22b git log -1 --format='%H %s' # Deve mostrar: fdae6e35b22b... [commit message] ```  ---  ## Documenta├º├úo de refer├¬ncia  Auditors devem ler os seguintes documentos antes de iniciar:  ### Arquitetura - `ARCHITECTURE-FREEZE-1.0-BASELINE.md` ÔÇö baseline congelada - `ARCHITECTURE-FREEZE-CHANGELOG.md` ÔÇö versionamento - `.ai/decisions/ARCHITECTURE_DECISIONS.md` ÔÇö 10 ADRs  ### Engenharia - `ENGINEERING-STANDARDS.md` ÔÇö 17 se├º├Áes de padr├Áes - `KPI-FORMULAS.md` ÔÇö f├│rmulas e schema de m├®tricas - `PRODUCTION-CRITERIA.md` ÔÇö 83 crit├®rios de produ├º├úo  ### Governan├ºa - `.ai/rules/CORE_RULES.md` ÔÇö 10 regras absolutas - `.ai/rules/CHANGE-CONTROL.md` ÔÇö o que pode mudar na 1.x - `.ai/rules/FROZEN-IDS.md` ÔÇö IDs imut├íveis - `.ai/rules/ERROR-CATALOG.md` ÔÇö ~70 c├│digos TANK-XXXX - `.ai/rules/API-STABILITY-POLICY.md` ÔÇö tags @stable/@experimental  ### Seguran├ºa - `SECURITY.md` ÔÇö pol├¡tica de disclosure - `BUG-BOUNTY.md` ÔÇö programa de recompensas - `NON-GOALS.md` ÔÇö escopo expl├¡cito do que N├âO fazer  ### Estado atual - `reports/metrics.json` ÔÇö KPIs atuais (Overall Confidence 65%) - `reports/code-audit.md` ÔÇö d├¡vida t├®cnica (0 findings) - `reports/benchmarks.md` ÔÇö performance baselines  ---  ## Estrutura do reposit├│rio  ``` src/ Ôö£ÔöÇÔöÇ lib/ Ôöé   Ôö£ÔöÇÔöÇ wallet-core/              ÔåÉ Audit #1: BIP-39/32/44, SLIP-10, AES-256-GCM Ôöé   Ôöé   Ôö£ÔöÇÔöÇ index.ts              ÔåÉ Deriva├º├úo de chaves Ôöé   Ôöé   Ôö£ÔöÇÔöÇ storage.ts            ÔåÉ Vault AES-256-GCM Ôöé   Ôöé   Ôö£ÔöÇÔöÇ errors.ts             ÔåÉ TankError + TANK-XXXX codes Ôöé   Ôöé   ÔööÔöÇÔöÇ __tests__/ Ôöé   Ôöé       Ôö£ÔöÇÔöÇ vectors/          ÔåÉ 9 vector sets (BIP-32, BIP-39, etc.) Ôöé   Ôöé       ÔööÔöÇÔöÇ vectors.test.ts   ÔåÉ 26 testes passing Ôöé   Ôöé Ôöé   Ôö£ÔöÇÔöÇ wallet-engines/           ÔåÉ Audit #2: 12 engines Ôöé   Ôöé   Ôö£ÔöÇÔöÇ key-management/       ÔåÉ Audit #1: SecureBuffer, zeroiza├º├úo Ôöé   Ôöé   Ôö£ÔöÇÔöÇ recovery/             ÔåÉ Audit #1: Shamir SSS sobre GF(256) Ôöé   Ôöé   Ôö£ÔöÇÔöÇ threat-intel/         ÔåÉ Audit #2: GoPlus integration Ôöé   Ôöé   Ôö£ÔöÇÔöÇ simulation/           ÔåÉ Audit #2: eth_call + state diff Ôöé   Ôöé   Ôö£ÔöÇÔöÇ policy/               ÔåÉ Audit #2: 6 policies + 11 condi├º├Áes Ôöé   Ôöé   Ôö£ÔöÇÔöÇ permission/           ÔåÉ Audit #2: ERC-20/721/1155/Permit2 Ôöé   Ôöé   Ôö£ÔöÇÔöÇ behavior/             ÔåÉ Audit #2: anomaly detection Ôöé   Ôöé   Ôö£ÔöÇÔöÇ network/              ÔåÉ Audit #2: RPC pool + failover Ôöé   Ôöé   Ôö£ÔöÇÔöÇ audit/                ÔåÉ Audit #2: HMAC chain tamper-evidence Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ index.ts Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ hmac-chain.ts     ÔåÉ HMAC-SHA256 chain Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ __tests__/ Ôöé   Ôöé   Ôöé       ÔööÔöÇÔöÇ hmac-chain.test.ts  ÔåÉ 10 testes passing Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ai-security/          ÔåÉ Audit #2: prompt injection detection Ôöé   Ôöé   Ôö£ÔöÇÔöÇ plugin/               ÔåÉ Audit #2: ChainPlugin interface Ôöé   Ôöé   ÔööÔöÇÔöÇ notification/ Ôöé   Ôöé Ôöé   Ôö£ÔöÇÔöÇ wallet-kernel/            ÔåÉ Audit #2: Security Kernel Ôöé   Ôöé   Ôö£ÔöÇÔöÇ architecture-freeze.ts     ÔåÉ Interfaces congeladas Ôöé   Ôöé   Ôö£ÔöÇÔöÇ security-decision-pipeline.ts  ÔåÉ Pipeline orquestrador Ôöé   Ôöé   ÔööÔöÇÔöÇ __tests__/ Ôöé   Ôöé       ÔööÔöÇÔöÇ pipeline.test.ts  ÔåÉ 7 testes passing Ôöé   Ôöé Ôöé   Ôö£ÔöÇÔöÇ wallet-evm/               ÔåÉ Audit #1: EIP-1559 signing Ôöé   Ôö£ÔöÇÔöÇ wallet-sovereignty/       ÔåÉ Audit #2: Lockdown, permissions Ôöé   Ôö£ÔöÇÔöÇ wallet-scanner/           ÔåÉ Audit #2: Contract scanner Ôöé   Ôö£ÔöÇÔöÇ wallet-plugins/           ÔåÉ Audit #2: 4 chain plugins Ôöé   Ôöé   Ôö£ÔöÇÔöÇ ethereum/ Ôöé   Ôöé   Ôö£ÔöÇÔöÇ bitcoin/ Ôöé   Ôöé   Ôö£ÔöÇÔöÇ solana/ Ôöé   Ôöé   Ôö£ÔöÇÔöÇ lightning/ Ôöé   Ôöé   ÔööÔöÇÔöÇ conformance.ts        ÔåÉ 11 testes ├ù 4 plugins Ôöé   Ôöé Ôöé   Ôö£ÔöÇÔöÇ observability/            ÔåÉ Audit #2: Logger, tracing, metrics Ôöé   Ôöé   Ôö£ÔöÇÔöÇ logger.ts Ôöé   Ôöé   Ôö£ÔöÇÔöÇ tracing.ts Ôöé   Ôöé   Ôö£ÔöÇÔöÇ metrics.ts Ôöé   Ôöé   ÔööÔöÇÔöÇ sentry.ts Ôöé   Ôöé Ôöé   ÔööÔöÇÔöÇ config/ Ôöé       ÔööÔöÇÔöÇ feature-flags.ts      ÔåÉ Audit #2: Free/PRO tier segmentation Ôöé Ôö£ÔöÇÔöÇ components/wallet/security/   ÔåÉ Audit #2: UI de seguran├ºa Ôöé   Ôö£ÔöÇÔöÇ security-decision-modal.tsx Ôöé   Ôö£ÔöÇÔöÇ engine-result-card.tsx Ôöé   ÔööÔöÇÔöÇ evidence-badge.tsx Ôöé ÔööÔöÇÔöÇ app/api/                      ÔåÉ Audit #2: API routes     Ôö£ÔöÇÔöÇ goplus/                   ÔåÉ GoPlus proxy     Ôö£ÔöÇÔöÇ threats/                  ÔåÉ Threat Intel DB     Ôö£ÔöÇÔöÇ metrics/                  ÔåÉ Prometheus endpoint     ÔööÔöÇÔöÇ whois/                    ÔåÉ WHOIS lookup ```  ---  ## Como reproduzir  ### Ambiente  ```bash # Requisitos bun --version  # 1.3.14 node --version  # 20+  # Clone e checkout git clone https://github.com/ENDART/tank-wallet cd tank-wallet git checkout fdae6e35b22b  # Instalar deps bun install --frozen-lockfile  # Gerar Prisma client bun run db:generate  # Rodar todos os gates bun run verify  # Rodar testes criptogr├íficos bun test src/lib/wallet-core/__tests__/vectors.test.ts  # Rodar testes do pipeline bun test src/lib/wallet-kernel/__tests__/pipeline.test.ts  # Rodar testes do HMAC chain bun test src/lib/wallet-engines/audit/__tests__/hmac-chain.test.ts  # Ver KPIs atuais bun run metrics cat reports/metrics.json | jq '.metrics' ```  ### Vari├íveis de ambiente necess├írias  ```bash DATABASE_URL=file:./db/custom.db # Opcionais (n├úo bloqueiam auditoria): # NEXT_PUBLIC_SENTRY_DSN=... # OTEL_EXPORTER_OTLP_ENDPOINT=... ```  ---  ## Deliverables esperados dos auditores  1. **Audit Report** em PDF com:    - Executive summary    - Methodology    - Findings classificados (Critical / High / Medium / Low / Informational)    - Recommendations    - Conclusion  2. **Re-test** ap├│s corre├º├úo de findings (se houver).  3. **Certificate** de conclus├úo (para `SECURITY-CLAIMS.md` promo├º├úo para `Audited`).  ---  ## Contato  - **Engineering Lead**: engineering@tankwallet.dev - **Security Lead**: security@tankwallet.dev - **PGP**: ver `SECURITY.md`  ---  ## Hist├│rico  | Vers├úo | Data | Mudan├ºa | |--------|------|---------| | 1.0 | 2026-07-16 | Vers├úo inicial. Commit fdae6e35b22b congelado. |
+# Audit Package — Tank Wallet
+
+> Pacote de auditoria para firms externas. Contém escopo, commit
+> congelado, instruções de acesso, e referências de documentação.
+>
+> Status: **Prepared**
+> Data: 2026-07-16
+> Commit frozen: fdae6e35b22b
+
 ---
 
-## Adendo T085 (2026-09-26) — Sprint 60
+## Overview
+
+Este pacote foi preparado para duas auditorias independentes:
+
+1. **Audit #1 — Crypto + Key Management + Recovery**
+   - Escopo: primitivos criptográficos, derivação de chaves, vault
+     AES-256-GCM, Shamir Secret Sharing, SecureBuffer zeroização.
+   - Foco: correção de implementação contra vetores oficiais.
+
+2. **Audit #2 — Engines + Decision Pipeline + Event Bus**
+   - Escopo: 16 security engines, SecurityDecisionPipeline, Event Bus,
+     Policy engine, Permission engine, Audit HMAC chain.
+   - Foco: lógica de decisão, fail-safe modes, tamper-evidence.
+
+---
+
+## Commit Frozen
+
+```
+Commit: fdae6e35b22b
+SHA-256: 3d8639a6ca1e1ecb...
+Date: 2026-07-15T23:59:38Z
+Branch: main
+```
+
+Este commit é o ponto de partida para ambas as auditorias. Qualquer
+mudança após este commit NÃO está no escopo da auditoria.
+
+### Verificação de integridade
+
+```bash
+git clone https://github.com/ENDART/tank-wallet
+cd tank-wallet
+git checkout fdae6e35b22b
+git log -1 --format='%H %s'
+# Deve mostrar: fdae6e35b22b... [commit message]
+```
+
+---
+
+## Documentação de referência
+
+Auditors devem ler os seguintes documentos antes de iniciar:
+
+### Arquitetura
+- `ARCHITECTURE-FREEZE-1.0-BASELINE.md` — baseline congelada
+- `ARCHITECTURE-FREEZE-CHANGELOG.md` — versionamento
+- `.ai/decisions/ARCHITECTURE_DECISIONS.md` — 10 ADRs
+
+### Engenharia
+- `ENGINEERING-STANDARDS.md` — 17 seções de padrões
+- `KPI-FORMULAS.md` — fórmulas e schema de métricas
+- `PRODUCTION-CRITERIA.md` — 83 critérios de produção
+
+### Governança
+- `.ai/rules/CORE_RULES.md` — 10 regras absolutas
+- `.ai/rules/CHANGE-CONTROL.md` — o que pode mudar na 1.x
+- `.ai/rules/FROZEN-IDS.md` — IDs imutáveis
+- `.ai/rules/ERROR-CATALOG.md` — ~70 códigos TANK-XXXX
+- `.ai/rules/API-STABILITY-POLICY.md` — tags @stable/@experimental
+
+### Segurança
+- `SECURITY.md` — política de disclosure
+- `BUG-BOUNTY.md` — programa de recompensas
+- `NON-GOALS.md` — escopo explícito do que NÃO fazer
+
+### Estado atual
+- `reports/metrics.json` — KPIs atuais (Overall Confidence 65%)
+- `reports/code-audit.md` — dívida técnica (0 findings)
+- `reports/benchmarks.md` — performance baselines
+
+---
+
+## Estrutura do repositório
+
+```
+src/
+├── lib/
+│   ├── wallet-core/              ← Audit #1: BIP-39/32/44, SLIP-10, AES-256-GCM
+│   │   ├── index.ts              ← Derivação de chaves
+│   │   ├── storage.ts            ← Vault AES-256-GCM
+│   │   ├── errors.ts             ← TankError + TANK-XXXX codes
+│   │   └── __tests__/
+│   │       ├── vectors/          ← 9 vector sets (BIP-32, BIP-39, etc.)
+│   │       └── vectors.test.ts   ← 26 testes passing
+│   │
+│   ├── wallet-engines/           ← Audit #2: 12 engines
+│   │   ├── key-management/       ← Audit #1: SecureBuffer, zeroização
+│   │   ├── recovery/             ← Audit #1: Shamir SSS sobre GF(256)
+│   │   ├── threat-intel/         ← Audit #2: GoPlus integration
+│   │   ├── simulation/           ← Audit #2: eth_call + state diff
+│   │   ├── policy/               ← Audit #2: 6 policies + 11 condições
+│   │   ├── permission/           ← Audit #2: ERC-20/721/1155/Permit2
+│   │   ├── behavior/             ← Audit #2: anomaly detection
+│   │   ├── network/              ← Audit #2: RPC pool + failover
+│   │   ├── audit/                ← Audit #2: HMAC chain tamper-evidence
+│   │   │   ├── index.ts
+│   │   │   ├── hmac-chain.ts     ← HMAC-SHA256 chain
+│   │   │   └── __tests__/
+│   │   │       └── hmac-chain.test.ts  ← 10 testes passing
+│   │   ├── ai-security/          ← Audit #2: prompt injection detection
+│   │   ├── plugin/               ← Audit #2: ChainPlugin interface
+│   │   └── notification/
+│   │
+│   ├── wallet-kernel/            ← Audit #2: Security Kernel
+│   │   ├── architecture-freeze.ts     ← Interfaces congeladas
+│   │   ├── security-decision-pipeline.ts  ← Pipeline orquestrador
+│   │   └── __tests__/
+│   │       └── pipeline.test.ts  ← 7 testes passing
+│   │
+│   ├── wallet-evm/               ← Audit #1: EIP-1559 signing
+│   ├── wallet-sovereignty/       ← Audit #2: Lockdown, permissions
+│   ├── wallet-scanner/           ← Audit #2: Contract scanner
+│   ├── wallet-plugins/           ← Audit #2: 4 chain plugins
+│   │   ├── ethereum/
+│   │   ├── bitcoin/
+│   │   ├── solana/
+│   │   ├── lightning/
+│   │   └── conformance.ts        ← 11 testes × 4 plugins
+│   │
+│   ├── observability/            ← Audit #2: Logger, tracing, metrics
+│   │   ├── logger.ts
+│   │   ├── tracing.ts
+│   │   ├── metrics.ts
+│   │   └── sentry.ts
+│   │
+│   └── config/
+│       └── feature-flags.ts      ← Audit #2: Free/PRO tier segmentation
+│
+├── components/wallet/security/   ← Audit #2: UI de segurança
+│   ├── security-decision-modal.tsx
+│   ├── engine-result-card.tsx
+│   └── evidence-badge.tsx
+│
+└── app/api/                      ← Audit #2: API routes
+    ├── goplus/                   ← GoPlus proxy
+    ├── threats/                  ← Threat Intel DB
+    ├── metrics/                  ← Prometheus endpoint
+    └── whois/                    ← WHOIS lookup
+```
+
+---
+
+## Como reproduzir
+
+### Ambiente
+
+```bash
+# Requisitos
+bun --version  # 1.3.14
+node --version  # 20+
+
+# Clone e checkout
+git clone https://github.com/ENDART/tank-wallet
+cd tank-wallet
+git checkout fdae6e35b22b
+
+# Instalar deps
+bun install --frozen-lockfile
+
+# Gerar Prisma client
+bun run db:generate
+
+# Rodar todos os gates
+bun run verify
+
+# Rodar testes criptográficos
+bun test src/lib/wallet-core/__tests__/vectors.test.ts
+
+# Rodar testes do pipeline
+bun test src/lib/wallet-kernel/__tests__/pipeline.test.ts
+
+# Rodar testes do HMAC chain
+bun test src/lib/wallet-engines/audit/__tests__/hmac-chain.test.ts
+
+# Ver KPIs atuais
+bun run metrics
+cat reports/metrics.json | jq '.metrics'
+```
+
+### Variáveis de ambiente necessárias
+
+```bash
+DATABASE_URL=file:./db/custom.db
+# Opcionais (não bloqueiam auditoria):
+# NEXT_PUBLIC_SENTRY_DSN=...
+# OTEL_EXPORTER_OTLP_ENDPOINT=...
+```
+
+---
+
+## Deliverables esperados dos auditores
+
+1. **Audit Report** em PDF com:
+   - Executive summary
+   - Methodology
+   - Findings classificados (Critical / High / Medium / Low / Informational)
+   - Recommendations
+   - Conclusion
+
+2. **Re-test** após correção de findings (se houver).
+
+3. **Certificate** de conclusão (para `SECURITY-CLAIMS.md` promoção para `Audited`).
+
+---
+
+## Contato
+
+- **Engineering Lead**: engineering@tankwallet.dev
+- **Security Lead**: security@tankwallet.dev
+- **PGP**: ver `SECURITY.md`
+
+---
+
+## Histórico
+
+| Versão | Data | Mudança |
+|--------|------|---------|
+| 1.0 | 2026-07-16 | Versão inicial. Commit fdae6e35b22b congelado. |
+
+---
+
+## Adendo T085 (2026-09-26) - Sprint 60
 - Escopos atualizados: SCOPE-AUDIT1.md (inclui MPC v2 + HSM), SCOPE-AUDIT2.md (inclui TypeSafe Jev/intent).
 - Novo commit frozen: COMMIT-FROZEN.md (2977f20). Firms: FIRMS-CANDIDATES.md. Contrato: ENGAGEMENT-TEMPLATE.md.
 - Reproducao: REPRODUCTION.md. Contato: CONTACT-RUNBOOK.md.
