@@ -49,6 +49,12 @@ describe("rate-limit advanced", () => {
     expect(res.headers["Retry-After"]).toBeDefined();
   });
 
+  it("headers de allowed refletem o bucket da operacao", () => {
+    const res = consumeRateLimitAdvanced(req("4.4.4.4"), { userId: "uh", operation: "send", now: 0 });
+    expect(res.headers["X-RateLimit-Limit"]).toBe("10");
+    expect(res.headers["X-RateLimit-Operation"]).toBe("send");
+  });
+
   it("contadores observaveis por operacao e resultado", () => {
     consumeRateLimitAdvanced(req("5.5.5.5"), { userId: "uc", operation: "send", now: 0 });
     const snap = snapshotRateLimitCounters();

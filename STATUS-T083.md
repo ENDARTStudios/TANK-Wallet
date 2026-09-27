@@ -21,3 +21,9 @@
 Kill-switch implícito: limites em const; 0 segredos; server-side.
 
 STATUS: DONE — pronto para REVIEW. Sem merge até APPROVED (D078).
+
+## Fechamento (R084)
+- CI PR #61 12/12 verdes (run 36286047592, Vercel preview completed).
+- Mapa: consumeRateLimitAdvanced só em broadcast/route.ts (send); swap/approve/bridge sem rotas — limites preparatórios.
+- Runtime: headers allowed mostram bucket da operação (fix verificado via bun -e).
+

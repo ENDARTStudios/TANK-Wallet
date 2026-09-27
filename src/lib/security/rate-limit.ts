@@ -109,18 +109,22 @@ export function consumeRateLimitAdvanced(
   const opRes = checkRateLimit(opKey, { limit: opLimit, windowMs, now });
   const ipRes = checkRateLimit(`${ip}:global`, { limit: GLOBAL_IP_LIMIT, windowMs, now });
   const blocked = !opRes.allowed || !ipRes.allowed;
-  const primary = !opRes.allowed ? opRes : ipRes;
+  const primary = operation !== undefined ? opRes : ipRes;
+  const retryFrom = !opRes.allowed ? opRes : ipRes;
   recordRateLimit(operation ?? "global", !blocked);
   const headers: Record<string, string> = { ...getRateLimitHeaders(primary) };
   if (operation !== undefined) headers["X-RateLimit-Operation"] = operation;
   return {
     allowed: !blocked,
     remaining: primary.remaining,
-    retryAfter: primary.retryAfter,
+    retryAfter: retryFrom.retryAfter,
     limit: primary.limit,
     resetAt: primary.resetAt,
     operation,
-    headers,
+    headers: {
+      ...headers,
+      ...(retryFrom.retryAfter ? { "Retry-After": String(retryFrom.retryAfter) } : {}),
+    },
   };
 }
 

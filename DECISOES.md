@@ -225,3 +225,8 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - /api/broadcast POST: operacao send com userId real apos auth; 429 com headers quando bloqueado.
 - STRIDE: spoofing (userId so de ctx autenticado; sem auth cai p/ IP); tampering (headers read-only); repudiation (counters + STATUS-T083); info disclosure (sem userId nos headers); DoS (teto global impede diluicao por userId falso); elevation (sem mudanca de permissao).
 
+
+## 2026-09-26 — T083 fechamento (mapa de cobertura)
+- Enforcement: apenas /api/broadcast (send + userId real). swap/approve/bridge sem rotas existentes (operacoes assinadas client-side) — limites preparatorios, sem rota sem enforcement. proxy.ts inalterado (pre-auth, teto IP global).
+- Fix headers: allowed reflete bucket da operacao (nao global); Retry-After do bucket que bloqueou.
+
