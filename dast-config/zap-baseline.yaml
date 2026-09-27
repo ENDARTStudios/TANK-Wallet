@@ -1,16 +1,18 @@
-# OWASP ZAP Baseline Scan — v1.1.0
-# Aplicado em CI via dast.yml (ZAP baseline weekly)
+# OWASP ZAP Baseline Scan — v1.2.0 (T090)
+# Alvo LOCAL was: https://tankwallet.dev (produção — PROIBIDO: muro SSO + quota + ética).
+# Alvo AGORA: http://localhost:3000 (app + scanner no mesmo host/CI job).
+# Roda em CI via dast.yml (weekly + manual). Produção adiada até PEND-SSO/BYPASS.
 # Documentação: https://www.zaproxy.org/docs/docker/baseline-scan/
 
 env:
   contexts:
-    - name: tank-wallet
+    - name: tank-wallet-local
       urls:
-        - https://tankwallet.dev
-        - https://tankwallet.dev/onboarding
-        - https://tankwallet.dev/api/health
-        - https://tankwallet.dev/sitemap.xml
-        - https://tankwallet.dev/robots.txt
+        - http://localhost:3000
+        - http://localhost:3000/terms
+        - http://localhost:3000/api/health
+        - http://localhost:3000/sitemap.xml
+        - http://localhost:3000/robots.txt
 
 jobs:
   - type: passiveScan
@@ -19,46 +21,36 @@ jobs:
       maxAlertsPerRule: 10
       scanOnlyInScope: true
 
-  - type: activeScan
-    name: active
-    parameters:
-      maxAlertsPerRule: 10
-      scanOnlyInScope: true
-      # Evitar denial-of-service no alvo
-      delayInMs: 100
-      threadCount: 2
-    policyDefinition:
-      defaultStrength: low
-      defaultThreshold: medium
-
   - type: spider
     name: spider
     parameters:
+      url: http://localhost:3000
       maxDepth: 5
       maxDuration: 10
 
   - type: report
     parameters:
       template: traditional-html
-      reportDir: /tmp/zap-out
+      reportDir: /zap/out
       reportFile: zap-report.html
       reportFormat: html
 
   - type: report
     parameters:
       template: traditional-json
-      reportDir: /tmp/zap-out
+      reportDir: /zap/out
       reportFile: zap-report.json
       reportFormat: json
 
-# Thresholds (bloqueantes em CI):
-# - High: 0
-# - Medium: < 5
-# - Low: < 20
-# - Informational: ignore
+# Thresholds (Sprint 25, mantidos):
+# high=0 bloqueia o job; medium/low = triagem documentada (D-quando-ocorrer).
+# Workflow dast.yml é NÃO-required (não bloqueia PRs).
 
 thresholds:
   high: 0
   medium: 5
   low: 20
   informational: 999
+
+# Futuro (pós PEND-SSO/BYPASS): contexto de produção SOMENTE com janela aprovada,
+# auth bypass e SEM activeScan. Nunca escanear produção sem decisão do Operador.
