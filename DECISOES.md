@@ -266,3 +266,8 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - ACHADO (pre-existente, nao causado por T087): src/proxy.ts aparenta nao executar nos builds Vercel — prod e preview (com codigo T086) servem /api/health 200 SEM x-csp-nonce/Reporting-Endpoints/X-RateLimit/report-only; policy estatica servida diverge da next.config.ts@main. Impacta T083/T084/T086 em prod (validos apenas local/CI). Investigacao dedicada: T092-proxy-vercel (Sprint 61/F08).
 - Sessao Vercel linkada localmente (.vercel/, git-ignored).
 
+
+## 2026-09-27 — T093 safe-state da flag CSP (R092, D093)
+- `vercel env rm CSP_ENFORCE production --yes` (Removed); Preview mantem true como canario isolado. Nenhum deploy no intervalo (vercel ls). Nenhum comportamento de producao pode mudar sem deploy supervisionado.
+- Regra permanente: flag de seguranca em Production so e alterada no mesmo ato em que comeca o monitoramento supervisionado. Ativacao real => T087 retomada (apos T092 + T093).
+

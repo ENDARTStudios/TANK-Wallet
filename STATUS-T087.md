@@ -100,3 +100,19 @@ sem nonce seriam BLOQUEADOS sob enforcing. O E2E local com flag ON passou 57/57 
 (evidência empírica de compatibilidade em dev), mas o risco de produção é NÃO-ZERO —
 o que reforça o canário (Preview ON) + monitoramento 24–48h + rollback deste plano.
 Correção registrada em D081.
+
+## 8. ADENDO T093-csp-flag-safe-state (R092) — 2026-09-27
+
+REVIEW R092 REJECTED o fechamento da T087 (não o trabalho): flag armada em Production com
+gatilho num merge futuro qualquer = bomba-relógio. Correção aplicada via CLI:
+
+- `vercel env rm CSP_ENFORCE production --yes` → `Removed Environment Variable`.
+- Verificação (`vercel env ls | Select-String CSP_ENFORCE`, valores redigidos):
+  ```
+  CSP_ENFORCE   Encrypted   Preview   21m ago
+  ```
+  Production: AUSENTE ✓. Preview: true (canário isolado) ✓.
+- `vercel ls`: nenhum deploy novo no intervalo (mais recente = 34m, pré-existente).
+  Nenhum comportamento de produção mudou nem pode mudar sem deploy supervisionado.
+- Regra permanente (D093): flag de segurança em Production só é alterada no mesmo ato em
+  que começa o monitoramento supervisionado. Ativação real → T087 retomada (após T092 + T093).
