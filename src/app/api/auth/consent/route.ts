@@ -15,7 +15,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   }
   try {
-    const stored = await recordConsent((args) => db.user.update(args), ctx.userId, parsed.data);
+    // Cast localizado na fronteira do Prisma: o union gerado (UserUpdateArgs)
+    // varia entre installs (bun.lock local vs npm na Vercel) e não é expressável
+    // como tipo estável na fachada — ver D103. Lib e testes permanecem limpos.
+    const stored = await recordConsent(
+      (args) => db.user.update(args as unknown as Parameters<typeof db.user.update>[0]),
+      ctx.userId,
+      parsed.data,
+    );
     return NextResponse.json({ success: true, ...stored });
   } catch {
     // Usuário inexistente no banco (ex.: sessão JWT sem registro) — não vaza detalhe.
