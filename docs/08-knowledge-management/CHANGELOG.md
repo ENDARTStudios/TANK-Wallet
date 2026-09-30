@@ -48,6 +48,17 @@ Baseado em Keep a Changelog, adaptado ao ritmo de sprints do projeto:
 > **Fundido de:** CHANGELOG.md
 
 # Changelog
+## [Unreleased] — Sprint 62 — P0s de runtime da auditoria jurídica (#98)
+### Security
+- **SEC-001**: hash de senha **scrypt** (OWASP N=16384/r=8/p=1) em `src/lib/auth/password.ts`; `authorize()` verifica em constant-time e faz **upgrade transparente** de credenciais legadas em texto puro no primeiro login
+- **SEC-002**: `src/lib/crypto/pii.ts` reescrito com **AES-256-GCM** (IV CSPRNG + auth tag); formato `pii:v2:<iv>:<tag>:<ct>`; decrypt do formato legado mantido p/ migração (vetor congelado); chave exige 32 bytes (fail-closed)
+- **§25**: `NEXTAUTH_SECRET` **fail-fast em produção** (recusa ausente/vazio/placeholder); fallback de dev mantido com warning
+- **§7/§9**: aceite legal com evidência server-side — `User` ganha `termsAcceptedAt/termsVersion/privacyAcceptedAt/privacyVersion`; rota `POST /api/auth/consent` (401 sem sessão, zod); `onboarding.tsx` grava server-side além do localStorage
+### Fixed
+- Schema Prisma regenerado (`User` +4 colunas nullable, backward-compatible); `db push` aplicado ao dev SQLite
+### Docs
+- `COMPLIANCE.md`: status dos 4 P0s atualizado (ref. issue #98)
+
 ## [Unreleased] — Sprint 61 — F08 testes + F07 operacional + F10 manual
 ### Added
 - **T088**: property-based MPC (`mpc-properties.test.ts`, fast-check; P1–P3 1000 runs) (PR #67)
