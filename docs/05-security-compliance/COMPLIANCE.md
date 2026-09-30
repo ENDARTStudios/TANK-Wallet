@@ -1,7 +1,7 @@
 # COMPLIANCE — Conformidade Legal e Regulatória
 
-> **Tipo:** Governança · **Atualizado:** 2026-09-29 · Dono: ENDARTStudios · Jurisdição primária: Brasil (LGPD) · Secundária: EU (GDPR).
-> **Status:** 🔴 **NÃO APROVADO** como "LGPD compliant" — ver [LEGAL-AUDIT-2026-09-29.md](LEGAL-AUDIT-2026-09-29.md) (27 achados P0/P1/P2 confirmados).
+> **Tipo:** Governança · **Atualizado:** 2026-09-30 · Dono: ENDARTStudios · Jurisdição primária: Brasil (LGPD) · Secundária: EU (GDPR).
+> **Status:** 🔴 **NÃO APROVADO** como "LGPD compliant" — ver [LEGAL-AUDIT-2026-09-29.md](LEGAL-AUDIT-2026-09-29.md) (27 achados, 8/8 alegações técnicas confirmadas) e re-auditoria pós-PR #95: [LEGAL-REAUDIT-2026-09-30.md](LEGAL-REAUDIT-2026-09-30.md) (runtime inalterado; próximo marco = correção verificável de SEC-001/SEC-002/§25/§7 + re-auditoria).
 
 ## 1. Privacidade de dados
 
