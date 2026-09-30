@@ -5,21 +5,26 @@ import { verifyPassword, needsRehash, hashPassword } from "@/lib/auth/password";
 
 const DEV_FALLBACK_SECRET = "dev-secret-change-me";
 
-// §25 (LEGAL-AUDIT): segredo previsível nunca pode valer em produção.
-function resolveAuthSecret(env: NodeJS.ProcessEnv = process.env): string {
+// §25 (LEGAL-AUDIT): segredo previsível nunca pode proteger produção.
+// A validação acontece em REQUEST-TIME (assertAuthSecret nos handlers), não no
+// import — throw em escopo de módulo quebra `next build`/previews sem a env
+// (lição do CI do PR #99: "Failed to collect page data").
+export function assertAuthSecret(env: NodeJS.ProcessEnv = process.env): void {
   const raw = env.NEXTAUTH_SECRET?.trim();
-  if (raw && raw !== DEV_FALLBACK_SECRET) return raw;
-  if (env.NODE_ENV === "production") {
+  if (raw && raw !== DEV_FALLBACK_SECRET) return;
+  // Vercel preview (VERCEL_ENV=preview) é o único ambiente de produção-node
+  // isento: deploys de PR não têm acesso aos envs de produção (precedente T079).
+  if (env.NODE_ENV === "production" && env.VERCEL_ENV !== "preview") {
     throw new Error(
       "NEXTAUTH_SECRET must be set to a strong value in production (refusing predictable fallback)",
     );
   }
-  console.warn("[auth] NEXTAUTH_SECRET ausente — usando fallback de desenvolvimento (nunca produza assim)");
-  return DEV_FALLBACK_SECRET;
 }
 
 export const authOptions: NextAuthOptions = {
-  secret: resolveAuthSecret(),
+  // String de init apenas; produção sem NEXTAUTH_SECRET é bloqueada em
+  // request-time por assertAuthSecret() (rotas de auth → 500, fail-closed).
+  secret: process.env.NEXTAUTH_SECRET?.trim() || DEV_FALLBACK_SECRET,
   session: { strategy: "jwt" },
   providers: [
     CredentialsProvider({

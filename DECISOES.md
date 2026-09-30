@@ -319,3 +319,10 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - UTF-16 LE em next.config.ts: edicoes trocam line-endings do arquivo inteiro (ruido no diff #77, funcional intacto) — cuidado futuro.
 - Falsos-positivos: wrong_key (acidente de prefixo), 429 (desenho, nao degradacao), proxy-nao-executa (muro SSO). Cultura: desconfiar do proprio alarme com contagens.
 - #75 e Issue (reorg docs), nao PR — verificar artefatos diretamente antes de categorizar.
+
+## 2026-09-30 — D103 P0s da auditoria jurídica: env-guard request-time (PR #99)
+- SEC-001/002/§25/§7-9 implementados (ver PR #99 + issue #98). Decisão-chave: fail-fast de NEXTAUTH_SECRET em REQUEST-TIME (assertAuthSecret no [...nextauth]/route.ts), não em import-time — throw em escopo de módulo quebrou `next build` da Vercel/Lighthouse (CI PR #99: "Failed to collect page data for /api/auth/[...nextauth]"), pois build roda NODE_ENV=production sem envs de produção.
+- Matriz: throw só quando NODE_ENV=production E VERCEL_ENV!=preview (preview de PR sem acesso a envs de produção é isento — precedente T079). Production em qualquer host sem segredo → rotas de auth 500 (fail-closed), build verde.
+- scrypt (node:crypto, OWASP N=16384/r=8/p=1) em vez de bcrypt/argon2: sem dependência nativa nova; upgrade transparente de senha legada no login (needsRehash).
+- pii.ts v2 (AES-256-GCM): decrypt do formato legado XOR mantido com vetor congelado — migração sem quebrar dados existentes.
+- Windows-local: `next build` falha em copiar chunk `[externals]_node:inspector` (EINVAL, dois-pontos em filename) — bug Next/Windows pré-existente (cf. caveat T099); CI linux não afetado.
