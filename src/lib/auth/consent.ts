@@ -8,28 +8,26 @@ export const consentSchema = z.object({
 
 export type ConsentInput = z.infer<typeof consentSchema>;
 
-interface ConsentDb {
-  user: {
-    update(args: {
-      where: { id: string };
-      data: {
-        termsAcceptedAt: Date;
-        termsVersion: string;
-        privacyAcceptedAt: Date;
-        privacyVersion: string;
-      };
-    }): Promise<unknown>;
+export interface ConsentUpdateArgs {
+  where: { id: string };
+  data: {
+    termsAcceptedAt: Date;
+    termsVersion: string;
+    privacyAcceptedAt: Date;
+    privacyVersion: string;
   };
 }
 
 // Timestamps são sempre server-side (a hora do cliente não é evidência confiável).
+// Recebe a função de update em vez do client Prisma: o delegate genérico do
+// Prisma não satisfaz structuralmente uma interface estreita (contravariância).
 export async function recordConsent(
-  db: ConsentDb,
+  updateUser: (args: ConsentUpdateArgs) => Promise<unknown>,
   userId: string,
   input: ConsentInput,
   now = new Date(),
 ): Promise<{ termsAcceptedAt: Date; privacyAcceptedAt: Date }> {
-  await db.user.update({
+  const args: ConsentUpdateArgs = {
     where: { id: userId },
     data: {
       termsAcceptedAt: now,
@@ -37,6 +35,7 @@ export async function recordConsent(
       privacyAcceptedAt: now,
       privacyVersion: input.privacyVersion,
     },
-  });
+  };
+  await updateUser(args);
   return { termsAcceptedAt: now, privacyAcceptedAt: now };
 }

@@ -1,15 +1,13 @@
 import { describe, it, expect } from "bun:test";
-import { recordConsent, consentSchema } from "../consent";
+import { recordConsent, consentSchema, type ConsentUpdateArgs } from "../consent";
 
-function fakeDb() {
-  const calls: unknown[] = [];
+function fakeUpdate() {
+  const calls: ConsentUpdateArgs[] = [];
   return {
     calls,
-    user: {
-      update: async (args: unknown) => {
-        calls.push(args);
-        return {};
-      },
+    update: async (args: ConsentUpdateArgs) => {
+      calls.push(args);
+      return {};
     },
   };
 }
@@ -27,16 +25,16 @@ describe("consent", () => {
   });
 
   it("grava timestamps server-side e versões por usuário", async () => {
-    const db = fakeDb();
+    const fake = fakeUpdate();
     const now = new Date("2026-09-30T12:00:00Z");
     await recordConsent(
-      db as never,
+      fake.update,
       "user-1",
       { termsVersion: "2026-08-30", privacyVersion: "2026-08-30" },
       now,
     );
-    expect(db.calls).toHaveLength(1);
-    const args = db.calls[0] as { where: { id: string }; data: Record<string, unknown> };
+    expect(fake.calls).toHaveLength(1);
+    const args = fake.calls[0];
     expect(args.where).toEqual({ id: "user-1" });
     expect(args.data.termsAcceptedAt).toEqual(now);
     expect(args.data.termsVersion).toBe("2026-08-30");

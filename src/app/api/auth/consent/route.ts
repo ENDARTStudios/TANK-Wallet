@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   }
   try {
-    const stored = await recordConsent(db, ctx.userId, parsed.data);
+    const stored = await recordConsent((args) => db.user.update(args), ctx.userId, parsed.data);
     return NextResponse.json({ success: true, ...stored });
   } catch {
     // Usuário inexistente no banco (ex.: sessão JWT sem registro) — não vaza detalhe.
