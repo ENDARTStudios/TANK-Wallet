@@ -13,12 +13,14 @@
 ### Implementação técnica
 | Requisito | Implementação |
 | --- | --- |
-| "PII em repouso cifrada" | ⚠️ **ALEGAÇÃO FALSA (SEC-002):** `src/lib/crypto/pii.ts` usa XOR custom com IV de `Math.random()` — **não é AES-256-GCM**. Substituição por AES-256-GCM real pendente |
+| "PII em repouso cifrada" | ✅ **CORRIGIDO (SEC-002, issue #98):** `src/lib/crypto/pii.ts` agora usa **AES-256-GCM** real (`pii:v2:`, IV CSPRNG, auth tag); decrypt do formato legado mantido p/ migração. Antes era XOR custom com IV de `Math.random()` |
 | Máscara em logs | `src/lib/observability/redact.ts` (tokens/emails/private keys) |
 | Segregação por tenant | RLS Postgres + `filterByWorkspace` ([RLS.md](RLS.md)) |
 | Log de acesso imutável | `PermissionAuditLog` (DB, HMAC chain) — ⚠️ o audit log client-side em localStorage (`wallet-engines/audit/`) é apenas tamper-evident (LEG-019) |
 | Páginas legais | `src/app/privacy/` e `src/app/terms/` |
-| Hash de senha | ⚠️ **ALEGAÇÃO FALSA (SEC-001):** `src/lib/auth/nextauth.ts:19` compara senha em texto puro — hashing obrigatório pendente |
+| Hash de senha | ✅ **CORRIGIDO (SEC-001, issue #98):** `src/lib/auth/password.ts` (scrypt OWASP) + upgrade transparente de legados no login (`nextauth.ts`). Antes comparava texto puro |
+| Segredo de sessão | ✅ **CORRIGIDO (§25, issue #98):** fail-fast em produção sem `NEXTAUTH_SECRET` (recusa placeholder); fallback só em dev |
+| Aceite legal | ✅ **CORRIGIDO (§7/§9, issue #98):** `User` persiste `termsAcceptedAt/Version` + `privacyAcceptedAt/Version`; rota `POST /api/auth/consent` grava server-side (além do localStorage client-side existente) |
 
 ### Direitos do titular (LGPD art. 18 / GDPR art. 15-22)
 - Acesso/portabilidade: dados da conta e logs de permissão exportáveis — ⚠️ **declarado mas não implementado (LEG-007)**.

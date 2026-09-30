@@ -13,6 +13,9 @@ import { useToast } from '@/hooks/use-toast'
 import { Shield, ShieldCheck, KeyRound, Lock, ArrowRight, ArrowLeft, Copy, Check, AlertTriangle, Plus, Download, Eye, EyeOff, Loader2, Sparkles, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+// Versão vigente dos documentos legais aceitos no onboarding (§7/§9 LEGAL-AUDIT).
+const LEGAL_DOCS_VERSION = '2026-08-30'
+
 type OnboardingStep =
   | 'welcome'        // First screen — choose create or import
   | 'generate'       // Showing the new mnemonic
@@ -117,8 +120,15 @@ export function Onboarding({ onUnlocked }: OnboardingProps) {
       await storeMnemonic(mnemonic, password, fingerprint)
       markVaultBackedUp()
       try {
-        localStorage.setItem('tank:termsAccepted', JSON.stringify({ at: new Date().toISOString(), version: '2026-08-30', terms: '/terms', privacy: '/privacy' }))
+        localStorage.setItem('tank:termsAccepted', JSON.stringify({ at: new Date().toISOString(), version: LEGAL_DOCS_VERSION, terms: '/terms', privacy: '/privacy' }))
       } catch {}
+      // §7/§9 (LEGAL-AUDIT): evidência server-side do aceite quando há sessão.
+      // Fire-and-forget — sem sessão a rota responde 401 e permanece só o localStorage.
+      void fetch('/api/auth/consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ termsVersion: LEGAL_DOCS_VERSION, privacyVersion: LEGAL_DOCS_VERSION }),
+      }).catch(() => {})
       toast({ title: 'Carteira criada', description: 'Mnemonic armazenado com criptografia AES-256-GCM.' })
       onUnlocked(wallet)
     } catch (e) {

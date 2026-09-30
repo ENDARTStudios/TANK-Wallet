@@ -32,6 +32,12 @@ model User {
   workspace   Workspace? @relation(fields: [workspaceId], references: [id])
   createdAt   DateTime   @default(now())
 
+  // §7/§9 (LEGAL-AUDIT): evidência server-side do aceite legal
+  termsAcceptedAt   DateTime?
+  termsVersion      String?
+  privacyAcceptedAt DateTime?
+  privacyVersion    String?
+
   @@index([workspaceId])
   @@index([role])
 }

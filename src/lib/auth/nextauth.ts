@@ -1,9 +1,25 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/lib/db";
+import { verifyPassword, needsRehash, hashPassword } from "@/lib/auth/password";
+
+const DEV_FALLBACK_SECRET = "dev-secret-change-me";
+
+// §25 (LEGAL-AUDIT): segredo previsível nunca pode valer em produção.
+function resolveAuthSecret(env: NodeJS.ProcessEnv = process.env): string {
+  const raw = env.NEXTAUTH_SECRET?.trim();
+  if (raw && raw !== DEV_FALLBACK_SECRET) return raw;
+  if (env.NODE_ENV === "production") {
+    throw new Error(
+      "NEXTAUTH_SECRET must be set to a strong value in production (refusing predictable fallback)",
+    );
+  }
+  console.warn("[auth] NEXTAUTH_SECRET ausente — usando fallback de desenvolvimento (nunca produza assim)");
+  return DEV_FALLBACK_SECRET;
+}
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET ?? "dev-secret-change-me",
+  secret: resolveAuthSecret(),
   session: { strategy: "jwt" },
   providers: [
     CredentialsProvider({
@@ -16,7 +32,16 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email) return null;
         const user = await db.user.findUnique({ where: { email: credentials.email.toLowerCase() } });
         if (!user) return null;
-        if (user.password && credentials.password !== user.password) return null;
+        if (user.password && !(await verifyPassword(credentials.password ?? "", user.password))) return null;
+        // SEC-001: upgrade transparente — legado em texto puro é rehasheado no login.
+        if (user.password && needsRehash(user.password)) {
+          try {
+            const hashed = await hashPassword(credentials.password);
+            await db.user.update({ where: { id: user.id }, data: { password: hashed } });
+          } catch (err) {
+            console.warn("[auth] rehash de upgrade falhou (login segue)", err);
+          }
+        }
         return {
           id: user.id,
           email: user.email,
