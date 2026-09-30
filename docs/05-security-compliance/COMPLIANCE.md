@@ -1,6 +1,7 @@
 # COMPLIANCE — Conformidade Legal e Regulatória
 
-> **Tipo:** Governança · **Atualizado:** 2026-09-23 · Dono: ENDARTStudios · Jurisdição primária: Brasil (LGPD) · Secundária: EU (GDPR).
+> **Tipo:** Governança · **Atualizado:** 2026-09-29 · Dono: ENDARTStudios · Jurisdição primária: Brasil (LGPD) · Secundária: EU (GDPR).
+> **Status:** 🔴 **NÃO APROVADO** como "LGPD compliant" — ver [LEGAL-AUDIT-2026-09-29.md](LEGAL-AUDIT-2026-09-29.md) (27 achados P0/P1/P2 confirmados).
 
 ## 1. Privacidade de dados
 
@@ -12,16 +13,17 @@
 ### Implementação técnica
 | Requisito | Implementação |
 | --- | --- |
-| PII em repouso cifrada | `src/lib/crypto/pii.ts` (encryptPII/decryptPII) |
+| "PII em repouso cifrada" | ⚠️ **ALEGAÇÃO FALSA (SEC-002):** `src/lib/crypto/pii.ts` usa XOR custom com IV de `Math.random()` — **não é AES-256-GCM**. Substituição por AES-256-GCM real pendente |
 | Máscara em logs | `src/lib/observability/redact.ts` (tokens/emails/private keys) |
 | Segregação por tenant | RLS Postgres + `filterByWorkspace` ([RLS.md](RLS.md)) |
-| Log de acesso imutável | `PermissionAuditLog` com HMAC chain |
+| Log de acesso imutável | `PermissionAuditLog` (DB, HMAC chain) — ⚠️ o audit log client-side em localStorage (`wallet-engines/audit/`) é apenas tamper-evident (LEG-019) |
 | Páginas legais | `src/app/privacy/` e `src/app/terms/` |
+| Hash de senha | ⚠️ **ALEGAÇÃO FALSA (SEC-001):** `src/lib/auth/nextauth.ts:19` compara senha em texto puro — hashing obrigatório pendente |
 
 ### Direitos do titular (LGPD art. 18 / GDPR art. 15-22)
-- Acesso/portabilidade: dados da conta e logs de permissão exportáveis.
+- Acesso/portabilidade: dados da conta e logs de permissão exportáveis — ⚠️ **declarado mas não implementado (LEG-007)**.
 - Exclusão: exclusão de conta remove PII; retenção mínima de logs de segurança pelo prazo legal, anonimizada.
-- DPO/contact: definido em `src/app/privacy/` ( manter atualizado).
+- DPO/contact: ⚠️ **NÃO identificado publicamente** em `src/app/privacy/` (confirmado na auditoria, LEG-006) — nomeação e publicação do Encarregado pendentes.
 
 ## 2. Criptoatividades (aviso)
 
