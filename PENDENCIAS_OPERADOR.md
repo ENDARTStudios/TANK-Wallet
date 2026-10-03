@@ -77,3 +77,8 @@ Depois de feito: responda "feito o item Nº 5".
 ### [PEND-VERCEL-QUOTA] RESOLVIDA (transitória — não requer ação)
 Quota 402 api-deployments-free-per-day estourou em 2026-09-26 e resetou no dia seguinte (previews dos PRs #67/#68 deployaram). Nenhuma ação do Operador. Se recursar, vira decisão de custo (upgrade Hobby→Pro).
 
+
+## PEND-MONOREPO (2026-09-30) — Vercel Root Directory (BLOCKER de merge do PR monorepo)
+- **O quê:** alternar Root Directory do projeto Vercel `tank-wallet` para `apps/web` no momento do merge (Project Settings → General → Root Directory), ou via API `PATCH /v9/projects/prj_OnSxF2v5MxpixxP3xyLWRDuVRyg6 {"rootDirectory":"apps/web"}`.
+- **Por quê:** a app saiu da raiz; com Root Directory ainda na raiz, o próximo deploy production falha (sem package.json/next.config lá).
+- **Sequência:** merge do PR → alternar Root Directory → deploy production → verificar https://tankwallet.dev/api/health. O CLI Vercel local não expõe esse toggle (gap conhecido); API precisa de VERCEL_TOKEN.

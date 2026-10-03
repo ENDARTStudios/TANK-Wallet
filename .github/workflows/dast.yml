@@ -16,6 +16,9 @@ jobs:
   zap-baseline-local:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/web
     steps:
       - uses: actions/checkout@v4
 
@@ -37,7 +40,7 @@ jobs:
           mkdir -p zap-out
           chmod 777 zap-out
           docker run --rm --network="host" \
-            -v "${{ github.workspace }}/dast-config:/zap/wrk:ro" \
+            -v "${{ github.workspace }}/infra/dast-config:/zap/wrk:ro" \
             -v "${{ github.workspace }}/zap-out:/zap/out" \
             ghcr.io/zaproxy/zaproxy:stable \
             zap.sh -cmd -autorun /zap/wrk/zap-baseline.yaml

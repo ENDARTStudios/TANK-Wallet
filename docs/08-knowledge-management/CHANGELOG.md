@@ -212,3 +212,12 @@ Baseado em Keep a Changelog, adaptado ao ritmo de sprints do projeto:
 - security.ts: engines promoted to verified via integration tests
 ### Removed
 - Redundant console.* override in key-management
+## [Unreleased] — Sprint 63 — Monorepo apps/web (#100)
+### Changed
+- App Next.js movida integralmente para `apps/web/` (653 renames via git mv); raiz = config global + delegação (`bun run --cwd apps/web`)
+- `infra/` criado (audit-config, dast-config); Docker dividido (`apps/web/Dockerfile`); dependabot/CODEOWNERS/7 workflows/compose apontam para apps/web
+- Lint global saudável novamente (0 erros — dívida de 6118 problemas era lixo da raiz removida)
+### Removed
+- Redirects de raiz (PRD/ARCHITECTURE/ENGINEERING/KPI/CHANGELOG) · mini-services vazio · package-lock.json (padrão bun) · render.yaml (→ docs/06-devops-deployment/legacy)
+### Docs
+- README raiz reescrito (guia monorepo) · apps/web/README.md novo · ADR-015 · D104 · PEND-MONOREPO (Vercel Root Directory, blocker de merge)

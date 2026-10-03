@@ -17,6 +17,9 @@ jobs:
     name: Generate SBOM (CycloneDX)
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/web
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,12 +30,12 @@ jobs:
       - run: npm install
       - name: Generate CycloneDX SBOM
         run: |
-          npx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON --spec-version 1.5
+          npx @cyclonedx/cyclonedx-npm --output-file apps/web/reports/sbom.cyclonedx.json --output-format JSON --spec-version 1.5
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: sbom-cyclonedx
-          path: reports/sbom.cyclonedx.json
+          path: apps/web/reports/sbom.cyclonedx.json
           retention-days: 90
       - name: Attach to GHCR release
         if: startsWith(github.ref, 'refs/tags/v')

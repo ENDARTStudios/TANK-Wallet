@@ -326,3 +326,10 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - scrypt (node:crypto, OWASP N=16384/r=8/p=1) em vez de bcrypt/argon2: sem dependência nativa nova; upgrade transparente de senha legada no login (needsRehash).
 - pii.ts v2 (AES-256-GCM): decrypt do formato legado XOR mantido com vetor congelado — migração sem quebrar dados existentes.
 - Windows-local: `next build` falha em copiar chunk `[externals]_node:inspector` (EINVAL, dois-pontos em filename) — bug Next/Windows pré-existente (cf. caveat T099); CI linux não afetado.
+
+## 2026-09-30 — D104 Monorepo apps/web (issue #100)
+- App integral em apps/web (653 renames via git mv — histórico preservado). Raiz: package.json delegador (--cwd), .gitignore reescrito, node_modules/.next/artefatos da raiz removidos, .env(s) movidos p/ apps/web.
+- Não existe backend Python (verificado: 0 app.py/requirements.txt/.venv) — apps/api fica para quando existir serviço real.
+- Movidos p/ docs: PROMPT_*/SKILL → 03-development-process/prompts; STATUS-*/PR_BODY_*/mnt/reports → 08-knowledge-management/history; MANUAL_DO_OPERADOR → 07-operations-marketing; download → 07/screenshots; render.yaml → 06-devops/legacy; redirects PRD/ARCHITECTURE/ENGINEERING/KPI/CHANGELOG da raiz removidos (pilares são canônicos).
+- mini-services/ era .gitkeep vazio → removido. package-lock.json raiz removido (padrão = bun). gsap-public → apps/web/vendor/gsap-public (eslint ignore atualizado). config/ + db/ + examples/ → apps/web/. audit-config/ + dast-config/ → infra/.
+- 7 workflows + dependabot + CODEOWNERS + docker-compose + vercel.json patchados p/ apps/web. Vercel Root Directory: alternar p/ apps/web NO MERGE (ver PENDENCIAS_OPERADOR).

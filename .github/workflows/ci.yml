@@ -20,6 +20,9 @@ jobs:
     name: Quality Gates
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,7 +53,7 @@ jobs:
         uses: codecov/codecov-action@v4
         if: always()
         with:
-          files: ./coverage/lcov.info
+          files: apps/web/coverage/lcov.info
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v4
@@ -58,8 +61,8 @@ jobs:
         with:
           name: reports-${{ github.sha }}
           path: |
-            reports/
-            coverage/
+            apps/web/reports/
+            apps/web/coverage/
             .ai/state/metrics.snapshot.json
           retention-days: 30
       - name: Commit metrics (main only)
@@ -68,7 +71,7 @@ jobs:
         run: |
           git config user.name "ci-bot"
           git config user.email "ci-bot@tankwallet.dev"
-          git add reports/ .ai/state/metrics.snapshot.json
+          git add apps/web/reports/ .ai/state/metrics.snapshot.json
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes"
           else
@@ -143,7 +146,9 @@ jobs:
         with:
           node-version: 20
       - run: npm install
-      - run: npx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON
+        working-directory: apps/web
+      - run: npx @cyclonedx/cyclonedx-npm --output-file apps/web/reports/sbom.cyclonedx.json
+        working-directory: apps/web --output-format JSON
       - uses: actions/upload-artifact@v4
         with:
           name: sbom

@@ -45,3 +45,9 @@ Regra: decisão estrutural nova = ADR **no PR que a implementa**, linkado abaixo
 1. Novo ADR: numere sequencialmente, escreva no formato acima e adicione ao índice.
 2. Decisão revogada: **não apague** — mude Status para `Substituído por ADR-XXX`.
 3. ADR que afeta produto (tiers, UX de segurança) precisa também de entrada em `../DECISOES.md` e/ou [MEMORY.md](MEMORY.md).
+
+### ADR-015 — Estrutura monorepo: apps/web + raiz-config (2026-09-30)
+**Status:** Aceito (issue #100)
+**Contexto:** raiz acumulava código, artefatos de build, docs soltos e configs de app — violando separação de contexto e higiene de ambientes; guia monorepo aprovado pelo Operador.
+**Decisão:** app Next.js integral em `apps/web/` (é fullstack: as rotas `/api` são o backend; não existe serviço Python — `apps/api` nascerá quando houver serviço real). Raiz = config global + delegação (`bun run --cwd apps/web`). `infra/` para configs de borda (audit/dast). Docs já centralizados em `docs/` (8 pilares). Docker dividido (`apps/web/Dockerfile`); dependabot/CODEOWNERS/workflows apontam para `apps/web`.
+**Consequências:** cutover Vercel exige Root Directory = apps/web (PENDENCIA_OPERADOR, blocker de merge); PRs precedentes (#97/#99) rebasam pós-merge; arquivos vivos de gestão (SPRINT/DECISOES/worklog) permanecem na raiz até sessões concorrentes ociosas (follow-up); lint global saudável de novo (0 erros — a dívida de 6118 problemas era lixo da raiz).
