@@ -111,7 +111,7 @@ Periodicamente (ou ao PR `chore/`): detectar código duplicado, arquivo órfão,
 
 ## 10. Docs vivos (mantêm e atualizam no PR)
 
-- `PRD.md` — produto (o que/por quê)
+- `docs/01-product-discovery/PRD.md` — produto (o que/por quê)
 - `docs/02-architecture-design/UML.md` — diagrama de classe e sequência
 - `docs/05-security-compliance/RBAC.md` — matrix de níveis de acesso
 - `docs/05-security-compliance/RLS.md` — segurança por linha
@@ -122,7 +122,7 @@ Periodicamente (ou ao PR `chore/`): detectar código duplicado, arquivo órfão,
 - `docs/05-security-compliance/SECURITY-GATE.md` — gate de deploy + WAF/bot/rate + TLS/HSTS
 - `SPRINT.md` — feature atual (não implemente fora dele)
 - `docs/03-development-process/ISSUES-BACKLOG.md` — issues prontas (title/body/labels)
-- `ARCHITECTURE.md` — arquitetura e fases técnicas
+- `docs/02-architecture-design/ARCHITECTURE.md` — arquitetura e fases técnicas
 
 ## 11. Convenções
 

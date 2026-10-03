@@ -32,13 +32,16 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+        working-directory: apps/web
 
       - name: Generate Prisma client
         run: bun run db:generate
+        working-directory: apps/web
         continue-on-error: true
 
       - name: Run all gates
         run: bun run verify
+        working-directory: apps/web
 
       - name: Build Docker image
         run: |
@@ -79,7 +82,7 @@ jobs:
           RELEASE_SIGNING_KEY: ${{ secrets.RELEASE_SIGNING_KEY }}
         run: |
           # Generate SBOM
-          bunx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON
+          bunx @cyclonedx/cyclonedx-npm --output-file apps/web/reports/sbom.cyclonedx.json --output-format JSON
 
           # Sign SBOM with Ed25519 key
           echo "$COSIGN_PRIVATE_KEY" > /tmp/cosign.key
@@ -99,7 +102,7 @@ jobs:
       - name: Generate SBOM (keyless fallback)
         if: env.RELEASE_SIGNING_KEY == ''
         run: |
-          bunx @cyclonedx/cyclonedx-npm --output-file reports/sbom.cyclonedx.json --output-format JSON
+          bunx @cyclonedx/cyclonedx-npm --output-file apps/web/reports/sbom.cyclonedx.json --output-format JSON
           cosign sign-blob --yes \
             --output-certificate reports/sbom.cyclonedx.json.pem \
             --output-signature reports/sbom.cyclonedx.json.sig \
@@ -110,7 +113,7 @@ jobs:
 
       - name: Generate build attestation
         run: |
-          cat > reports/build-attestation.md << 'EOF'
+          mkdir -p apps/web/reports && cat > apps/web/reports/build-attestation.md << 'EOF'
           # Build Attestation
 
           - **Version**: ${{ github.ref_name }}
@@ -122,7 +125,7 @@ jobs:
           - **SBOM signature**: reports/sbom.cyclonedx.json.sig
           - **Docker image**: ghcr.io/endart/tank-wallet:${{ github.ref_name }}
           EOF
-          docker image inspect tank-wallet:${{ github.ref_name }} --format='{{json .RootFS.Layers}}' > reports/image-layers.json
+          docker image inspect tank-wallet:${{ github.ref_name }} --format='{{json .RootFS.Layers}}' > apps/web/reports/image-layers.json
 
       - name: Login to GHCR
         if: github.event_name == 'push'
@@ -144,7 +147,7 @@ jobs:
             reports/sbom.cyclonedx.json
             reports/sbom.cyclonedx.json.pem
             reports/sbom.cyclonedx.json.sig
-            reports/build-attestation.md
+            apps/web/reports/build-attestation.md
             reports/image-layers.json
           generate_release_notes: true
           draft: false
@@ -156,5 +159,5 @@ jobs:
           name: release-${{ github.ref_name }}
           path: |
             reports/
-            Dockerfile
+            apps/web/Dockerfile
           retention-days: 90

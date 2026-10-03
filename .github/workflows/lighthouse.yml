@@ -14,6 +14,9 @@ jobs:
     name: Lighthouse audit
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,6 +40,6 @@ jobs:
       - name: Lighthouse CI
         uses: treosh/lighthouse-ci-action@v11
         with:
-          configPath: .lighthouserc.json
+          configPath: apps/web/.lighthouserc.json
           uploadArtifacts: true
           temporaryPublicStorage: true

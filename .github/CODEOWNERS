@@ -3,11 +3,11 @@
 * @ENDARTStudios
 
 # Security-sensitive paths require security review
-/src/lib/security/ @ENDARTStudios
-/src/lib/auth/ @ENDARTStudios
-/src/lib/crypto/ @ENDARTStudios
-/src/lib/risk-service/ @ENDARTStudios
-/src/lib/ai-risk/ @ENDARTStudios
+/apps/web/src/lib/security/ @ENDARTStudios
+/apps/web/src/lib/auth/ @ENDARTStudios
+/apps/web/src/lib/crypto/ @ENDARTStudios
+/apps/web/src/lib/risk-service/ @ENDARTStudios
+/apps/web/src/lib/ai-risk/ @ENDARTStudios
 /src/proxy.ts @ENDARTStudios
 /src/middleware.ts @ENDARTStudios
 /src/app/error.tsx @ENDARTStudios

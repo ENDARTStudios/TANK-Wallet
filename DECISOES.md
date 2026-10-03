@@ -319,3 +319,17 @@ Alternativas consideradas: Auditoria paga (descartada â€” sem orÃ§amento)
 - UTF-16 LE em next.config.ts: edicoes trocam line-endings do arquivo inteiro (ruido no diff #77, funcional intacto) — cuidado futuro.
 - Falsos-positivos: wrong_key (acidente de prefixo), 429 (desenho, nao degradacao), proxy-nao-executa (muro SSO). Cultura: desconfiar do proprio alarme com contagens.
 - #75 e Issue (reorg docs), nao PR — verificar artefatos diretamente antes de categorizar.
+
+## 2026-09-30 — D103 P0s da auditoria jurídica: env-guard request-time (PR #99)
+- SEC-001/002/§25/§7-9 implementados (ver PR #99 + issue #98). Decisão-chave: fail-fast de NEXTAUTH_SECRET em REQUEST-TIME (assertAuthSecret no [...nextauth]/route.ts), não em import-time — throw em escopo de módulo quebrou `next build` da Vercel/Lighthouse (CI PR #99: "Failed to collect page data for /api/auth/[...nextauth]"), pois build roda NODE_ENV=production sem envs de produção.
+- Matriz: throw só quando NODE_ENV=production E VERCEL_ENV!=preview (preview de PR sem acesso a envs de produção é isento — precedente T079). Production em qualquer host sem segredo → rotas de auth 500 (fail-closed), build verde.
+- scrypt (node:crypto, OWASP N=16384/r=8/p=1) em vez de bcrypt/argon2: sem dependência nativa nova; upgrade transparente de senha legada no login (needsRehash).
+- pii.ts v2 (AES-256-GCM): decrypt do formato legado XOR mantido com vetor congelado — migração sem quebrar dados existentes.
+- Windows-local: `next build` falha em copiar chunk `[externals]_node:inspector` (EINVAL, dois-pontos em filename) — bug Next/Windows pré-existente (cf. caveat T099); CI linux não afetado.
+
+## 2026-09-30 — D104 Monorepo apps/web (issue #100)
+- App integral em apps/web (653 renames via git mv — histórico preservado). Raiz: package.json delegador (--cwd), .gitignore reescrito, node_modules/.next/artefatos da raiz removidos, .env(s) movidos p/ apps/web.
+- Não existe backend Python (verificado: 0 app.py/requirements.txt/.venv) — apps/api fica para quando existir serviço real.
+- Movidos p/ docs: PROMPT_*/SKILL → 03-development-process/prompts; STATUS-*/PR_BODY_*/mnt/reports → 08-knowledge-management/history; MANUAL_DO_OPERADOR → 07-operations-marketing; download → 07/screenshots; render.yaml → 06-devops/legacy; redirects PRD/ARCHITECTURE/ENGINEERING/KPI/CHANGELOG da raiz removidos (pilares são canônicos).
+- mini-services/ era .gitkeep vazio → removido. package-lock.json raiz removido (padrão = bun). gsap-public → apps/web/vendor/gsap-public (eslint ignore atualizado). config/ + db/ + examples/ → apps/web/. audit-config/ + dast-config/ → infra/.
+- 7 workflows + dependabot + CODEOWNERS + docker-compose + vercel.json patchados p/ apps/web. Vercel Root Directory: alternar p/ apps/web NO MERGE (ver PENDENCIAS_OPERADOR).
