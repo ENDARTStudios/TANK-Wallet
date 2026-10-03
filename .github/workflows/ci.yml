@@ -149,8 +149,8 @@ jobs:
       - run: mkdir -p apps/web/reports
       - run: npm install
         working-directory: apps/web
-      - run: npx @cyclonedx/cyclonedx-npm --output-file apps/web/reports/sbom.cyclonedx.json
-        working-directory: apps/web --output-format JSON
+      - run: npx @cyclonedx/cyclonedx-npm --output-file apps/web/reports/sbom.cyclonedx.json --output-format JSON
+        working-directory: apps/web
       - uses: actions/upload-artifact@v4
         with:
           name: sbom
