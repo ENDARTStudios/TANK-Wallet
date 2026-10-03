@@ -124,18 +124,19 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v4
+      - run: mkdir -p apps/web/reports
       - uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           scan-ref: .
           format: json
-          output: reports/trivy-deps.json
+          output: apps/web/reports/trivy-deps.json
           exit-code: "0"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: trivy-report
-          path: reports/trivy-deps.json
+          path: apps/web/reports/trivy-deps.json
 
   sbom:
     name: SBOM
@@ -145,6 +146,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - run: mkdir -p apps/web/reports
       - run: npm install
         working-directory: apps/web
       - run: npx @cyclonedx/cyclonedx-npm --output-file apps/web/reports/sbom.cyclonedx.json
@@ -158,6 +160,9 @@ jobs:
     name: E2E Playwright
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/web
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
@@ -170,5 +175,5 @@ jobs:
         if: always()
         with:
           name: playwright-report
-          path: playwright-report/
+          path: apps/web/playwright-report/
           retention-days: 30

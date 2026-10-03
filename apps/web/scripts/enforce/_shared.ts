@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-export const PROJECT_ROOT = resolve(__dirname, "..", "..");
+export const PROJECT_ROOT = resolve(__dirname, "..", "..", "..", ".."); // raiz do monorepo (.ai/, docs/)
 export const SRC_DIR = "src";
 export interface Finding { rule: string; severity: "blocker" | "warning"; file: string; line?: number; message: string; }
 export interface EnforcementResult { rule: string; description: string; passed: boolean; findings: Finding[]; summary: string; }
